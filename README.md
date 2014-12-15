@@ -1,27 +1,31 @@
-Routelandia android application use Google Play services to load Google Map
+Routelandia Android application use Google Play services to load Google Map
 
-In oder to request from Google Map API, you need to set up the API key
+## Requirements
 
-	Displaying the debug certificate fingerprint
+ - Java 1.7 or later.
+ - A Google Maps API key.
 
-    Locate your debug keystore file. The file name is debug.keystore, and is created the first time you build your project. By default, it is stored in the same directory as your Android Virtual Device (AVD) files:
+### API keys
 
-    OS X and Linux: ~/.android/
-    Windows Vista and Windows 7: C:\Users\your_user_name\.android\
-    If you are using Eclipse with ADT, and you're not sure where your debug keystore is located, you can select Windows > Prefs > Android > Build to check the full path, which you can then paste into a file explorer to locate the directory containing the keystore.
+Each Google Maps Web Service requires an API key or Client ID. API keys are
+freely available with a Google Account at
+https://developers.google.com/console. To generate a server key for
+your project:
 
-    List the SHA-1 fingerprint.
+ 1. Visit https://developers.google.com/console and log in with
+    a Google Account.
+ 2. Select an existing project, or create a new project.
+ 3. Click **Enable an API**.
+ 4. Browse for the API, and set its status to "On". The Java Client for Google Maps Services
+    accesses the following APIs:
+    * Directions API
+    * Google Maps API
+ 5. Once you've enabled the APIs, click **Credentials** from the left navigation of the Developer
+    Console.
+ 6. In the "Public API access", click **Create new Key**.
+ 7. Choose **Server Key**.
+ 8. If you'd like to restrict requests to a specific IP address, do so now.
+ 9. Click **Create**.
 
-    For Linux or OS X, open a terminal window and enter the following:
+Your API key should be 40 characters long, and begin with `AIza`.
 
-    keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
-    For Windows Vista and Windows 7, run:
-
-    keytool -list -v -keystore "%USERPROFILE%\.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
-
-
-    The line that begins SHA1 contains the certificate's SHA-1 fingerprint. The fingerprint is the sequence of 20 two-digit hexadecimal numbers separated by colons
-
-    The package name of Routelandia is edu.pdx.its.portal.routelandia
-
-    After you know the SHA-1 and package name, go to https://console.developers.google.com/project to create API key
