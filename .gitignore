@@ -35,3 +35,4 @@ application files
 /.idea/libraries
 .DS_Store
 /build
+/.idea
