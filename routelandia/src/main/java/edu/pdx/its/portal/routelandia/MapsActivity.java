@@ -1,16 +1,23 @@
 package edu.pdx.its.portal.routelandia;
 
+import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.Polyline;
 
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private TextView mTapTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +53,11 @@ public class MapsActivity extends FragmentActivity {
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
+            mMap.getUiSettings().setZoomControlsEnabled(true);
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMapToolbarEnabled(false);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+            mMap.moveCamera( CameraUpdateFactory.newLatLngZoom(new LatLng(45.509534, -122.681081), 10.0f));
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
@@ -60,6 +72,6 @@ public class MapsActivity extends FragmentActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(45.509534, -122.681081)).title("Marker"));
     }
 }
