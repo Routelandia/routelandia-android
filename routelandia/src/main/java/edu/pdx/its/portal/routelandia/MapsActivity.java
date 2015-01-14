@@ -4,26 +4,65 @@ import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.widget.TextView;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import android.widget.Toast;
+import android.location.Location;
+import android.app.Activity;
+
+
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 
-public class MapsActivity extends FragmentActivity {
+import java.util.ArrayList;
+
+
+public class MapsActivity extends FragmentActivity implements
+        OnMapClickListener , OnMapLongClickListener{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private TextView mTapTextView;
+    private Marker marker;
+    private ArrayList<LatLng> arrayPoint = null;
+    PolylineOptions polylineoptions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+        arrayPoint = new ArrayList<LatLng>();
+        //SupportMapFragment mf = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
+        // mMap = mf.getMap();
+        //mMap.setMyLocationEnabed(true);
+        //mMap.setOnMapClickListner(this);
+        //mMap.setOnMapLongClickListner(this);
+
+        /*googleMap.setOnMapClickListner(new GoogleMap.OnMapClickListener() {
+            @overide
+            public void onMapClick (LatLng latlng){
+                mapFragment.addMarkerToMap(latlng);
+            }
+        });
+        if(googleMap.getMyLocation() != null){
+            double lat = googleMap.getMyLocation().getLatitude();
+
+        }*/
     }
 
     @Override
@@ -58,6 +97,15 @@ public class MapsActivity extends FragmentActivity {
             mMap.getUiSettings().setMapToolbarEnabled(false);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
             mMap.moveCamera( CameraUpdateFactory.newLatLngZoom(new LatLng(45.509534, -122.681081), 10.0f));
+            mMap.setOnMapClickListener((GoogleMap.OnMapClickListener) this);
+            mMap.setOnMapLongClickListener((GoogleMap.OnMapLongClickListener) this);
+
+            //some blue line I place on portland bridge
+            Polyline line = mMap.addPolyline(new PolylineOptions()
+                    .add(new LatLng(45.540716, -122.679678), new LatLng(45.535297, -122.686308))
+                    .width(5)
+                    .color(Color.CYAN)
+                    .geodesic(true));
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
@@ -72,6 +120,29 @@ public class MapsActivity extends FragmentActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(45.509534, -122.681081)).title("Marker"));
+        //mMap.addMarker(new MarkerOptions().position(new LatLng(45.540716, -122.679678)).title("Marker"));
+       // mMap.addMarker(new MarkerOptions().position(new LatLng(45.509534, -122.681081)).title("Marker"));
+    }
+
+    @Override
+    public void onMapClick(LatLng point){
+        //add marker
+        MarkerOptions marker = new MarkerOptions();
+        marker.position(point);
+        mMap.addMarker(marker);
+        //Draw line
+        polylineoptions  = new PolylineOptions();
+        arrayPoint.add(point);
+        polylineoptions.addAll(arrayPoint);
+        mMap.addPolyline(polylineoptions);
+
+        //mTapTextView.setText("tapped, point=" + point);
+    }
+
+    @Override
+    public void onMapLongClick(LatLng point){
+        mMap.clear();
+        arrayPoint.clear();
+        //mTapTextView.setText("long pressed, point=" + point);
     }
 }

@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Routelandia.iml" filepath="$PROJECT_DIR$/Routelandia.iml" />
       <module fileurl="file://$PROJECT_DIR$/routelandia/routelandia.iml" filepath="$PROJECT_DIR$/routelandia/routelandia.iml" />
+      <module fileurl="file://$PROJECT_DIR$/routelandia-android.iml" filepath="$PROJECT_DIR$/routelandia-android.iml" />
     </modules>
   </component>
 </project>
+

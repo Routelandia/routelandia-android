@@ -15,6 +15,7 @@ public class FirstPage extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first_page);
+        //mapView = (MapView) findViewById(R.id.mapview);
 
         Button button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
@@ -25,7 +26,16 @@ public class FirstPage extends Activity {
             }
         });
     }
-
+   /* @Override
+    public void onLocationChanged(Location location) {
+        if (lastLocationloc == null) {
+            lastLocationloc = location;
+        }
+        LatLng lastLatLng = locationToLatLng(lastLocationloc);
+        LatLng thisLatLng = locationToLatLng(location);
+        mMap.addPolyline(new PolylineOptions().add(lastLatLng).add(thisLatLng).width(3).color(Color.RED));
+        lastLocationloc = location;
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
