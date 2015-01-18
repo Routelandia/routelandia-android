@@ -1,8 +1,10 @@
 package edu.pdx.its.portal.routelandia;
 
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.location.Location;
@@ -24,7 +26,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 
 public class MapsActivity extends FragmentActivity implements
@@ -141,4 +151,36 @@ public class MapsActivity extends FragmentActivity implements
         arrayPoint.clear();
         //mTapTextView.setText("long pressed, point=" + point);
     }
+
+    private String downloadURL(String strURL) throws IOException{
+        String data = "";
+        InputStream inputStream = null;
+        HttpURLConnection connection = null;
+        try{
+            URL url = new URL(strURL);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.connect();
+            inputStream = connection.getInputStream();
+
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            StringBuffer stringBuffer = new StringBuffer();
+            String line;
+
+            while((line = bufferedReader.readLine()) != null){
+                stringBuffer.append(line);
+            }
+            data = stringBuffer.toString();
+
+            bufferedReader.close();
+
+        }catch (Exception e){
+            Log.d("Exception while downloading url", e.toString());
+        }finally {
+            inputStream.close();
+            connection.disconnect();
+        }
+        return data;
+    }
+
+
 }
