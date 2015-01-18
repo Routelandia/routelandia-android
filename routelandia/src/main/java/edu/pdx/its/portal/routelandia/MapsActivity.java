@@ -26,6 +26,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +48,7 @@ public class MapsActivity extends FragmentActivity implements
     private Marker marker;
     private ArrayList<LatLng> arrayPoint = null;
     PolylineOptions polylineoptions;
+    List<HashMap<Integer, List<LatLng>>> segment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +73,18 @@ public class MapsActivity extends FragmentActivity implements
             double lat = googleMap.getMyLocation().getLatitude();
 
         }*/
+
+        String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";
+        try{
+            String result = downloadURL(url);
+            JSONObject jsonObject = new JSONObject(result);
+            JSONParser jsonParser = new JSONParser();
+            segment = jsonParser.parse(jsonObject);
+        } catch (IOException e) {
+            Log.d("Exception while downloading url", e.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -181,6 +197,5 @@ public class MapsActivity extends FragmentActivity implements
         }
         return data;
     }
-
 
 }
