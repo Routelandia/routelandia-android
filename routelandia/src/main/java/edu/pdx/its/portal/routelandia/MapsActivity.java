@@ -9,6 +9,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Arrays;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,6 +23,7 @@ import android.location.LocationListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -27,12 +32,19 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 public class MapsActivity extends FragmentActivity implements
         LocationListener{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     ArrayList<LatLng> mMarkerPoints;
+    //protected PolylineOptions globalPoly;
+    //private static final ScheduledExecutorService worker =
+           // Executors.newSingleThreadScheduledExecutor();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,19 +55,19 @@ public class MapsActivity extends FragmentActivity implements
         // Getting Google Play availability status
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
 
-        if(status!=ConnectionResult.SUCCESS){ // Google Play Services are not available
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are not available
 
             int requestCode = 10;
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, requestCode);
             dialog.show();
 
-        }else { // Google Play Services are available
+        } else { // Google Play Services are available
 
             // Initializing
             mMarkerPoints = new ArrayList<>();
 
             // Getting reference to SupportMapFragment of the activity_maps
-            SupportMapFragment fm = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
+            SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
             // Getting Map for the SupportMapFragment
             mMap = fm.getMap();
@@ -71,6 +83,43 @@ public class MapsActivity extends FragmentActivity implements
             downloadTask.execute(url);
 
         }
+        /*
+         Setting onclick event listener for the map
+         Created by Nasim
+          */
+       // Runnable task = new Runnable() {
+          //  @Override
+           // public void run() {
+                mMap.setOnMapClickListener(new OnMapClickListener() {
+
+                    @Override
+                    public void onMapClick(LatLng point) {
+                        //if point found in hashmap latlng do rest
+                           // if (globalPoly.getPoints().contains(point)) {
+                                // Creating MarkerOptions
+                                MarkerOptions marker = new MarkerOptions();
+                                List<MarkerOptions> markerList = new ArrayList<MarkerOptions>();
+                                // Setting the position of the marker
+                                marker.position(point);
+                                mMarkerPoints.add(point);
+                                if (mMarkerPoints.size() == 1) {
+                                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                                    LatLng startPoint = marker.getPosition();
+                                    markerList.add(marker);
+                                } else if (mMarkerPoints.size() == 2) {
+                                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                                    LatLng endPoint = marker.getPosition();
+                                    markerList.add(marker);
+                                    mMarkerPoints.clear();
+                                }
+                                mMap.addMarker(marker);
+                            }
+                  //  }
+                });//mMap.setOnMapClickListener(new OnMapClickListener()
+
+          //  }
+       // };
+       // worker.schedule(task, 20, TimeUnit.SECONDS);
     }
 
     @Override
@@ -203,15 +252,48 @@ public class MapsActivity extends FragmentActivity implements
         // Executes in UI thread, after the parsing process
         @Override
         protected void onPostExecute(HashMap<Integer, List<LatLng>> result) {
-            List<LatLng> points = result.get(1064);
+            /*List<LatLng> points = result.get(1064);
             System.out.println(points);
             PolylineOptions lineOptions = new PolylineOptions();
 
             lineOptions.addAll(points);
-            lineOptions.width(20);
-            lineOptions.color(Color.RED);
+            lineOptions.width(10);
+            lineOptions.color(Color.GREEN);
 
-            mMap.addPolyline(lineOptions);
+            mMap.addPolyline(lineOptions);*/
+            List<Integer> listStationIDFive = Arrays.asList(1130,3165,1001,1002,3191,1003,1004,1005,
+                    3197,1006,1007,1008,1009,1010,1011,1012,3167,1013,1014,3117,3193,1015,3119,3184,
+                    1016,1017,3168,1018,3169,3171,1019,1020,1021,3123,3124,1022,1023,1024,1025);
+            List<Integer> listStationID2 = Arrays.asList(1071,1070,1069,1068,1067,3157,1066,1065,3155,1064,1063,3153);
+            // Has null values that crashes app
+            //List<Integer> listStationID3 = Arrays.asList(1138,3178,1081,1082,1128,1084,1083,1085,1086,1087,1088,1089,3180,1090,1091,3161,1148,3163,1123);
+           for (int i = 0; i < listStationIDFive.size(); i++) {
+               List<LatLng> points = result.get(listStationIDFive.get(i));
+               if(points != null) {
+                   PolylineOptions lineOptions = new PolylineOptions();
+
+                   //globalPoly.addAll(points);
+                   lineOptions.addAll(points);
+                   lineOptions.width(10);
+                   lineOptions.color(Color.GREEN);
+
+                   mMap.addPolyline(lineOptions);
+               }
+           }
+            for (int i = 0; i < listStationID2.size(); i++) {
+                List<LatLng> points = result.get(listStationID2.get(i));
+                if(points != null) {
+                    PolylineOptions lineOptions = new PolylineOptions();
+
+                    //globalPoly.addAll(points);
+                    lineOptions.addAll(points);
+                    lineOptions.width(10);
+                    lineOptions.color(Color.RED);
+
+                    mMap.addPolyline(lineOptions);
+                }
+            }
+
         }
     }
 
