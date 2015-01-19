@@ -1,34 +1,5 @@
 package edu.pdx.its.portal.routelandia;
 
-import android.graphics.Color;
-import android.os.AsyncTask;
-import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
-import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.location.Location;
-import android.app.Activity;
-
-
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,51 +10,66 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import android.app.Dialog;
+import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 public class MapsActivity extends FragmentActivity implements
-        OnMapClickListener , OnMapLongClickListener{
+        LocationListener{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private TextView mTapTextView;
-    private Marker marker;
-    private ArrayList<LatLng> arrayPoint = null;
-    PolylineOptions polylineoptions;
-    List<HashMap<Integer, List<LatLng>>> segment;
+    ArrayList<LatLng> mMarkerPoints;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
-        arrayPoint = new ArrayList<LatLng>();
-        //Nasim needs to cleanup
-        //SupportMapFragment mf = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
-        // mMap = mf.getMap();
-        //mMap.setMyLocationEnabed(true);
-        //mMap.setOnMapClickListner(this);
-        //mMap.setOnMapLongClickListner(this);
 
-        /*googleMap.setOnMapClickListner(new GoogleMap.OnMapClickListener() {
-            @overide
-            public void onMapClick (LatLng latlng){
-                mapFragment.addMarkerToMap(latlng);
-            }
-        });
-        if(googleMap.getMyLocation() != null){
-            double lat = googleMap.getMyLocation().getLatitude();
+        // Getting Google Play availability status
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
 
-        }*/
+        if(status!=ConnectionResult.SUCCESS){ // Google Play Services are not available
 
-        String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";
-        try{
-            String result = downloadURL(url);
-            JSONObject jsonObject = new JSONObject(result);
-            JSONParser jsonParser = new JSONParser();
-            segment = jsonParser.parse(jsonObject);
-        } catch (IOException e) {
-            Log.d("Exception while downloading url", e.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
+            int requestCode = 10;
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, requestCode);
+            dialog.show();
+
+        }else { // Google Play Services are available
+
+            // Initializing
+            mMarkerPoints = new ArrayList<>();
+
+            // Getting reference to SupportMapFragment of the activity_maps
+            SupportMapFragment fm = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
+
+            // Getting Map for the SupportMapFragment
+            mMap = fm.getMap();
+
+            // Enable MyLocation Button in the Map
+            mMap.setMyLocationEnabled(true);
+
+            String url = "http://capstoneaa.cs.pdx.edu/api/stations.json";
+
+            DownloadTask downloadTask = new DownloadTask();
+
+            // Start downloading json data from Google Directions API
+            downloadTask.execute(url);
+
         }
     }
 
@@ -96,7 +82,7 @@ public class MapsActivity extends FragmentActivity implements
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
+     * call {@link # setUpMap()} once when {@link #mMap} is not null.
      * <p>
      * If it isn't installed {@link SupportMapFragment} (and
      * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
@@ -119,83 +105,133 @@ public class MapsActivity extends FragmentActivity implements
             mMap.getUiSettings().setMapToolbarEnabled(false);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
             mMap.moveCamera( CameraUpdateFactory.newLatLngZoom(new LatLng(45.509534, -122.681081), 10.0f));
-            mMap.setOnMapClickListener((GoogleMap.OnMapClickListener) this);
-            mMap.setOnMapLongClickListener((GoogleMap.OnMapLongClickListener) this);
-
-            //some blue line I place on portland bridge
-            Polyline line = mMap.addPolyline(new PolylineOptions()
-                    .add(new LatLng(45.540716, -122.679678), new LatLng(45.535297, -122.686308))
-                    .width(5)
-                    .color(Color.CYAN)
-                    .geodesic(true));
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
-            }
         }
     }
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
-     */
-    private void setUpMap() {
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(45.540716, -122.679678)).title("Marker"));
-        // mMap.addMarker(new MarkerOptions().position(new LatLng(45.509534, -122.681081)).title("Marker"));
-    }
+    /** A class to download data from Google Directions URL */
+    public class DownloadTask extends AsyncTask<String, Void, String>{
 
-    @Override
-    public void onMapClick(LatLng point){
-        //add marker
-        MarkerOptions marker = new MarkerOptions();
-        marker.position(point);
-        mMap.addMarker(marker);
-        //Draw line
-        polylineoptions  = new PolylineOptions();
-        arrayPoint.add(point);
-        polylineoptions.addAll(arrayPoint);
-        mMap.addPolyline(polylineoptions);
+        // Downloading data in non-ui thread
+        @Override
+        protected String doInBackground(String... url) {
 
-        //mTapTextView.setText("tapped, point=" + point);
-    }
+            // For storing data from web service
+            String data = "";
 
-    @Override
-    public void onMapLongClick(LatLng point){
-        mMap.clear();
-        arrayPoint.clear();
-        //mTapTextView.setText("long pressed, point=" + point);
-    }
-
-    private String downloadURL(String strURL) throws IOException{
-        String data = "";
-        InputStream inputStream = null;
-        HttpURLConnection connection = null;
-        try{
-            URL url = new URL(strURL);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.connect();
-            inputStream = connection.getInputStream();
-
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuffer stringBuffer = new StringBuffer();
-            String line;
-
-            while((line = bufferedReader.readLine()) != null){
-                stringBuffer.append(line);
+            try{
+                // Fetching the data from web service
+                data = downloadUrl(url[0]);
+            }catch(Exception e){
+                Log.d("Background Task",e.toString());
             }
-            data = stringBuffer.toString();
+            return data;
+        }
 
-            bufferedReader.close();
+        // Executes in UI thread, after the execution of doInBackground()
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
 
-        }catch (Exception e){
+            ParserTask parserTask = new ParserTask();
+
+            // Invokes the thread for parsing the JSON data
+            parserTask.execute(result);
+
+        }
+    }
+
+    /** A method to download json data from url */
+    private String downloadUrl(String strUrl) throws IOException{
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try{
+            URL url = new URL(strUrl);
+
+            // Creating an http connection to communicate with url
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            // Connecting to url
+            urlConnection.connect();
+
+            // Reading data from url
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuilder sb  = new StringBuilder();
+
+            String line;
+            while( ( line = br.readLine())  != null){
+                sb.append(line);
+            }
+
+            data = sb.toString();
+
+            br.close();
+
+        }catch(Exception e){
             Log.d("Exception while downloading url", e.toString());
-        }finally {
-            inputStream.close();
-            connection.disconnect();
+        }finally{
+            iStream.close();
+            urlConnection.disconnect();
         }
         return data;
     }
 
+    /** A class to parse the Google Directions in JSON format */
+    public class ParserTask extends AsyncTask<String, Integer, HashMap<Integer,List<LatLng>> >{
+
+        // Parsing the data in non-ui thread
+        @Override
+        protected HashMap<Integer, List<LatLng>> doInBackground(String... jsonData) {
+
+            HashMap<Integer, List<LatLng>> routes = new HashMap<>();
+
+            try{
+                JSONArray jObject = new JSONArray(jsonData[0]);
+                JSONParser parser = new JSONParser();
+
+                // Starts parsing data
+                routes = parser.parse(jObject);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+        // Executes in UI thread, after the parsing process
+        @Override
+        protected void onPostExecute(HashMap<Integer, List<LatLng>> result) {
+            List<LatLng> points = result.get(1064);
+            System.out.println(points);
+            PolylineOptions lineOptions = new PolylineOptions();
+
+            lineOptions.addAll(points);
+            lineOptions.width(20);
+            lineOptions.color(Color.RED);
+
+            mMap.addPolyline(lineOptions);
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }
