@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Arrays;
+import java.lang.Object;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -35,13 +36,14 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.maps.android.PolyUtil;
 
 public class MapsActivity extends FragmentActivity implements
         LocationListener{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     ArrayList<LatLng> mMarkerPoints;
-    //protected PolylineOptions globalPoly;
+    protected PolylineOptions globalPoly = new PolylineOptions();
     //private static final ScheduledExecutorService worker =
            // Executors.newSingleThreadScheduledExecutor();
 
@@ -83,43 +85,15 @@ public class MapsActivity extends FragmentActivity implements
             downloadTask.execute(url);
 
         }
-        /*
-         Setting onclick event listener for the map
-         Created by Nasim
-          */
-       // Runnable task = new Runnable() {
-          //  @Override
-           // public void run() {
-                mMap.setOnMapClickListener(new OnMapClickListener() {
+
+        mMap.setOnMapClickListener(new OnMapClickListener() {
 
                     @Override
                     public void onMapClick(LatLng point) {
-                        //if point found in hashmap latlng do rest
-                           // if (globalPoly.getPoints().contains(point)) {
-                                // Creating MarkerOptions
-                                MarkerOptions marker = new MarkerOptions();
-                                List<MarkerOptions> markerList = new ArrayList<MarkerOptions>();
-                                // Setting the position of the marker
-                                marker.position(point);
-                                mMarkerPoints.add(point);
-                                if (mMarkerPoints.size() == 1) {
-                                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                                    LatLng startPoint = marker.getPosition();
-                                    markerList.add(marker);
-                                } else if (mMarkerPoints.size() == 2) {
-                                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                                    LatLng endPoint = marker.getPosition();
-                                    markerList.add(marker);
-                                    mMarkerPoints.clear();
-                                }
-                                mMap.addMarker(marker);
-                            }
-                  //  }
-                });//mMap.setOnMapClickListener(new OnMapClickListener()
+                    drawMarker(point);
+                    }
+                });
 
-          //  }
-       // };
-       // worker.schedule(task, 20, TimeUnit.SECONDS);
     }
 
     @Override
@@ -272,10 +246,11 @@ public class MapsActivity extends FragmentActivity implements
                if(points != null) {
                    PolylineOptions lineOptions = new PolylineOptions();
 
-                   //globalPoly.addAll(points);
+                   globalPoly.addAll(points);
                    lineOptions.addAll(points);
                    lineOptions.width(10);
                    lineOptions.color(Color.GREEN);
+                   lineOptions.geodesic(true);
 
                    mMap.addPolyline(lineOptions);
                }
@@ -285,10 +260,11 @@ public class MapsActivity extends FragmentActivity implements
                 if(points != null) {
                     PolylineOptions lineOptions = new PolylineOptions();
 
-                    //globalPoly.addAll(points);
+                    globalPoly.addAll(points);
                     lineOptions.addAll(points);
                     lineOptions.width(10);
                     lineOptions.color(Color.RED);
+                    lineOptions.geodesic(true);
 
                     mMap.addPolyline(lineOptions);
                 }
@@ -296,7 +272,29 @@ public class MapsActivity extends FragmentActivity implements
 
         }
     }
-
+    private void drawMarker(LatLng point) {
+        //isLocationOnPath(LatLng point, java.util.List<LatLng> polyline, boolean geodesic)
+        //Same as isLocationOnPath(LatLng, List, boolean, double) with a default tolerance of 0.1 meters.
+        List<LatLng> drawnPoints = globalPoly.getPoints();
+            if(PolyUtil.isLocationOnPath(point, drawnPoints, true)) {
+                MarkerOptions marker = new MarkerOptions();
+                List<MarkerOptions> markerList = new ArrayList<MarkerOptions>();
+                // Setting the position of the marker
+                marker.position(point);
+                mMarkerPoints.add(point);
+                if (mMarkerPoints.size() == 1) {
+                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    LatLng startPoint = marker.getPosition();
+                    markerList.add(marker);
+                } else if (mMarkerPoints.size() == 2) {
+                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    LatLng endPoint = marker.getPosition();
+                    markerList.add(marker);
+                    mMarkerPoints.clear();
+                }
+                mMap.addMarker(marker);
+            }
+    }
     @Override
     public void onLocationChanged(Location location) {
 
