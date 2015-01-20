@@ -43,6 +43,7 @@ public class MapsActivity extends FragmentActivity implements
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     ArrayList<LatLng> mMarkerPoints;
+    ArrayList<LatLng> startEnd = new ArrayList<LatLng>();
     protected PolylineOptions globalPoly = new PolylineOptions();
     //private static final ScheduledExecutorService worker =
            // Executors.newSingleThreadScheduledExecutor();
@@ -226,6 +227,7 @@ public class MapsActivity extends FragmentActivity implements
         // Executes in UI thread, after the parsing process
         @Override
         protected void onPostExecute(HashMap<Integer, List<LatLng>> result) {
+            PolylineOptions line = new PolylineOptions();
             /*List<LatLng> points = result.get(1064);
             System.out.println(points);
             PolylineOptions lineOptions = new PolylineOptions();
@@ -247,6 +249,7 @@ public class MapsActivity extends FragmentActivity implements
                    PolylineOptions lineOptions = new PolylineOptions();
 
                    globalPoly.addAll(points);
+                   line.addAll(points);
                    lineOptions.addAll(points);
                    lineOptions.width(10);
                    lineOptions.color(Color.GREEN);
@@ -261,6 +264,7 @@ public class MapsActivity extends FragmentActivity implements
                     PolylineOptions lineOptions = new PolylineOptions();
 
                     globalPoly.addAll(points);
+                    line.addAll(points);
                     lineOptions.addAll(points);
                     lineOptions.width(10);
                     lineOptions.color(Color.RED);
@@ -269,14 +273,14 @@ public class MapsActivity extends FragmentActivity implements
                     mMap.addPolyline(lineOptions);
                 }
             }
-
+            //System.out.println(globalPoly.getPoints());
         }
     }
     private void drawMarker(LatLng point) {
         //isLocationOnPath(LatLng point, java.util.List<LatLng> polyline, boolean geodesic)
         //Same as isLocationOnPath(LatLng, List, boolean, double) with a default tolerance of 0.1 meters.
         List<LatLng> drawnPoints = globalPoly.getPoints();
-            if(PolyUtil.isLocationOnPath(point, drawnPoints, true)) {
+            if(PolyUtil.isLocationOnPath(point, drawnPoints,true, 200.0)) {
                 MarkerOptions marker = new MarkerOptions();
                 List<MarkerOptions> markerList = new ArrayList<MarkerOptions>();
                 // Setting the position of the marker
@@ -285,10 +289,12 @@ public class MapsActivity extends FragmentActivity implements
                 if (mMarkerPoints.size() == 1) {
                     marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                     LatLng startPoint = marker.getPosition();
+                    startEnd.add(startPoint);
                     markerList.add(marker);
                 } else if (mMarkerPoints.size() == 2) {
                     marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                     LatLng endPoint = marker.getPosition();
+                    startEnd.add(endPoint);
                     markerList.add(marker);
                     mMarkerPoints.clear();
                 }
