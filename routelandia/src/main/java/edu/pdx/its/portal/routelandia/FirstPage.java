@@ -1,15 +1,18 @@
 package edu.pdx.its.portal.routelandia;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.util.Log;
+import android.view.View.OnClickListener;
 
 
-public class FirstPage extends Activity {
+public class FirstPage extends Activity implements OnClickListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +29,6 @@ public class FirstPage extends Activity {
         });
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -35,6 +37,15 @@ public class FirstPage extends Activity {
     }
 
     @Override
+    public void onClick(View v){
+        Log.i("clicks", "you clicked start");
+        Intent i = new Intent(
+                FirstPage.this,
+                MapsActivity.class);
+        startActivity(i);
+    }
+
+   /* @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -47,5 +58,6 @@ public class FirstPage extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
+
 }

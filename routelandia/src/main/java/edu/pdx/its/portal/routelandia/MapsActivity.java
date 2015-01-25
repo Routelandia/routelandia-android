@@ -1,11 +1,14 @@
 package edu.pdx.its.portal.routelandia;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
+import android.app.DialogFragment;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -18,11 +21,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
+import android.view.View.OnClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends FragmentActivity implements OnClickListener{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     ArrayList<LatLng> mMarkerPoints;
@@ -147,5 +151,15 @@ public class MapsActivity extends FragmentActivity {
             }
             mMap.addMarker(marker);
         }
+    }
+
+    @Override
+    public void onClick(View v){
+        Log.i("clicks", "you clicked start");
+        Intent i = new Intent(
+                MapsActivity.this,
+                TimePickUp.class);
+        startActivity(i);
+
     }
 }
