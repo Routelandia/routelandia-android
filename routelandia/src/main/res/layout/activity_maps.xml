@@ -10,4 +10,13 @@
         android:id="@+id/map"
         tools:context="edu.pdx.its.portal.routelandia.MapsActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment"/>
-    </RelativeLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pick Time"
+        android:id="@+id/button2"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+</RelativeLayout>
