@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:orientation="vertical"
+    android:weightSum="1">
+
+<Button
+    android:id="@+id/btnDepartureTime"
+    android:layout_width="304dp"
+    android:layout_height="wrap_content"
+    android:text="Set Departure Time"
+    android:layout_gravity="center_horizontal"
+    android:layout_weight="0.15" />
+
+<TextView
+    android:id="@+id/tvTime"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text=""
+    android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TimePicker
+        android:id="@+id/timePicker1"
+        android:layout_width="395dp"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
