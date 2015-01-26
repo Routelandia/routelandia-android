@@ -1,4 +1,4 @@
-language: android
+nguage: android
 jdk: oraclejdk7
 env:
   matrix:
@@ -6,8 +6,7 @@ env:
 
 android:
   components:
-  #  - build-tools-21.1.1
-  # use the latest revision of Android SDK Tools
+    # use the latest revision of Android SDK Tools
     - platform-tools
     - tools
 
@@ -32,8 +31,7 @@ before_script:
   # Create and start emulator
   - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
   - emulator -avd test -no-skin -no-audio -no-window &
-  #- android-wait-for-emulator
-  #- adb shell input keyevent 82 &
+
 script:
   - ./android-wait-for-emulator
-  - ./gradlew assemble
+  - ./gradlew connectedCheck
