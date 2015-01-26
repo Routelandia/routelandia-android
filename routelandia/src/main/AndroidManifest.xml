@@ -46,6 +46,12 @@
             android:theme="@style/Theme.AppCompat" >
         </activity>
 
+        <activity
+            android:name=".DatePickUp"
+            android:label=""
+            android:theme="@style/Theme.AppCompat" >
+        </activity>
+
     </application>
 
 </manifest>

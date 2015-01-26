@@ -21,12 +21,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
-import android.view.View.OnClickListener;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnClickListener{
+public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     ArrayList<LatLng> mMarkerPoints;
@@ -65,7 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnClickListener{
             // Enable MyLocation Button in the Map
             mMap.setMyLocationEnabled(true);
 
-//            String url = "http://capstoneaa.cs.pdx.edu/api/stations.json";
+           // String url = "http://capstoneaa.cs.pdx.edu/api/stations.json";
             String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";
             DownloadTask downloadTask = new DownloadTask(mMap, globalPoly);
 
@@ -78,18 +78,22 @@ public class MapsActivity extends FragmentActivity implements OnClickListener{
 
             @Override
             public void onMapClick(LatLng point) {
-                drawMarker(point);
+                    drawMarker(point);
             }
         });
 
-        Button button = (Button) findViewById(R.id.button2);
-        button.setOnClickListener(new View.OnClickListener() {
+        Button button3 = (Button) findViewById(R.id.button3);
+        button3.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), TimePickUp.class);
-                startActivity(intent);
+            public void onClick(View v){
+                Log.i("clicks", "you clicked start");
+                Intent i = new Intent(
+                        MapsActivity.this,
+                        DatePickUp.class);
+                startActivity(i);
             }
         });
+
     }
 
     @Override
@@ -142,24 +146,15 @@ public class MapsActivity extends FragmentActivity implements OnClickListener{
                 LatLng startPoint = marker.getPosition();
                 startEnd.add(startPoint);
                 markerList.add(marker);
+                mMap.addMarker(marker);
             } else if (mMarkerPoints.size() == 2) {
                 marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 LatLng endPoint = marker.getPosition();
                 startEnd.add(endPoint);
                 markerList.add(marker);
-                mMarkerPoints.clear();
+                //mMarkerPoints.clear();
+                mMap.addMarker(marker);
             }
-            mMap.addMarker(marker);
         }
-    }
-
-    @Override
-    public void onClick(View v){
-        Log.i("clicks", "you clicked start");
-        Intent i = new Intent(
-                MapsActivity.this,
-                TimePickUp.class);
-        startActivity(i);
-
     }
 }
