@@ -1,4 +1,5 @@
 Routelandia Android application use Google Play services to load Google Map
+[![Build Status](https://travis-ci.org/PSU-Capstone-2014-B/routelandia-android.svg?branch=master)](https://travis-ci.org/PSU-Capstone-2014-B/routelandia-android)
 
 ## Requirements
 
