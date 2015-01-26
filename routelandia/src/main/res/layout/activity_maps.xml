@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+    android:background="@color/button_material_dark">
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -9,9 +10,12 @@
         android:layout_height="match_parent"
         android:id="@+id/map"
         tools:context="edu.pdx.its.portal.routelandia.MapsActivity"
-        android:name="com.google.android.gms.maps.SupportMapFragment"/>
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/button3"
+        android:layout_alignParentStart="true" />
 
-    <Button
+  <!--  <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/pick_time"
@@ -19,6 +23,19 @@
         android:onClick="showTimePickUp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:fontFamily="helvitica" />-->
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CHOOSE YOUR DATE"
+        android:id="@+id/button3"
+        android:onClick="showDatePickUp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:fontFamily="helvitica"
+        android:layout_alignParentLeft="true" />
 
 </RelativeLayout>
