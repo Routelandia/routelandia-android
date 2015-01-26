@@ -1,23 +1,28 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="edu.pdx.its.portal.routelandia.TimePickUp">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:orientation="vertical"
+    android:weightSum="1">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView2" />
+<Button
+    android:id="@+id/btnDepartureTime"
+    android:layout_width="304dp"
+    android:layout_height="wrap_content"
+    android:text="Set Departure Time"
+    android:layout_gravity="center_horizontal"
+    android:layout_weight="0.15" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/pick_time"
-        android:onClick="showTimePickerDialog"
-        android:layout_below="@+id/textView2"
-        android:layout_toRightOf="@+id/textView2"
-        android:layout_toEndOf="@+id/textView2"
-        android:layout_marginTop="122dp" />
+<TextView
+    android:id="@+id/tvTime"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text=""
+    android:textAppearance="?android:attr/textAppearanceLarge" />
 
-</RelativeLayout>
+    <TimePicker
+        android:id="@+id/timePicker1"
+        android:layout_width="395dp"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
