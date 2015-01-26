@@ -4,8 +4,9 @@
     <string name="app_name">Routelandia</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_maps"></string>
     <string name="welcome_portland">Welcome to Portland!!!</string>
     <string name="title_activity_time_pick_up">TimePickUp</string>
-    <string name="pick_time">Choose your time</string>
+    <string name="pick_time">CHOOSE YOUR TIME</string>
+    <string name="pick_date">CHOOSE YOUR DATE</string>
 </resources>

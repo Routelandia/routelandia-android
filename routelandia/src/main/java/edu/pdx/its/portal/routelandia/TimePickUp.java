@@ -4,7 +4,9 @@ import java.util.Calendar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -18,7 +20,7 @@ public class TimePickUp extends Activity{
     private Button btnDepartureTime;
     private int hour;
     private int minute;
-    static final int TIME_DIALOG_ID = 999;
+    static final int TIME_DIALOG_ID = 100;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -28,7 +30,7 @@ public class TimePickUp extends Activity{
         addListenerOnButton();
     }
 
-    // display current time
+    //Display current time
     public void setCurrentTimeOnView() {
 
         tvDisplayTime = (TextView) findViewById(R.id.tvTime);
@@ -53,7 +55,13 @@ public class TimePickUp extends Activity{
 
             @Override
             public void onClick(View v) {
-                showDialog(TIME_DIALOG_ID);
+                // showDialog(TIME_DIALOG_ID);
+                //save time in jason array and switch back to map for now...
+                Log.i("clicks", "you clicked start");
+                Intent i = new Intent(
+                        TimePickUp.this,
+                        MapsActivity.class);
+                startActivity(i);
             }
         });
     }
@@ -62,10 +70,9 @@ public class TimePickUp extends Activity{
     protected Dialog onCreateDialog(int id) {
         switch (id) {
             case TIME_DIALOG_ID:
-                // set time picker as current time
+                //Set time picker as current time
                 return new TimePickerDialog(this,
                         timePickerListener, hour, minute,false);
-
         }
         return null;
     }
@@ -77,11 +84,11 @@ public class TimePickUp extends Activity{
                     hour = selectedHour;
                     minute = selectedMinute;
 
-                    // set current time into textview
+                    //Set current time into text view
                     tvDisplayTime.setText(new StringBuilder().append(pad(hour))
                             .append(":").append(pad(minute)));
 
-                    // set current time into timepicker
+                    //Set current time into time picker
                     thisTimePicker.setCurrentHour(hour);
                     thisTimePicker.setCurrentMinute(minute);
                 }
@@ -94,72 +101,3 @@ public class TimePickUp extends Activity{
             return "0" + String.valueOf(c);
     }
 }
-/*public class TimePickUp extends DialogFragment implements
-                    TimePickerDialog.OnTimeSetListener{
-                    //, DatePickerDialog.OnDateSetListener
-
-   @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // Use the current time as the default values for the picker
-        final Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int minute = c.get(Calendar.MINUTE);
-
-
-        // Use the current date as the default date in the picker
-        //final Calendar c = Calendar.getInstance();
-       // int year = c.get(Calendar.YEAR);
-       // int month = c.get(Calendar.MONTH);
-       // int day = c.get(Calendar.DAY_OF_MONTH);
-
-        // Create a new instance of DatePickerDialog and return it
-        //return new DatePickerDialog(getActivity(), this, year, month, day);
-
-        // Create a new instance of TimePickerDialog and return it
-        return new TimePickerDialog(getActivity(), this, hour, minute,
-                DateFormat.is24HourFormat(getActivity()));
-    }
-
-    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        // Do something with the time chosen by the user
-    }
-
-    public void onDateSet(DatePicker view, int year, int month, int day) {
-        // Do something with the date chosen by the user
-    }
-
-    public void showTimePickUp(View v) {
-        DialogFragment newFragment = new TimePickUp();
-        newFragment.show(getFragmentManager(), "timePicker");
-    }
-    /*@Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_time_pick_up);
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_time_pick_up, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-
-}*/
