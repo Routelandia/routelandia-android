@@ -1,37 +1,52 @@
+# Travis CI Settings
+#-------------------
+
 language: android
-jdk: oraclejdk7
+# Turning off caching to avoid caching Issues
+cache: false
+# Using the new Container-Based Infrastructure
+sudo: false
 env:
-  matrix:
-    - ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a
+  global:
+# Initiating clean Gradle output
+    - TERM=dumb
+# Amount of memory granted to Gradle JVM
+    - GRADLE_OPTS="-Xmx512m -XX:MaxPermSize=512m"
+# General Android settings used in builds
+    - ANDROID_TARGET=android-21
+    - ANDROID_ABI=armeabi-v7a
+
+before_install:
+# Making sure gradlew has executable permissions
+    - chmod +x gradlew
 
 android:
   components:
-    # use the latest revision of Android SDK Tools
-    - platform-tools
-    - tools
-
-    # The BuildTools version used by your project
-    - build-tools-21.1.1
-
-    # The SDK version used to compile your project
-    - android-21
-
-    # Additional components
-    - extra-google-google_play_services
-    - extra-google-m2repository
-    - extra-android-m2repository
-    - addon-google_apis-google-21
-
-    # Specify at least one system image,
-    # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-21
-    - sys-img-x86-android-1
-
+# We are using the latest revision of Android SDK Tools
+     - platform-tools
+     - tools
+# The BuildTools version we are using for our project
+     - build-tools-21.1.1
+# System Image we use to run emulator(s) during tests
+     - sys-img-armeabi-v7a-android-21
+    
+  licenses:
+     - 'android-sdk-license-.+'
+     
+# Emulator Management: Create, Start and Wait
 before_script:
-  # Create and start emulator
-  - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window &
+# Inspecting running services
+     - ps auxww
+     - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
+     - emulator -avd test -no-skin -no-audio -no-window &
+     - android-wait-for-emulator
+     - adb shell input keyevent 82 &
+     
+script: ./gradlew connectedAndroidTest --info
 
-script:
-  - ./android-wait-for-emulator
-  - ./gradlew connectedCheck
+
+addons:
+# Scan results: http://scan.coverity.com/projects/3346
+    build_command_prepend: "./gradlew clean"
+    build_command: "./gradlew build"
+    branch_pattern: master
