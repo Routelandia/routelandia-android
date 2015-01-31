@@ -35,6 +35,7 @@ public class DatePickUp extends Activity{
     private int year;
     private int month;
     private int day;
+    private String dayOfWeek;
 
     static final int DATE_DIALOG_ID = 100;
 
@@ -57,6 +58,8 @@ public class DatePickUp extends Activity{
         year = c.get(Calendar.YEAR);
         month = c.get(Calendar.MONTH);
         day = c.get(Calendar.DAY_OF_MONTH);
+        dayOfWeek = getDayOfWeek(c.get(Calendar.DAY_OF_WEEK));
+        System.out.println(dayOfWeek);
 
         //Set current date into text view
         tvDisplayDate.setText(new StringBuilder()
@@ -80,13 +83,13 @@ public class DatePickUp extends Activity{
                 Log.i("clicks", "you clicked start");
                 Intent i = new Intent(
                         DatePickUp.this,
-                        TimePickUp.class);
+                        ListStat.class);
                 startActivity(i);
             }
         });
     }
 
-    @Override
+  /*  @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
             case DATE_DIALOG_ID:
@@ -112,6 +115,34 @@ public class DatePickUp extends Activity{
 
             datePickerResult.init(year, month, day, null);
         }
-    };
+    };*/
+
+    private String getDayOfWeek(int value) {
+        String day = "";
+        switch (value) {
+            case 1:
+                day = "Sunday";
+                break;
+            case 2:
+                day = "Monday";
+                break;
+            case 3:
+                day = "Tuesday";
+                break;
+            case 4:
+                day = "Wednesday";
+                break;
+            case 5:
+                day = "Thursday";
+                break;
+            case 6:
+                day = "Friday";
+                break;
+            case 7:
+                day = "Saturday";
+                break;
+        }
+        return day;
+    }
 
 }

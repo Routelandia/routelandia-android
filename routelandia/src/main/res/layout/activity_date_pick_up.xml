@@ -5,13 +5,12 @@
     android:orientation="vertical"
     android:clickable="false">
 
-   <Button
+    <Button
         android:id="@+id/btnDepartureDate"
-        android:layout_width="304dp"
-        android:layout_height="wrap_content"
+        android:layout_width="271dp"
+        android:layout_height="62dp"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="0.15"
-        android:text="@string/pick_time" />
+        android:text="@string/pick_stats" />
 
     <TextView
         android:id="@+id/tvDate"
@@ -25,5 +24,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Widget.AppCompat.Spinner" />
+
+    <TimePicker
+        style="@style/Widget.AppCompat.Spinner"
+        android:id="@+id/timePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.24" />
 
 </LinearLayout>

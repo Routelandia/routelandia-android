@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/map"
+        android:layout_width="271dp"
+        android:layout_height="62dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Map" />
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/wallet_dim_foreground_inverse_disabled_holo_dark"
+        android:clickable="false"
+        style="@style/Base.TextAppearance.AppCompat.Body1"
+        android:stackFromBottom="false"
+        android:smoothScrollbar="true"
+        android:scrollingCache="true"
+        android:textFilterEnabled="false">
+
+        </ListView>
+
+</LinearLayout>
