@@ -34,7 +34,9 @@ public class TimePickUp extends Activity{
     private Button btnDepartureTime;
     private int hour;
     private int minute;
+    private int am_pm;
     static final int TIME_DIALOG_ID = 100;
+    public String dayOfWeek;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,13 +55,19 @@ public class TimePickUp extends Activity{
         final Calendar c = Calendar.getInstance();
         hour = c.get(Calendar.HOUR_OF_DAY);
         minute = c.get(Calendar.MINUTE);
+        am_pm = c.get(Calendar.AM_PM);
+        dayOfWeek = getPmAm(c.get(Calendar.AM_PM));
 
         tvDisplayTime.setText(
                 new StringBuilder().append(pad(hour))
                         .append(":").append(pad(minute)));
 
+        StringBuilder s =  new StringBuilder().append(pad(hour)).append(":").append(pad(minute)).append(" ").append(dayOfWeek);
+        System.out.println(s);
+
         thisTimePicker.setCurrentHour(hour);
         thisTimePicker.setCurrentMinute(minute);
+        //thisTimePicker.setIs24HourView(false);
     }
 
     public void addListenerOnButton() {
@@ -80,13 +88,13 @@ public class TimePickUp extends Activity{
         });
     }
 
-    @Override
+   /* @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
             case TIME_DIALOG_ID:
                 //Set time picker as current time
                 return new TimePickerDialog(this,
-                        timePickerListener, hour, minute,false);
+                        timePickerListener, hour, minute, false);
         }
         return null;
     }
@@ -98,15 +106,21 @@ public class TimePickUp extends Activity{
                     hour = selectedHour;
                     minute = selectedMinute;
 
+
                     //Set current time into text view
                     tvDisplayTime.setText(new StringBuilder().append(pad(hour))
                             .append(":").append(pad(minute)));
 
+                    StringBuilder s =  new StringBuilder().append(pad(hour)).append(":").append(pad(minute)).append(" ").append(dayOfWeek);
+                    System.out.println(s);
+
                     //Set current time into time picker
                     thisTimePicker.setCurrentHour(hour);
                     thisTimePicker.setCurrentMinute(minute);
+                    //thisTimePicker.setIs24HourView(false);
+                    //System.out.println(thisTimePicker.getCurrentHour());
                 }
-            };
+            };*/
 
     private static String pad(int c) {
         if (c >= 10)
@@ -114,4 +128,22 @@ public class TimePickUp extends Activity{
         else
             return "0" + String.valueOf(c);
     }
+
+    private String getPmAm(int value) {
+        String pmAm = "";
+        switch (value) {
+            case 1:
+                if (am_pm == 1) {
+                    pmAm = "pm";
+                }
+                break;
+            case 2:
+                if (am_pm == 0) {
+                    pmAm = "am";
+                }
+                break;
+        }
+        return pmAm;
+    }
+
 }

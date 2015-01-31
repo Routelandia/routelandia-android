@@ -32,6 +32,7 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
@@ -46,6 +47,7 @@ public class MapsActivity extends FragmentActivity {
     ArrayList<LatLng> mMarkerPoints;
     ArrayList<LatLng> startEnd = new ArrayList<LatLng>();
     protected PolylineOptions globalPoly = new PolylineOptions();
+    protected MarkerOptions marker = new MarkerOptions();
     //private static final ScheduledExecutorService worker =
     // Executors.newSingleThreadScheduledExecutor();
 
@@ -79,7 +81,7 @@ public class MapsActivity extends FragmentActivity {
             // Enable MyLocation Button in the Map
             mMap.setMyLocationEnabled(true);
 
-           // String url = "http://capstoneaa.cs.pdx.edu/api/stations.json";
+            // String url = "http://capstoneaa.cs.pdx.edu/api/stations.json";
             String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";
             DownloadTask downloadTask = new DownloadTask(mMap, globalPoly);
 
@@ -92,7 +94,7 @@ public class MapsActivity extends FragmentActivity {
 
             @Override
             public void onMapClick(LatLng point) {
-                    drawMarker(point);
+                drawMarker(point);
             }
         });
 
@@ -105,6 +107,17 @@ public class MapsActivity extends FragmentActivity {
                         MapsActivity.this,
                         DatePickUp.class);
                 startActivity(i);
+            }
+        });
+        Button button2 = (Button) findViewById(R.id.button2);
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                Intent i = new Intent(
+                        MapsActivity.this,
+                        MapsActivity.class);
+                startActivity(i);
+
             }
         });
 
@@ -150,19 +163,22 @@ public class MapsActivity extends FragmentActivity {
         //Same as isLocationOnPath(LatLng, List, boolean, double) with a default tolerance of 0.1 meters.
         List<LatLng> drawnPoints = globalPoly.getPoints();
         if (PolyUtil.isLocationOnPath(point, drawnPoints, true, 200.0)) {
-            MarkerOptions marker = new MarkerOptions();
+
             List<MarkerOptions> markerList = new ArrayList<MarkerOptions>();
             // Setting the position of the marker
             marker.position(point);
             mMarkerPoints.add(point);
             if (mMarkerPoints.size() == 1) {
                 marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                marker.draggable(true);
                 LatLng startPoint = marker.getPosition();
                 startEnd.add(startPoint);
                 markerList.add(marker);
                 mMap.addMarker(marker);
+
             } else if (mMarkerPoints.size() == 2) {
                 marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                marker.draggable(true);
                 LatLng endPoint = marker.getPosition();
                 startEnd.add(endPoint);
                 markerList.add(marker);

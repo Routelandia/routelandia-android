@@ -33,7 +33,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyAp7qOsdFhearSfzZfs3qAw2PmjHHgB-rc" />
+            android:value="" />
 
         <activity
             android:name=".MapsActivity"
@@ -52,6 +52,11 @@
             android:theme="@style/Theme.AppCompat" >
         </activity>
 
+        <activity
+            android:name=".ListStat"
+            android:label=""
+            android:theme="@style/Theme.AppCompat" >
+        </activity>
     </application>
 
 </manifest>
