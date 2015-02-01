@@ -46,6 +46,8 @@ public class DatePickUp extends Activity{
 
         setCurrentDateOnView();
         addListenerOnButton();
+        HttpAsyncTask httpAsyncTask = new HttpAsyncTask();
+        httpAsyncTask.execute();
     }
 
     //Display current date
