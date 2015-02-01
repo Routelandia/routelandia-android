@@ -50,3 +50,8 @@ addons:
     build_command_prepend: "./gradlew clean"
     build_command: "./gradlew build"
     branch_pattern: master
+
+notifications:
+  slack:
+    rooms:
+      - psu2014:Y8aJDZfDewFhwDBZqbM8D8Pt#android
