@@ -44,14 +44,13 @@ before_script:
      
 script: ./gradlew connectedAndroidTest --info
 
+notifications:
+  slack:
+    rooms:
+      - psu2014:Y8aJDZfDewFhwDBZqbM8D8Pt#android
 
 addons:
 # Scan results: http://scan.coverity.com/projects/3346
     build_command_prepend: "./gradlew clean"
     build_command: "./gradlew build"
     branch_pattern: master
-
-notifications:
-  slack:
-    rooms:
-      - psu2014:Y8aJDZfDewFhwDBZqbM8D8Pt#android
