@@ -34,7 +34,7 @@
         android:onClick="showDatePickUp"
         android:layout_alignParentTop="true"
         android:fontFamily="helvitica"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentRight="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -42,7 +42,7 @@
         android:text="Clear Markers"
         android:id="@+id/button2"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
         android:fontFamily="helvitica" />
 
 </RelativeLayout>

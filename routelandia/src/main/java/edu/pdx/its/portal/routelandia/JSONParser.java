@@ -27,58 +27,46 @@ import java.util.List;
  * Created by loc on 1/17/15.
  */
 public class JSONParser {
-//    public HashMap<Integer, List<LatLng>> parse(JSONArray jsArray) {
-//        HashMap<Integer, List<LatLng>> segment = new HashMap<>();
-//
-//        try {
-//            for (int i = 0; i < jsArray.length(); i++) {
-//                JSONObject jsonObject = (JSONObject) jsArray.get(i);
-//
-//                int stationId = (int) jsonObject.get("stationid");
-//
-//                if (!jsonObject.isNull("geojson_raw")) {
-//                    JSONObject segment_raw = (JSONObject) jsonObject.get("geojson_raw");
-//
-//                    JSONArray jsonArray = segment_raw.getJSONArray("coordinates");
-//
-//                    List<LatLng> listLatLong = new ArrayList<LatLng>();
-//
-//                    for (int j = 0; j < jsonArray.length(); j++) {
-//                        double latitude = Double.parseDouble(((JSONArray) jsonArray.get(j)).get(1).toString());
-//                        double longtitude = Double.parseDouble(((JSONArray) jsonArray.get(j)).get(0).toString());
-//                        listLatLong.add(new LatLng(latitude, longtitude));
-//                    }
-//
-//                    segment.put(stationId, listLatLong);
-//                }
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return segment;
-//    }
-
+    /**
+     * Parse the json array which download from the web
+     * @param jsonArray
+     * @return the list of highways which contain the latlng
+     * so the Mapsactivity can draw freeway line on the map
+     */
     public List<Highway> parse(JSONArray jsonArray){
         List<Highway> highwayList =  new ArrayList<>();
         try{
             for (int i = 0; i <jsonArray.length() ; i++) {
+                //Create JSON Object for each array index
                 JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+
+                //Get highwayid from the object
                 int highwayid = jsonObject.getInt("highwayid");
+
+                //Get highway name in the object
                 String highwayname = jsonObject.getString("highwayname");
+
+                //add the highway to the list highway
                 highwayList.add(i, new Highway(highwayname, highwayid));
+
                 JSONObject fullGeoJson = (JSONObject) jsonObject.get("fullGeoJson");
+
+                //Create json array from coordinates
                 JSONArray coordinates = (JSONArray) fullGeoJson.get("coordinates");
+
+                //for each json array coordinates, create latlng and
+                //add it to the list latlng of its highway
                 for (int j = 0; j <coordinates.length() ; j++) {
                     double latitude = Double.parseDouble(((JSONArray) coordinates.get(j)).get(1).toString());
                     double longtitude = Double.parseDouble(((JSONArray) coordinates.get(j)).get(0).toString());
                     highwayList.get(i).addLatLng(new LatLng(latitude, longtitude));
                 }
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         return highwayList;
     }
 }

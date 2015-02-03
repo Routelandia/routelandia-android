@@ -15,14 +15,12 @@
 package edu.pdx.its.portal.routelandia;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.app.DialogFragment;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -32,11 +30,9 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,14 +40,16 @@ import java.util.List;
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    ArrayList<LatLng> mMarkerPoints;
-    ArrayList<LatLng> startEnd = new ArrayList<LatLng>();
+    protected ArrayList<LatLng> mMarkerPoints = new ArrayList<>();
+    protected ArrayList<LatLng> startEnd = new ArrayList<>();
     protected PolylineOptions globalPoly = new PolylineOptions();
     protected MarkerOptions marker = new MarkerOptions();
-    //private static final ScheduledExecutorService worker =
-    // Executors.newSingleThreadScheduledExecutor();
 
-
+    /**
+     * Perform initialization of all fragments and loaders.
+     *
+     * @param savedInstanceState Bundle from Google SDK
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,10 +66,6 @@ public class MapsActivity extends FragmentActivity {
             dialog.show();
 
         } else { // Google Play Services are available
-
-            // Initializing
-            mMarkerPoints = new ArrayList<>();
-
             // Getting reference to SupportMapFragment of the activity_maps
             SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
@@ -81,41 +75,42 @@ public class MapsActivity extends FragmentActivity {
             // Enable MyLocation Button in the Map
             mMap.setMyLocationEnabled(true);
 
-            // String url = "http://capstoneaa.cs.pdx.edu/api/stations.json";
+            //The URL to download all highway data from the back end
             String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";
+
+            //Create downloadtask to do the http connect and download json from API
             DownloadTask downloadTask = new DownloadTask(mMap, globalPoly);
 
             // Start downloading json data from Google Directions API
             downloadTask.execute(url);
-
         }
 
+        //overwrite onMapClickListener to let users drag marker in the map
         mMap.setOnMapClickListener(new OnMapClickListener() {
-
             @Override
             public void onMapClick(LatLng point) {
                 drawMarker(point);
             }
         });
 
-        Button button3 = (Button) findViewById(R.id.button3);
-        button3.setOnClickListener(new View.OnClickListener() {
+        //Create a time and data button so users can go to the next page
+        //which allow them to choose the time when they want to commute
+        Button timeAndDateButton = (Button) findViewById(R.id.button3);
+        timeAndDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Log.i("clicks", "you clicked start");
-                Intent i = new Intent(
-                        MapsActivity.this,
-                        DatePickUp.class);
+                Intent i = new Intent(MapsActivity.this, DatePickUp.class);
                 startActivity(i);
             }
         });
-        Button button2 = (Button) findViewById(R.id.button2);
-        button2.setOnClickListener(new View.OnClickListener() {
+
+        //Create a clear button so users can re-drag the markers
+        Button clearButton = (Button) findViewById(R.id.button2);
+        clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                Intent i = new Intent(
-                        MapsActivity.this,
-                        MapsActivity.class);
+            public void onClick(View v) {
+                Intent i = new Intent(MapsActivity.this, MapsActivity.class);
                 startActivity(i);
 
             }
@@ -123,6 +118,15 @@ public class MapsActivity extends FragmentActivity {
 
     }
 
+    /**
+     * Dispatch onResume() to fragments.  Note that for better inter-operation
+     * with older versions of the platform, at the point of this call the
+     * fragments attached to the activity are <em>not</em> resumed.  This means
+     * that in some cases the previous state may still be saved, not allowing
+     * fragment transactions that modify the state.  To correctly interact
+     * with fragments in their proper state, you should instead override
+     * {@link #onResumeFragments()}.
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -147,24 +151,32 @@ public class MapsActivity extends FragmentActivity {
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
+
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
-            mMap.getUiSettings().setZoomControlsEnabled(true);
+
+            //Enable location services
             mMap.setMyLocationEnabled(true);
+
+            //Enable zoom control and location
+            //Disable map toolbar
+            mMap.getUiSettings().setZoomControlsEnabled(true);
             mMap.getUiSettings().setMapToolbarEnabled(false);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.509534, -122.681081), 10.0f));
         }
     }
 
+    /**
+     * The function check if users tap a point close 200m to the freeway
+     * then drag a marker
+     * @param point which is users tap on the map
+     */
     private void drawMarker(LatLng point) {
-        //isLocationOnPath(LatLng point, java.util.List<LatLng> polyline, boolean geodesic)
-        //Same as isLocationOnPath(LatLng, List, boolean, double) with a default tolerance of 0.1 meters.
         List<LatLng> drawnPoints = globalPoly.getPoints();
         if (PolyUtil.isLocationOnPath(point, drawnPoints, true, 200.0)) {
 
-            List<MarkerOptions> markerList = new ArrayList<MarkerOptions>();
             // Setting the position of the marker
             marker.position(point);
             mMarkerPoints.add(point);
@@ -173,7 +185,6 @@ public class MapsActivity extends FragmentActivity {
                 marker.draggable(true);
                 LatLng startPoint = marker.getPosition();
                 startEnd.add(startPoint);
-                markerList.add(marker);
                 mMap.addMarker(marker);
 
             } else if (mMarkerPoints.size() == 2) {
@@ -181,8 +192,6 @@ public class MapsActivity extends FragmentActivity {
                 marker.draggable(true);
                 LatLng endPoint = marker.getPosition();
                 startEnd.add(endPoint);
-                markerList.add(marker);
-                //mMarkerPoints.clear();
                 mMap.addMarker(marker);
             }
         }
