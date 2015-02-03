@@ -39,12 +39,25 @@ public class ParserTask extends AsyncTask<String, Integer, List<Highway>> {
         this.globalPoly = globalPoly;
     }
 
-    // Parsing the data in non-ui thread
+    /**
+     * Override this method to perform a computation on a background thread. The
+     * specified parameters are the parameters passed to {@link #execute}
+     * by the caller of this task.
+     * <p/>
+     * This method can call {@link #publishProgress} to publish updates
+     * on the UI thread.
+     *
+     * @param jsonData The parameters of the task.
+     * @return A result, defined by the subclass of this task.
+     * @see #onPreExecute()
+     * @see #onPostExecute
+     * @see #publishProgress
+     */
     @Override
     protected List<Highway> doInBackground(String... jsonData) {
 
-//        HashMap<Integer, List<LatLng>> routes = new HashMap<>();
         List<Highway> routes =  new ArrayList<>();
+
         try {
             JSONArray jObject = new JSONArray(jsonData[0]);
             JSONParser parser = new JSONParser();
@@ -57,12 +70,22 @@ public class ParserTask extends AsyncTask<String, Integer, List<Highway>> {
         return routes;
     }
 
-    // Executes in UI thread, after the parsing process
+    /**
+     * <p>Runs on the UI thread after {@link #doInBackground}. The
+     * specified result is the value returned by {@link #doInBackground}.</p>
+     * <p/>
+     * <p>This method won't be invoked if the task was cancelled.</p>
+     *
+     * @param highwayList The result of the operation computed by {@link #doInBackground}.
+     * @see #onPreExecute
+     * @see #doInBackground
+     * @see #onCancelled(Object)
+     */
     @Override
-    protected void onPostExecute(List<Highway> result) {
+    protected void onPostExecute(List<Highway> highwayList) {
         PolylineOptions line = new PolylineOptions();
-        for (int i = 0; i < result.size(); i++) {
-            List<LatLng> points = result.get(i).getLatLngList();
+        for (int i = 0; i < highwayList.size(); i++) {
+            List<LatLng> points = highwayList.get(i).getLatLngList();
             if (points != null) {
                 PolylineOptions lineOptions = new PolylineOptions();
 
