@@ -12,6 +12,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,8 +26,8 @@ import java.io.InputStreamReader;
  */
 public class HttpAsyncTask extends AsyncTask<String, Void, JSONObject>{
 
-    private LatLng startPoint = new LatLng(-122.00, 45.00);
-    private LatLng endPoint =  new LatLng(-123.00, 45.00);
+    private LatLng startPoint = new LatLng(45.509534, -122.681081);
+    private LatLng endPoint =  new LatLng(45.509534, -122.681081);
     String midpoint = "17:30";
     String weekday = "Monday";
     String url = "http://capstoneaa.cs.pdx.edu/api/trafficstats";
@@ -45,12 +46,12 @@ public class HttpAsyncTask extends AsyncTask<String, Void, JSONObject>{
         JSONObject jsonObject = new JSONObject();
         try {
             JSONObject startJsonObject = new JSONObject();
-            startJsonObject.put("lat", startPoint.latitude);
             startJsonObject.put("lng", startPoint.longitude);
+            startJsonObject.put("lat", startPoint.latitude);
 
             JSONObject endJsonObject = new JSONObject();
-            endJsonObject.put("lat", endPoint.latitude);
             endJsonObject.put("lng", endPoint.longitude);
+            endJsonObject.put("lat", endPoint.latitude);
 
             JSONObject time = new JSONObject();
             time.put("midpoint", midpoint);
@@ -78,22 +79,22 @@ public class HttpAsyncTask extends AsyncTask<String, Void, JSONObject>{
             //http://capstoneaa.cs.pdx.edu/api/trafficstats
             HttpPost httpPost = new HttpPost(url);
 
-            System.out.println(url);
+            System.out.println("url: " + url);
 
             // 4. convert JSONObject to JSON to String
 
              String json = jsonObject.toString();
 
-            System.out.println(json);
+            System.out.println("my json : " + json);
             // 5. set json to StringEntity
             StringEntity se = new StringEntity(json);
 
             // 6. set httpPost Entity
             httpPost.setEntity(se);
 
-//            // 7. Set some headers to inform server about the type of the content
-//            httpPost.setHeader("Accept", "application/json");
-//            httpPost.setHeader("Content-type", "application/json");
+            // 7. Set some headers to inform server about the type of the content
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setHeader("Content-type", "application/json");
 
             // 8. Execute POST request to the given URL
             HttpResponse httpResponse = httpclient.execute(httpPost);
@@ -113,13 +114,13 @@ public class HttpAsyncTask extends AsyncTask<String, Void, JSONObject>{
 
         JSONObject json = null;
         try {
-
-            json = new JSONObject(result);
+            JSONArray jsonArray = new JSONArray(result);
+            json = jsonArray.getJSONObject(0);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         // 11. return result
-
+        System.out.println("json from the response: " + json);
         return json;
     }
 
