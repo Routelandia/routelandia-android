@@ -35,12 +35,28 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
     protected GoogleMap mMap;
     protected PolylineOptions globalPoly;
 
+    /**
+     * Constructor for DownloadTask class
+     * @param mMap is a field Google Map in MapsActivity class
+     * @param globalPoly is field polylineOptions in MapsActivity
+     */
     public DownloadTask(GoogleMap mMap, PolylineOptions globalPoly) {
         this.mMap = mMap;
         this.globalPoly = globalPoly;
     }
 
-    // Downloading data in non-ui thread
+    /**
+     * Override this method to perform a computation on a background thread. The
+     * specified parameters are the parameters passed to {@link #execute}
+     * by the caller of this task.
+     * <p/>
+     * This method can call {@link #publishProgress} to publish updates
+     * on the UI thread.
+     *
+     * @param url The parameters of the task.
+     * @return A result, defined by the subclass of this task.
+     * @see #onPostExecute
+     */
     @Override
     protected String doInBackground(String... url) {
 
@@ -56,11 +72,22 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
         return data;
     }
 
-    // Executes in UI thread, after the execution of doInBackground()
+    /**
+     * <p>Runs on the UI thread after {@link #doInBackground}. The
+     * specified result is the value returned by {@link #doInBackground}.</p>
+     * <p/>
+     * <p>This method won't be invoked if the task was cancelled.</p>
+     *
+     * @param result The result of the operation computed by {@link #doInBackground}.
+     * @see #onPreExecute
+     * @see #doInBackground
+     * @see #onCancelled(Object)
+     */
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
 
+        //Create ParserTask class to parse the JSON from the backend
         ParserTask parserTask = new ParserTask(mMap, globalPoly);
 
         // Invokes the thread for parsing the JSON data
@@ -68,14 +95,17 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
 
     }
 
-
     /**
      * A method to download json data from url
+     * @param strUrl is the URL API endpoint to download the highway information
+     * @return the string json
+     * @throws IOException
      */
     private String downloadUrl(String strUrl) throws IOException {
         String data = "";
-        InputStream iStream = null;
-        HttpURLConnection urlConnection = null;
+        InputStream iStream;
+        HttpURLConnection urlConnection;
+
         try {
             URL url = new URL(strUrl);
 
@@ -88,25 +118,28 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
             // Reading data from url
             iStream = urlConnection.getInputStream();
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+            // Create bufferedReader from input
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(iStream));
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
 
             String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
+
+            //append all line from buffered Reader into string builder
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line);
             }
 
-            data = sb.toString();
+            //convert the string builder into string and update its for data
+            data = stringBuilder.toString();
 
-            br.close();
+            //close the buffered reader
+            bufferedReader.close();
 
         } catch (Exception e) {
             Log.d("Exception while downloading url", e.toString());
-        } finally {
-            iStream.close();
-            urlConnection.disconnect();
         }
+
         return data;
     }
 }
