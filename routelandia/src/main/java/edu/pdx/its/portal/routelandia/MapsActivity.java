@@ -100,8 +100,10 @@ public class MapsActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 Log.i("clicks", "you clicked start");
-                Intent i = new Intent(MapsActivity.this, DatePickUp.class);
-                startActivity(i);
+                if(mMarkerPoints.size()==2) {
+                    Intent i = new Intent(MapsActivity.this, DatePickUp.class);
+                    startActivity(i);
+                }
             }
         });
 
@@ -110,9 +112,10 @@ public class MapsActivity extends FragmentActivity {
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MapsActivity.this, MapsActivity.class);
-                startActivity(i);
-
+                if(mMarkerPoints.size() == 1 || mMarkerPoints.size() == 2) {
+                    Intent i = new Intent(MapsActivity.this, MapsActivity.class);
+                    startActivity(i);
+                }
             }
         });
 
