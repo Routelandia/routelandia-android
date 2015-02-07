@@ -9,16 +9,20 @@
     tools:context=".FirstPage">
 
     <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Start"
-            android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="START"
+        android:id="@+id/button"
         android:textColor="#4eabe9"
         android:fontFamily="Helvitica"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="135dp"
-        android:background="#636265" />
+        android:layout_marginBottom="90dp"
+        android:height="60sp"
+        android:width="130sp"
+        android:background="@drawable/start_button"
+        android:textSize="22dp"
+        android:layout_alignParentEnd="false" />
 
     <TextView
         android:layout_width="wrap_content"
