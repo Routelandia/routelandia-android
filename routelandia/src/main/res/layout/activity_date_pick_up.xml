@@ -20,21 +20,20 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         style="@style/Bubble.TextAppearance.Light" />
 
-    <DatePicker
-        android:id="@+id/datePickerResult"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/TextAppearance.AppCompat.Widget.DropDownItem"
-        android:calendarViewShown="false"
-        android:layout_weight="0.15" />
-
     <TimePicker
         style="@style/Widget.AppCompat.Spinner"
         android:id="@+id/timePicker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:foregroundGravity="bottom"
-        android:layout_weight="0.43"
+        android:layout_weight="0.10"
         android:layout_gravity="bottom" />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner"
+        android:entries="@array/Week_Day"
+        android:spinnerMode="dropdown" />
 
 </LinearLayout>
