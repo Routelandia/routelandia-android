@@ -17,33 +17,21 @@ package edu.pdx.its.portal.routelandia;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.PolylineOptions;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Created by loc on 1/24/15.
+ * Created by loc on 2/6/15.
  */
-public class DownloadTask extends AsyncTask<String, Void, String> {
+public class DownloadListofHighway extends AsyncTask<String, Void, String> {
 
-//    protected GoogleMap mMap;
-//    protected PolylineOptions globalPoly;
-//
-//    /**
-//     * Constructor for DownloadTask class
-//     * @param mMap is a field Google Map in MapsActivity class
-//     * @param globalPoly is field polylineOptions in MapsActivity
-//     */
-//    public DownloadTask(GoogleMap mMap, PolylineOptions globalPoly) {
-//        this.mMap = mMap;
-//        this.globalPoly = globalPoly;
-//    }
+    protected List<Highway> highwayList =  new ArrayList<>();
 
     /**
      * Override this method to perform a computation on a background thread. The
@@ -53,23 +41,23 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
      * This method can call {@link #publishProgress} to publish updates
      * on the UI thread.
      *
-     * @param url The parameters of the task.
+     * @param params The parameters of the task.
      * @return A result, defined by the subclass of this task.
+     * @see #onPreExecute()
      * @see #onPostExecute
+     * @see #publishProgress
      */
     @Override
-    protected String doInBackground(String... url) {
-
-        // For storing data from web service
-        String data = "";
-
-        try {
-            // Fetching the data from web service
-            data = downloadUrl(url[0]);
-        } catch (Exception e) {
-            Log.d("Background Task", e.toString());
+    protected String doInBackground(String... params) {
+        String resultDownloadFromTheWeb = "";
+        
+        try{
+            resultDownloadFromTheWeb = downloadListofHighwayFromTheAPI(params[0]);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return data;
+        
+        return resultDownloadFromTheWeb;
     }
 
     /**
@@ -78,36 +66,32 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
      * <p/>
      * <p>This method won't be invoked if the task was cancelled.</p>
      *
-     * @param result The result of the operation computed by {@link #doInBackground}.
+     * @param s The result of the operation computed by {@link #doInBackground}.
      * @see #onPreExecute
      * @see #doInBackground
      * @see #onCancelled(Object)
      */
-    @Override
-    protected void onPostExecute(String result) {
-        super.onPostExecute(result);
-
-        //Create ParserTask class to parse the JSON from the backend
-//        ParserTask parserTask = new ParserTask(mMap, globalPoly);
+//    @Override
+//    protected void onPostExecute(String s) {
+//        super.onPostExecute(s);
+//        ParserListofHighway parserListofHighway = new ParserListofHighway();
 //
-//        // Invokes the thread for parsing the JSON data
-//        parserTask.execute(result);
-
-    }
+//        parserListofHighway.execute(s);
+//    }
 
     /**
      * A method to download json data from url
-     * @param strUrl is the URL API endpoint to download the highway information
+     * @param stringURL is the URL API endpoint to download the highway information
      * @return the string json
-     * @throws IOException
+     * @throws java.io.IOException
      */
-    private String downloadUrl(String strUrl) throws IOException {
+    private String downloadListofHighwayFromTheAPI(String stringURL) throws IOException {
         String data = "";
         InputStream iStream;
         HttpURLConnection urlConnection;
 
         try {
-            URL url = new URL(strUrl);
+            URL url = new URL(stringURL);
 
             // Creating an http connection to communicate with url
             urlConnection = (HttpURLConnection) url.openConnection();

@@ -14,12 +14,7 @@
 
 package edu.pdx.its.portal.routelandia;
 
-import android.graphics.Color;
 import android.os.AsyncTask;
-
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 
@@ -27,17 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by loc on 1/24/15.
+ * Created by loc on 2/6/15.
  */
-public class ParserTask extends AsyncTask<String, Integer, List<Station>> {
+public class ParserListofHighway extends AsyncTask<String, Integer, List<Highway>>{
+    protected List<Highway> highwayList = new ArrayList<>();
 
-//    protected GoogleMap mMap;
-//    protected PolylineOptions globalPoly;
-//
-//    public ParserTask(GoogleMap mMap, PolylineOptions globalPoly) {
-//        this.mMap = mMap;
-//        this.globalPoly = globalPoly;
-//    }
 
     /**
      * Override this method to perform a computation on a background thread. The
@@ -47,27 +36,24 @@ public class ParserTask extends AsyncTask<String, Integer, List<Station>> {
      * This method can call {@link #publishProgress} to publish updates
      * on the UI thread.
      *
-     * @param jsonData The parameters of the task.
+     * @param params The parameters of the task.
      * @return A result, defined by the subclass of this task.
      * @see #onPreExecute()
      * @see #onPostExecute
      * @see #publishProgress
      */
     @Override
-    protected List<Station> doInBackground(String... jsonData) {
-
-        List<Station> routes =  new ArrayList<>();
-
+    protected List<Highway> doInBackground(String... params) {
         try {
-            JSONArray jObject = new JSONArray(jsonData[0]);
+            JSONArray jObject = new JSONArray(params[0]);
             JSONParser parser = new JSONParser();
 
             // Starts parsing data
-            routes = parser.parseStationList(jObject);
+            highwayList.addAll(parser.parseListOfHighWay(jObject));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return routes;
+        return highwayList;
     }
 
     /**
@@ -76,30 +62,13 @@ public class ParserTask extends AsyncTask<String, Integer, List<Station>> {
      * <p/>
      * <p>This method won't be invoked if the task was cancelled.</p>
      *
-     * @param highwayList The result of the operation computed by {@link #doInBackground}.
+     * @param highways The result of the operation computed by {@link #doInBackground}.
      * @see #onPreExecute
      * @see #doInBackground
      * @see #onCancelled(Object)
      */
-    @Override
-    protected void onPostExecute(List<Station> highwayList) {
-        PolylineOptions line = new PolylineOptions();
-        for (int i = 0; i < highwayList.size(); i++) {
-            List<LatLng> points = highwayList.get(i).getLatLngList();
-            if (points != null) {
-                PolylineOptions lineOptions = new PolylineOptions();
-
-//                globalPoly.addAll(points);
-                line.addAll(points);
-                lineOptions.addAll(points);
-                lineOptions.width(10);
-                lineOptions.color(Color.GREEN);
-                lineOptions.geodesic(true);
-
-//                mMap.addPolyline(lineOptions);
-            }
-        }
-
-    }
+//    @Override
+//    protected void onPostExecute(List<Highway> highways) {
+//        super.onPostExecute(highways);
+//    }
 }
-
