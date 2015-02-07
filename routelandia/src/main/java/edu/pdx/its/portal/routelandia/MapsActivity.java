@@ -196,11 +196,11 @@ public class MapsActivity extends FragmentActivity {
                     .getMap();
 
             //Enable location services
-            mMap.setMyLocationEnabled(true);
+            //mMap.setMyLocationEnabled(true);
 
             //Enable zoom control and location
             //Disable map toolbar
-            mMap.getUiSettings().setZoomControlsEnabled(true);
+            //mMap.getUiSettings().setZoomControlsEnabled(true);
             mMap.getUiSettings().setMapToolbarEnabled(false);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.509534, -122.681081), 10.0f));
@@ -254,6 +254,7 @@ public class MapsActivity extends FragmentActivity {
             List<LatLng> points = stations.get(i).getLatLngList();
             
             if(points!= null){
+                globalPoly.addAll(points);
                 PolylineOptions polylineOptions = new PolylineOptions();
                 polylineOptions.addAll(points).width(10).color(Color.GREEN).geodesic(true);
                 

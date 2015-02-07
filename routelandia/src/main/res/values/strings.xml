@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Routelandia</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -9,4 +8,5 @@
     <string name="title_activity_time_pick_up">TimePickUp</string>
     <string name="pick_stats">Get Statistics</string>
     <string name="pick_date">CHOOSE YOUR DATE</string>
+    <string name="start_button">START</string>
 </resources>
