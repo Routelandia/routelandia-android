@@ -69,4 +69,67 @@ public class JSONParser {
 
         return highwayList;
     }
+
+    public List<Highway> parseListOfHighWay(JSONArray jsonArray){
+        List<Highway> highwayList =  new ArrayList<>();
+        
+        try{
+            for (int i = 0; i <jsonArray.length() ; i++) {
+                //Create JSON Object for each array index
+                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+
+                //Get highwayid from the object
+                int highwayid = jsonObject.getInt("highwayid");
+
+                //Get highway name in the object
+                String highwayname = jsonObject.getString("highwayname");
+
+                //add the highway to the list highway
+                highwayList.add(i, new Highway(highwayname, highwayid));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return highwayList;
+    }
+
+    public List<Station> parseStationList(JSONArray jsonArray){
+        List<Station> stationList =  new ArrayList<>();
+        try{
+            for (int i = 0; i <jsonArray.length() ; i++) {
+                //Create JSON Object for each array index
+                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+
+                //Get stationid from the object
+                int stationid = jsonObject.getInt("stationid");
+
+                //Get linked list position in the object
+                int linkedListPosition = jsonObject.getInt("linked_list_position");
+
+                //add the highway to the list highway
+                stationList.add(linkedListPosition, new Station(stationid, linkedListPosition));
+
+                if (!jsonObject.isNull("geojson_raw")) {
+                    JSONObject geojsonRaw = jsonObject.getJSONObject("geojson_raw");
+
+                    //Create json array from coordinates
+                    JSONArray coordinates = (JSONArray) geojsonRaw.get("coordinates");
+
+                    //for each json array coordinates, create latlng and
+                    //add it to the list latlng of its station
+                    for (int j = 0; j < coordinates.length(); j++) {
+                        double latitude = Double.parseDouble(((JSONArray) coordinates.get(j)).get(1).toString());
+                        double longtitude = Double.parseDouble(((JSONArray) coordinates.get(j)).get(0).toString());
+                        stationList.get(i).addLatLng(new LatLng(latitude, longtitude));
+                    }
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return stationList;
+    }
 }
