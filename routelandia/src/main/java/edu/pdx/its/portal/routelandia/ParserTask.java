@@ -29,15 +29,15 @@ import java.util.List;
 /**
  * Created by loc on 1/24/15.
  */
-public class ParserTask extends AsyncTask<String, Integer, List<Highway>> {
+public class ParserTask extends AsyncTask<String, Integer, List<Station>> {
 
-    protected GoogleMap mMap;
-    protected PolylineOptions globalPoly;
-
-    public ParserTask(GoogleMap mMap, PolylineOptions globalPoly) {
-        this.mMap = mMap;
-        this.globalPoly = globalPoly;
-    }
+//    protected GoogleMap mMap;
+//    protected PolylineOptions globalPoly;
+//
+//    public ParserTask(GoogleMap mMap, PolylineOptions globalPoly) {
+//        this.mMap = mMap;
+//        this.globalPoly = globalPoly;
+//    }
 
     /**
      * Override this method to perform a computation on a background thread. The
@@ -54,16 +54,16 @@ public class ParserTask extends AsyncTask<String, Integer, List<Highway>> {
      * @see #publishProgress
      */
     @Override
-    protected List<Highway> doInBackground(String... jsonData) {
+    protected List<Station> doInBackground(String... jsonData) {
 
-        List<Highway> routes =  new ArrayList<>();
+        List<Station> routes =  new ArrayList<>();
 
         try {
             JSONArray jObject = new JSONArray(jsonData[0]);
             JSONParser parser = new JSONParser();
 
             // Starts parsing data
-            routes = parser.parse(jObject);
+            routes = parser.parseStationList(jObject);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -82,21 +82,21 @@ public class ParserTask extends AsyncTask<String, Integer, List<Highway>> {
      * @see #onCancelled(Object)
      */
     @Override
-    protected void onPostExecute(List<Highway> highwayList) {
+    protected void onPostExecute(List<Station> highwayList) {
         PolylineOptions line = new PolylineOptions();
         for (int i = 0; i < highwayList.size(); i++) {
             List<LatLng> points = highwayList.get(i).getLatLngList();
             if (points != null) {
                 PolylineOptions lineOptions = new PolylineOptions();
 
-                globalPoly.addAll(points);
+//                globalPoly.addAll(points);
                 line.addAll(points);
                 lineOptions.addAll(points);
                 lineOptions.width(10);
                 lineOptions.color(Color.GREEN);
                 lineOptions.geodesic(true);
 
-                mMap.addPolyline(lineOptions);
+//                mMap.addPolyline(lineOptions);
             }
         }
 
