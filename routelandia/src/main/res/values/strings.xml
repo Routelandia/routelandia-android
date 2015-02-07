@@ -9,4 +9,14 @@
     <string name="title_activity_time_pick_up">TimePickUp</string>
     <string name="pick_stats">Get Statistics</string>
     <string name="pick_date">CHOOSE YOUR DATE</string>
+    <string name="start_button_string">Start</string>
+    <string-array name="Week_Day">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
 </resources>
