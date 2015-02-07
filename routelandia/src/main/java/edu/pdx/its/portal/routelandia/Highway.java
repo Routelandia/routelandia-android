@@ -39,4 +39,12 @@ public class Highway {
     public List<LatLng> getLatLngList() {
         return latLngList;
     }
+    
+    public String toString(){
+        return "Highway " + name + " has id : " + highwayid;
+    }
+
+    public int getHighwayid() {
+        return highwayid;
+    }
 }
