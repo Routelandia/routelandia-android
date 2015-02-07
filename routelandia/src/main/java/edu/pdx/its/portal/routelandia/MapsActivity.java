@@ -16,6 +16,7 @@ package edu.pdx.its.portal.routelandia;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -35,7 +36,9 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class MapsActivity extends FragmentActivity {
 
@@ -44,6 +47,8 @@ public class MapsActivity extends FragmentActivity {
     protected ArrayList<LatLng> startEnd = new ArrayList<>();
     protected PolylineOptions globalPoly = new PolylineOptions();
     protected MarkerOptions marker = new MarkerOptions();
+    protected List<Highway> highwayList = new ArrayList<>();
+    protected HashMap<Integer, List<Station>> listOfStationsBaseOnHighwayid = new HashMap<>();
 
     /**
      * Perform initialization of all fragments and loaders.
@@ -72,19 +77,50 @@ public class MapsActivity extends FragmentActivity {
             // Getting Map for the SupportMapFragment
             mMap = fm.getMap();
 
-            // Enable MyLocation Button in the Map
-            mMap.setMyLocationEnabled(true);
+//            // Enable MyLocation Button in the Map
+//            mMap.setMyLocationEnabled(true);
 
             //The URL to download all highway data from the back end
-            String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";
+            String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";          
+            try {
+                //Create downloadtask to do the http connect and download json from API
+                DownloadListofHighway downloadListofHighway = new DownloadListofHighway();
+                
+                ParserListofHighway parserListofHighway = new ParserListofHighway();
+                
+                highwayList =  parserListofHighway.execute(downloadListofHighway.execute(url).get()).get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
 
-            //Create downloadtask to do the http connect and download json from API
-            DownloadTask downloadTask = new DownloadTask(mMap, globalPoly);
+            for(int i =0; i<highwayList.size(); i++) {
 
-            // Start downloading json data from Google Directions API
-            downloadTask.execute(url);
+                String urlStations = urlForAllStationsInEachHighWay(highwayList.get(i).getHighwayid());
+
+                try {
+                    DownloadTask downloadTask = new DownloadTask();
+
+                    ParserTask parserTask = new ParserTask();
+
+                    List<Station> stationList = parserTask.execute(downloadTask.execute(urlStations).get()).get();
+
+                    listOfStationsBaseOnHighwayid.put(highwayList.get(i).getHighwayid(), stationList);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+            
+            for (int i =0; i<highwayList.size(); i++){
+                List<Station> stations = listOfStationsBaseOnHighwayid.get(highwayList.get(i).getHighwayid());
+                drawHighway(stations);
+            }
+            
+//            drawHighway(stationList);
         }
-
         //overwrite onMapClickListener to let users drag marker in the map
         mMap.setOnMapClickListener(new OnMapClickListener() {
             @Override
@@ -112,7 +148,7 @@ public class MapsActivity extends FragmentActivity {
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mMarkerPoints.size() == 1 || mMarkerPoints.size() == 2) {
+                if (mMarkerPoints.size() == 1 || mMarkerPoints.size() == 2) {
                     Intent i = new Intent(MapsActivity.this, MapsActivity.class);
                     startActivity(i);
                 }
@@ -196,6 +232,32 @@ public class MapsActivity extends FragmentActivity {
                 LatLng endPoint = marker.getPosition();
                 startEnd.add(endPoint);
                 mMap.addMarker(marker);
+            }
+        }
+    }
+
+    /**
+     * * 
+     * @param highwayid
+     * @return
+     */
+    private String urlForAllStationsInEachHighWay(int highwayid){
+        String url = "http://capstoneaa.cs.pdx.edu/api/highways.json/";
+        String station = "/stations";
+        
+        return url + highwayid + station;
+    }
+    
+    public void drawHighway(List<Station> stations){
+       
+        for (int i=0; i<stations.size(); i++){
+            List<LatLng> points = stations.get(i).getLatLngList();
+            
+            if(points!= null){
+                PolylineOptions polylineOptions = new PolylineOptions();
+                polylineOptions.addAll(points).width(10).color(Color.GREEN).geodesic(true);
+                
+                mMap.addPolyline(polylineOptions);
             }
         }
     }
