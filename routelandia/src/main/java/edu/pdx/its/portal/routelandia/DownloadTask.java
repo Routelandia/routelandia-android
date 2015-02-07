@@ -32,18 +32,18 @@ import java.net.URL;
  */
 public class DownloadTask extends AsyncTask<String, Void, String> {
 
-    protected GoogleMap mMap;
-    protected PolylineOptions globalPoly;
-
-    /**
-     * Constructor for DownloadTask class
-     * @param mMap is a field Google Map in MapsActivity class
-     * @param globalPoly is field polylineOptions in MapsActivity
-     */
-    public DownloadTask(GoogleMap mMap, PolylineOptions globalPoly) {
-        this.mMap = mMap;
-        this.globalPoly = globalPoly;
-    }
+//    protected GoogleMap mMap;
+//    protected PolylineOptions globalPoly;
+//
+//    /**
+//     * Constructor for DownloadTask class
+//     * @param mMap is a field Google Map in MapsActivity class
+//     * @param globalPoly is field polylineOptions in MapsActivity
+//     */
+//    public DownloadTask(GoogleMap mMap, PolylineOptions globalPoly) {
+//        this.mMap = mMap;
+//        this.globalPoly = globalPoly;
+//    }
 
     /**
      * Override this method to perform a computation on a background thread. The
@@ -88,10 +88,10 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
         super.onPostExecute(result);
 
         //Create ParserTask class to parse the JSON from the backend
-        ParserTask parserTask = new ParserTask(mMap, globalPoly);
-
-        // Invokes the thread for parsing the JSON data
-        parserTask.execute(result);
+//        ParserTask parserTask = new ParserTask(mMap, globalPoly);
+//
+//        // Invokes the thread for parsing the JSON data
+//        parserTask.execute(result);
 
     }
 
