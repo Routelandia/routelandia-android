@@ -14,19 +14,11 @@
         android:text="@string/pick_stats" />
 
     <TextView
-        android:id="@+id/tvDate"
+        android:id="@+id/tvTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         style="@style/Bubble.TextAppearance.Light" />
-
-    <DatePicker
-        android:id="@+id/datePickerResult"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/TextAppearance.AppCompat.Widget.DropDownItem"
-        android:calendarViewShown="false"
-        android:layout_weight="0.15" />
 
     <TimePicker
         style="@style/Widget.AppCompat.Spinner"
@@ -34,7 +26,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:foregroundGravity="bottom"
-        android:layout_weight="0.43"
+        android:layout_weight="0.11"
         android:layout_gravity="bottom" />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:prompt="@string/day_pick"
+        android:entries="@array/week_day"
+        android:id="@+id/spinner" />
 
 </LinearLayout>

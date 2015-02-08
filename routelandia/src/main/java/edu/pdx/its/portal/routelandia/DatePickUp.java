@@ -16,61 +16,67 @@ package edu.pdx.its.portal.routelandia;
 
 import java.util.Calendar;
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.DatePicker;
+import android.widget.TimePicker;
 
-public class DatePickUp extends Activity{
-    private TextView tvDisplayDate;
-    private DatePicker datePickerResult;
+
+public class DatePickUp extends Activity {
+    private TextView tvDisplayDay;
+    private TimePicker thisTimePicker;
     private Button btnDepartureDate;
-
-    private int year;
-    private int month;
-    private int day;
-    private String dayOfWeek;
-
-    static final int DATE_DIALOG_ID = 100;
+    private int hour;
+    private int minute;
+    private int am_pm;
+    static final int TIME_DIALOG_ID = 100;
+    public String dayOfWeek;
+    private Spinner weekDaySpinner;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_date_pick_up);
 
-        setCurrentDateOnView();
+        setCurrentTimeOnView();
         addListenerOnButton();
-        HttpAsyncTask httpAsyncTask = new HttpAsyncTask();
-        httpAsyncTask.execute();
+        addListenerOnWeekDaySpinnerSelection();
+        addListenerOnTime();
     }
 
-    //Display current date
-    public void setCurrentDateOnView() {
+    private void addListenerOnWeekDaySpinnerSelection() {
+        weekDaySpinner = (Spinner) findViewById(R.id.spinner);
+        weekDaySpinner.setOnItemSelectedListener(new DayPickSelectedListener());
+    }
 
-        tvDisplayDate = (TextView) findViewById(R.id.tvDate);
-        datePickerResult = (DatePicker) findViewById(R.id.datePickerResult);
+    private void addListenerOnTime(){
+        thisTimePicker = (TimePicker) findViewById(R.id.timePicker);
+        thisTimePicker.setOnTimeChangedListener(new TimePickSelectedListener());
+    }
+
+    //Display current time
+    public void setCurrentTimeOnView() {
+
+        tvDisplayDay = (TextView) findViewById(R.id.tvTime);
+        thisTimePicker = (TimePicker) findViewById(R.id.timePicker);
 
         final Calendar c = Calendar.getInstance();
-        year = c.get(Calendar.YEAR);
-        month = c.get(Calendar.MONTH);
-        day = c.get(Calendar.DAY_OF_MONTH);
-        dayOfWeek = getDayOfWeek(c.get(Calendar.DAY_OF_WEEK));
-        System.out.println(dayOfWeek);
+        hour = c.get(Calendar.HOUR_OF_DAY);
+        minute = c.get(Calendar.MINUTE);
+        am_pm = c.get(Calendar.AM_PM);
+        dayOfWeek = getPmAm(c.get(Calendar.AM_PM));
 
-        //Set current date into text view
-        tvDisplayDate.setText(new StringBuilder()
-                // Month is 0 based, just add 1
-                .append(month + 1).append("-").append(day).append("-")
-                .append(year).append(" "));
+        tvDisplayDay.setText(
+                new StringBuilder().append(hour)
+                        .append(":").append(minute));
 
-        datePickerResult.init(year, month, day, null);
-
+        thisTimePicker.setCurrentHour(hour);
+        thisTimePicker.setCurrentMinute(minute);
     }
 
     public void addListenerOnButton() {
@@ -80,9 +86,6 @@ public class DatePickUp extends Activity{
 
             @Override
             public void onClick(View v) {
-                //ShowDialog(DATE_DIALOG_ID);
-                //Save date in jason array and switch to map for now...
-                Log.i("clicks", "you clicked start");
                 Intent i = new Intent(
                         DatePickUp.this,
                         ListStat.class);
@@ -91,60 +94,27 @@ public class DatePickUp extends Activity{
         });
     }
 
-  /*  @Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case DATE_DIALOG_ID:
-
-                return new DatePickerDialog(this, datePickerListener,
-                        year, month,day);
-        }
-        return null;
+    private static String pad(int c) {
+        if (c >= 10)
+            return String.valueOf(c);
+        else
+            return "0" + String.valueOf(c);
     }
 
-    private DatePickerDialog.OnDateSetListener datePickerListener
-            = new DatePickerDialog.OnDateSetListener() {
-
-        public void onDateSet(DatePicker view, int selectedYear,
-                              int selectedMonth, int selectedDay) {
-            year = selectedYear;
-            month = selectedMonth;
-            day = selectedDay;
-
-            tvDisplayDate.setText(new StringBuilder().append(month + 1)
-                    .append("-").append(day).append("-").append(year)
-                    .append(" "));
-
-            datePickerResult.init(year, month, day, null);
-        }
-    };*/
-
-    private String getDayOfWeek(int value) {
-        String day = "";
+    private String getPmAm(int value) {
+        String pmAm = "";
         switch (value) {
             case 1:
-                day = "Sunday";
+                if (am_pm == 1) {
+                    pmAm = "pm";
+                }
                 break;
             case 2:
-                day = "Monday";
-                break;
-            case 3:
-                day = "Tuesday";
-                break;
-            case 4:
-                day = "Wednesday";
-                break;
-            case 5:
-                day = "Thursday";
-                break;
-            case 6:
-                day = "Friday";
-                break;
-            case 7:
-                day = "Saturday";
+                if (am_pm == 0) {
+                    pmAm = "am";
+                }
                 break;
         }
-        return day;
+        return pmAm;
     }
-
 }
