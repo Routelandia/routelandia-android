@@ -26,10 +26,13 @@ import java.io.InputStreamReader;
  */
 public class HttpAsyncTask extends AsyncTask<String, Void, JSONObject>{
 
-    private LatLng startPoint = new LatLng(45.509534, -122.681081);
-    private LatLng endPoint =  new LatLng(45.509534, -122.681081);
+    //private LatLng startPoint = new LatLng(45.509534, -122.681081);
+    //private LatLng endPoint =  new LatLng(45.509534, -122.681081);
+    private LatLng startPoint = MapsActivity.start_point;
+    private LatLng endPoint =  MapsActivity.end_ponit;
     String midpoint = "17:30";
-    String weekday = "Monday";
+    String weekday = DayPickSelectedListener.weekDay;
+
     String url = "http://capstoneaa.cs.pdx.edu/api/trafficstats";
 
     @Override

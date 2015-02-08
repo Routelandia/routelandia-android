@@ -49,6 +49,8 @@ public class MapsActivity extends FragmentActivity {
     protected MarkerOptions marker = new MarkerOptions();
     protected List<Highway> highwayList = new ArrayList<>();
     protected HashMap<Integer, List<Station>> listOfStationsBaseOnHighwayid = new HashMap<>();
+    public static LatLng start_point;
+    public static LatLng end_ponit;
 
     /**
      * Perform initialization of all fragments and loaders.
@@ -135,7 +137,7 @@ public class MapsActivity extends FragmentActivity {
         timeAndDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("clicks", "you clicked start");
+                Log.i("clicks", "you clicked date pick up");
                 if(mMarkerPoints.size()==2) {
                     Intent i = new Intent(MapsActivity.this, DatePickUp.class);
                     startActivity(i);
@@ -222,14 +224,18 @@ public class MapsActivity extends FragmentActivity {
             if (mMarkerPoints.size() == 1) {
                 marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                 marker.draggable(true);
+                marker.title("Start");
                 LatLng startPoint = marker.getPosition();
+                start_point = startPoint;
                 startEnd.add(startPoint);
                 mMap.addMarker(marker);
 
             } else if (mMarkerPoints.size() == 2) {
                 marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 marker.draggable(true);
+                marker.title("End");
                 LatLng endPoint = marker.getPosition();
+                end_ponit = endPoint;
                 startEnd.add(endPoint);
                 mMap.addMarker(marker);
             }

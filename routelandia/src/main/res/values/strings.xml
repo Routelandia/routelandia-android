@@ -9,4 +9,15 @@
     <string name="pick_stats">Get Statistics</string>
     <string name="pick_date">CHOOSE YOUR DATE</string>
     <string name="start_button">START</string>
+    <string name="day_pick">Choose a week day</string>
+
+    <string-array name="week_day">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
 </resources>
