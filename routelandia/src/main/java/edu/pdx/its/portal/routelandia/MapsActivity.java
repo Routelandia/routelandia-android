@@ -166,8 +166,8 @@ public class MapsActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 Log.i("clicks", "you clicked date pick up");
-                if(mMarkerPoints.size()==2) {
-                    Intent i = new Intent(MapsActivity.this, DatePickUp.class);
+                if(firstMarker != null && secondMarker != null) {
+                    Intent i = new Intent(getApplicationContext(), DatePickUp.class);
                     startActivity(i);
                 }
             }
@@ -244,25 +244,25 @@ public class MapsActivity extends FragmentActivity {
      *
      * @param outState
      */
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        
-        //save the hashmap of list station
-        outState.putSerializable("a hashmap of list stations", listOfStationsBaseOnHighwayid);
-        
-        //save the location of first marker
-        if(firstMarker != null) {
-            outState.putSerializable("lat of first marker", firstMarker.getPosition().latitude);
-            outState.putSerializable("lng of first marker", firstMarker.getPosition().longitude);
-        }
-
-        //save the location of second marker
-        if(secondMarker !=null) {
-            outState.putSerializable("lat of second marker", secondMarker.getPosition().latitude);
-            outState.putSerializable("lng of second marker", secondMarker.getPosition().longitude);
-        }
-    }
+//    @Override
+//    protected void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//
+//        //save the hashmap of list station
+//        outState.putSerializable("a hashmap of list stations", listOfStationsBaseOnHighwayid);
+//
+//        //save the location of first marker
+//        if(firstMarker != null) {
+//            outState.putSerializable("lat of first marker", firstMarker.getPosition().latitude);
+//            outState.putSerializable("lng of first marker", firstMarker.getPosition().longitude);
+//        }
+//
+//        //save the location of second marker
+//        if(secondMarker !=null) {
+//            outState.putSerializable("lat of second marker", secondMarker.getPosition().latitude);
+//            outState.putSerializable("lng of second marker", secondMarker.getPosition().longitude);
+//        }
+//    }
 
     /**
      * The function check if users tap a point close 200m to the freeway
