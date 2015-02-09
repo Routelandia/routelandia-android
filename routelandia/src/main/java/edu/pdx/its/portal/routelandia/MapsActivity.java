@@ -86,8 +86,8 @@ public class MapsActivity extends FragmentActivity {
             //Manually create highway list has data instead request to
             //have a list of highway and some highway have no data
             
-/*            //The URL to download all highway data from the back end
-            String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";
+            //The URL to download all highway data from the back end
+/*            String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";
             try {
                 //Create downloadtask to do the http connect and download json from API
                 DownloadListofHighway downloadListofHighway = new DownloadListofHighway();
@@ -106,7 +106,7 @@ public class MapsActivity extends FragmentActivity {
             if(savedInstanceState != null){
                 //get the hashmap list of station before users rotate the phone
                 listOfStationsBaseOnHighwayid = (HashMap<Integer, List<Station>>) savedInstanceState.get("a hashmap of list stations");
-                
+
                 //if users drag first marker, get the latlng back and re-create that marker
                 if(savedInstanceState.get("lat of first marker") != null) {
                     LatLng latLngOfFirstMarker = new LatLng((Double) savedInstanceState.get("lat of first marker"), (Double) savedInstanceState.get("lng of first marker"));
@@ -137,6 +137,8 @@ public class MapsActivity extends FragmentActivity {
 
                         List<Station> stationList = parserTask.execute(downloadTask.execute(urlStations).get()).get();
 
+//                        drawHighway(stationList);
+                        
                         listOfStationsBaseOnHighwayid.put(highwayList.get(i).getHighwayid(), stationList);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -244,25 +246,25 @@ public class MapsActivity extends FragmentActivity {
      *
      * @param outState
      */
-//    @Override
-//    protected void onSaveInstanceState(Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//
-//        //save the hashmap of list station
-//        outState.putSerializable("a hashmap of list stations", listOfStationsBaseOnHighwayid);
-//
-//        //save the location of first marker
-//        if(firstMarker != null) {
-//            outState.putSerializable("lat of first marker", firstMarker.getPosition().latitude);
-//            outState.putSerializable("lng of first marker", firstMarker.getPosition().longitude);
-//        }
-//
-//        //save the location of second marker
-//        if(secondMarker !=null) {
-//            outState.putSerializable("lat of second marker", secondMarker.getPosition().latitude);
-//            outState.putSerializable("lng of second marker", secondMarker.getPosition().longitude);
-//        }
-//    }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        //save the hashmap of list station
+        outState.putSerializable("a hashmap of list stations", listOfStationsBaseOnHighwayid);
+
+        //save the location of first marker
+        if(firstMarker != null) {
+            outState.putSerializable("lat of first marker", firstMarker.getPosition().latitude);
+            outState.putSerializable("lng of first marker", firstMarker.getPosition().longitude);
+        }
+
+        //save the location of second marker
+        if(secondMarker !=null) {
+            outState.putSerializable("lat of second marker", secondMarker.getPosition().latitude);
+            outState.putSerializable("lng of second marker", secondMarker.getPosition().longitude);
+        }
+    }
 
     /**
      * The function check if users tap a point close 200m to the freeway
