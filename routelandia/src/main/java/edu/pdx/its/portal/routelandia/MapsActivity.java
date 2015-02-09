@@ -79,49 +79,55 @@ public class MapsActivity extends FragmentActivity {
             // Getting Map for the SupportMapFragment
             mMap = fm.getMap();
 
-//            // Enable MyLocation Button in the Map
-//            mMap.setMyLocationEnabled(true);
 
-            //The URL to download all highway data from the back end
-            String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";          
+            //Manually create highway list has data instead request to
+            //have a list of highway and some highway have no data
+            
+/*            //The URL to download all highway data from the back end
+            String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";
             try {
                 //Create downloadtask to do the http connect and download json from API
                 DownloadListofHighway downloadListofHighway = new DownloadListofHighway();
-                
+
                 ParserListofHighway parserListofHighway = new ParserListofHighway();
-                
+
                 highwayList =  parserListofHighway.execute(downloadListofHighway.execute(url).get()).get();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
                 e.printStackTrace();
+            }*/
+
+            manualCreateHighwayList();
+            
+            if(savedInstanceState != null){
+                listOfStationsBaseOnHighwayid = (HashMap<Integer, List<Station>>) savedInstanceState.get("a hashmap of list stations");
             }
+            else {
+                for (int i = 0; i < highwayList.size(); i++) {
 
-            for(int i =0; i<highwayList.size(); i++) {
+                    String urlStations = urlForAllStationsInEachHighWay(highwayList.get(i).getHighwayid());
 
-                String urlStations = urlForAllStationsInEachHighWay(highwayList.get(i).getHighwayid());
+                    try {
+                        DownloadTask downloadTask = new DownloadTask();
 
-                try {
-                    DownloadTask downloadTask = new DownloadTask();
+                        ParserTask parserTask = new ParserTask();
 
-                    ParserTask parserTask = new ParserTask();
+                        List<Station> stationList = parserTask.execute(downloadTask.execute(urlStations).get()).get();
 
-                    List<Station> stationList = parserTask.execute(downloadTask.execute(urlStations).get()).get();
-
-                    listOfStationsBaseOnHighwayid.put(highwayList.get(i).getHighwayid(), stationList);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
+                        listOfStationsBaseOnHighwayid.put(highwayList.get(i).getHighwayid(), stationList);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-            
             for (int i =0; i<highwayList.size(); i++){
                 List<Station> stations = listOfStationsBaseOnHighwayid.get(highwayList.get(i).getHighwayid());
                 drawHighway(stations);
             }
             
-//            drawHighway(stationList);
         }
         //overwrite onMapClickListener to let users drag marker in the map
         mMap.setOnMapClickListener(new OnMapClickListener() {
@@ -197,16 +203,21 @@ public class MapsActivity extends FragmentActivity {
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
 
-            //Enable location services
-            //mMap.setMyLocationEnabled(true);
-
-            //Enable zoom control and location
-            //Disable map toolbar
-            //mMap.getUiSettings().setZoomControlsEnabled(true);
             mMap.getUiSettings().setMapToolbarEnabled(false);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.509534, -122.681081), 10.0f));
         }
+    }
+
+    /**
+     * Save all appropriate fragment state.
+     *
+     * @param outState
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("a hashmap of list stations", listOfStationsBaseOnHighwayid);
     }
 
     /**
@@ -243,8 +254,8 @@ public class MapsActivity extends FragmentActivity {
     }
 
     /**
-     * * 
-     * @param highwayid
+     * url request the list of station for each highway*
+     * @param highwayid the number's associated for highway
      * @return
      */
     private String urlForAllStationsInEachHighWay(int highwayid){
@@ -253,7 +264,11 @@ public class MapsActivity extends FragmentActivity {
         
         return url + highwayid + station;
     }
-    
+
+    /**
+     * draw polyline for each station based on its list latlng*
+     * @param stations: in its highway
+     */
     public void drawHighway(List<Station> stations){
        
         for (int i=0; i<stations.size(); i++){
@@ -268,4 +283,21 @@ public class MapsActivity extends FragmentActivity {
             }
         }
     }
+
+    /**
+     * manually create list of highway has data* 
+     */
+    private void manualCreateHighwayList(){
+        highwayList.add(new Highway("I-5 ", 1));
+        highwayList.add(new Highway("I-5 ", 2));
+        highwayList.add(new Highway("I-205 ", 4));
+        highwayList.add(new Highway("I-84 ", 7));
+        highwayList.add(new Highway("OR 217 ", 9));
+        highwayList.add(new Highway("OR 217 ", 10));
+        highwayList.add(new Highway("US 26 ", 11));
+        highwayList.add(new Highway("US 26 ", 12));
+        highwayList.add(new Highway("WA I-205 ", 54));
+        highwayList.add(new Highway("WA I-5 ", 502));        
+    }
+    
 }
