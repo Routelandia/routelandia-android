@@ -1,9 +1,7 @@
 package edu.pdx.its.portal.routelandia;
 
 import android.os.AsyncTask;
-import android.text.format.Time;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -28,8 +26,8 @@ public class HttpAsyncTask extends AsyncTask<String, Void, JSONObject>{
 
     //private LatLng startPoint = new LatLng(45.509534, -122.681081);
     //private LatLng endPoint =  new LatLng(45.509534, -122.681081);
-    private LatLng startPoint = MapsActivity.start_point;
-    private LatLng endPoint =  MapsActivity.end_ponit;
+    private LatLng startPoint = MapsActivity.startPoint;
+    private LatLng endPoint =  MapsActivity.endPoint;
     String midpoint = "17:30";
     String weekday = DayPickSelectedListener.weekDay;
 

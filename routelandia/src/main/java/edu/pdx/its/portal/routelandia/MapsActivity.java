@@ -31,6 +31,7 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
@@ -46,11 +47,13 @@ public class MapsActivity extends FragmentActivity {
     protected ArrayList<LatLng> mMarkerPoints = new ArrayList<>();
     protected ArrayList<LatLng> startEnd = new ArrayList<>();
     protected PolylineOptions globalPoly = new PolylineOptions();
-    protected MarkerOptions marker = new MarkerOptions();
+    protected MarkerOptions markerOptions = new MarkerOptions();
     protected List<Highway> highwayList = new ArrayList<>();
     protected HashMap<Integer, List<Station>> listOfStationsBaseOnHighwayid = new HashMap<>();
-    public static LatLng start_point;
-    public static LatLng end_ponit;
+    public static LatLng startPoint;
+    public static LatLng endPoint;
+    protected Marker firstMarker;
+    protected Marker secondMarker;
 
     /**
      * Perform initialization of all fragments and loaders.
@@ -101,7 +104,26 @@ public class MapsActivity extends FragmentActivity {
             manualCreateHighwayList();
             
             if(savedInstanceState != null){
+                //get the hashmap list of station before users rotate the phone
                 listOfStationsBaseOnHighwayid = (HashMap<Integer, List<Station>>) savedInstanceState.get("a hashmap of list stations");
+                
+                //if users drag first marker, get the latlng back and re-create that marker
+                if(savedInstanceState.get("lat of first marker") != null) {
+                    LatLng latLngOfFirstMarker = new LatLng((Double) savedInstanceState.get("lat of first marker"), (Double) savedInstanceState.get("lng of first marker"));
+                    firstMarker = mMap.addMarker(new MarkerOptions().position(latLngOfFirstMarker).
+                            icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).
+                            draggable(true).title("Start"));
+                    startPoint = firstMarker.getPosition();
+                }
+
+                //if users drag second marker, get the latlng back and re-create that marker
+                if(savedInstanceState.get("lat of second marker") != null) {
+                    LatLng latLngOfSecondMarker = new LatLng((Double) savedInstanceState.get("lat of second marker"), (Double) savedInstanceState.get("lng of second marker"));
+                    secondMarker = mMap.addMarker(new MarkerOptions().position(latLngOfSecondMarker).
+                            icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).
+                            draggable(true).title("End"));
+                    endPoint = secondMarker.getPosition();
+                }
             }
             else {
                 for (int i = 0; i < highwayList.size(); i++) {
@@ -129,7 +151,7 @@ public class MapsActivity extends FragmentActivity {
             }
             
         }
-        //overwrite onMapClickListener to let users drag marker in the map
+        //overwrite onMapClickListener to let users drag markerOptions in the map
         mMap.setOnMapClickListener(new OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
@@ -144,8 +166,8 @@ public class MapsActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 Log.i("clicks", "you clicked date pick up");
-                if(mMarkerPoints.size()==2) {
-                    Intent i = new Intent(MapsActivity.this, DatePickUp.class);
+                if(firstMarker != null && secondMarker != null) {
+                    Intent i = new Intent(getApplicationContext(), DatePickUp.class);
                     startActivity(i);
                 }
             }
@@ -156,9 +178,17 @@ public class MapsActivity extends FragmentActivity {
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mMarkerPoints.size() == 1 || mMarkerPoints.size() == 2) {
-                    Intent i = new Intent(MapsActivity.this, MapsActivity.class);
-                    startActivity(i);
+//                if (mMarkerPoints.size() == 1 || mMarkerPoints.size() == 2) {
+//                    Intent i = new Intent(MapsActivity.this, MapsActivity.class);
+//                    startActivity(i);
+//                }
+                if(firstMarker != null){
+                    firstMarker.remove();
+                    firstMarker = null;
+                }
+                if(secondMarker != null){
+                    secondMarker.remove();
+                    secondMarker = null;
                 }
             }
         });
@@ -214,41 +244,68 @@ public class MapsActivity extends FragmentActivity {
      *
      * @param outState
      */
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable("a hashmap of list stations", listOfStationsBaseOnHighwayid);
-    }
+//    @Override
+//    protected void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//
+//        //save the hashmap of list station
+//        outState.putSerializable("a hashmap of list stations", listOfStationsBaseOnHighwayid);
+//
+//        //save the location of first marker
+//        if(firstMarker != null) {
+//            outState.putSerializable("lat of first marker", firstMarker.getPosition().latitude);
+//            outState.putSerializable("lng of first marker", firstMarker.getPosition().longitude);
+//        }
+//
+//        //save the location of second marker
+//        if(secondMarker !=null) {
+//            outState.putSerializable("lat of second marker", secondMarker.getPosition().latitude);
+//            outState.putSerializable("lng of second marker", secondMarker.getPosition().longitude);
+//        }
+//    }
 
     /**
      * The function check if users tap a point close 200m to the freeway
-     * then drag a marker
+     * then drag a markerOptions
      * @param point which is users tap on the map
      */
     private void drawMarker(LatLng point) {
         List<LatLng> drawnPoints = globalPoly.getPoints();
         if (PolyUtil.isLocationOnPath(point, drawnPoints, true, 200.0)) {
 
-            // Setting the position of the marker
-            marker.position(point);
+           /* // Setting the position of the markerOptions
+            markerOptions.position(point);
             mMarkerPoints.add(point);
             if (mMarkerPoints.size() == 1) {
-                marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                marker.draggable(true);
-                marker.title("Start");
-                LatLng startPoint = marker.getPosition();
-                start_point = startPoint;
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                markerOptions.draggable(true);
+                markerOptions.title("Start");
+                LatLng startPoint = markerOptions.getPosition();
+                startPoint = startPoint;
                 startEnd.add(startPoint);
-                mMap.addMarker(marker);
+                mMap.addMarker(markerOptions);
 
             } else if (mMarkerPoints.size() == 2) {
-                marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                marker.draggable(true);
-                marker.title("End");
-                LatLng endPoint = marker.getPosition();
-                end_ponit = endPoint;
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                markerOptions.draggable(true);
+                markerOptions.title("End");
+                LatLng endPoint = markerOptions.getPosition();
+                endPoint = endPoint;
                 startEnd.add(endPoint);
-                mMap.addMarker(marker);
+                mMap.addMarker(markerOptions);
+            }*/
+            
+            if(firstMarker == null){
+                firstMarker = mMap.addMarker(new MarkerOptions().position(point).
+                        icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).
+                        draggable(true).title("Start"));
+                startPoint = firstMarker.getPosition();                
+            }
+            else if(secondMarker == null ){
+                secondMarker = mMap.addMarker(new MarkerOptions().position(point).
+                        icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).
+                        draggable(true).title("End"));
+                endPoint = secondMarker.getPosition();
             }
         }
     }
