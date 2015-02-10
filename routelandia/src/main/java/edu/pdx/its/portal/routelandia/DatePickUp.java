@@ -26,6 +26,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.android.gms.maps.model.LatLng;
+
 
 public class DatePickUp extends Activity {
     private TextView tvDisplayDay;
@@ -35,28 +37,44 @@ public class DatePickUp extends Activity {
     private int minute;
     private int am_pm;
     static final int TIME_DIALOG_ID = 100;
-    public String dayOfWeek;
     private Spinner weekDaySpinner;
-
+    public String weekDay;// = "Sunday";
+    protected LatLng startPoint;
+    protected LatLng endPoint;
+    protected String departureTime;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_date_pick_up);
-
+     
         setCurrentTimeOnView();
         addListenerOnButton();
-        addListenerOnWeekDaySpinnerSelection();
-        addListenerOnTime();
+        weekDay = addListenerOnWeekDaySpinnerSelection();
+        departureTime = addListenerOnTime();
+        
+        if(getIntent().getExtras() != null) {
+            startPoint = new LatLng(getIntent().getExtras().getDouble("lat of first point"), 
+                    getIntent().getExtras().getDouble("lng of first point"));
+
+            endPoint = new LatLng(getIntent().getExtras().getDouble("lat of second point"),
+                    getIntent().getExtras().getDouble("lng of second point"));
+
+        }
+
     }
 
-    private void addListenerOnWeekDaySpinnerSelection() {
+    private String addListenerOnWeekDaySpinnerSelection() {
         weekDaySpinner = (Spinner) findViewById(R.id.spinner);
-        weekDaySpinner.setOnItemSelectedListener(new DayPickSelectedListener());
+        DayPickSelectedListener dayPickSelectedListener = new DayPickSelectedListener();
+        weekDaySpinner.setOnItemSelectedListener(dayPickSelectedListener);
+        return dayPickSelectedListener.getWeekDay();
     }
 
-    private void addListenerOnTime(){
+    private String addListenerOnTime(){
         thisTimePicker = (TimePicker) findViewById(R.id.timePicker);
-        thisTimePicker.setOnTimeChangedListener(new TimePickSelectedListener());
+        TimePickSelectedListener timePickSelectedListener = new TimePickSelectedListener();
+        thisTimePicker.setOnTimeChangedListener(timePickSelectedListener);
+        return timePickSelectedListener.getDepartureTime();
     }
 
     //Display current time
@@ -69,7 +87,7 @@ public class DatePickUp extends Activity {
         hour = c.get(Calendar.HOUR_OF_DAY);
         minute = c.get(Calendar.MINUTE);
         am_pm = c.get(Calendar.AM_PM);
-        dayOfWeek = getPmAm(c.get(Calendar.AM_PM));
+//        dayOfWeek = getPmAm(c.get(Calendar.AM_PM));
 
         tvDisplayDay.setText(
                 new StringBuilder().append(hour)
@@ -86,9 +104,9 @@ public class DatePickUp extends Activity {
 
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(
-                        DatePickUp.this,
-                        ListStat.class);
+                HttpAsyncTask httpAsyncTask = new HttpAsyncTask(startPoint, endPoint, departureTime, weekDay);
+                httpAsyncTask.execute();
+                Intent i = new Intent(getApplicationContext(),ListStat.class);
                 startActivity(i);
             }
         });
