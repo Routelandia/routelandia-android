@@ -169,7 +169,11 @@ public class MapsActivity extends FragmentActivity {
             public void onClick(View v) {
                 Log.i("clicks", "you clicked date pick up");
                 if(firstMarker != null && secondMarker != null) {
-                    Intent i = new Intent(getApplicationContext(), DatePickUp.class);
+                    Intent i = new Intent(getApplicationContext(), DatePickUp.class).
+                            putExtra("lat of first point", startPoint.latitude).
+                            putExtra("lng of first point", startPoint.longitude).
+                            putExtra("lat of second point", endPoint.latitude).
+                            putExtra("lng of second point", endPoint.longitude);
                     startActivity(i);
                 }
             }
@@ -180,10 +184,6 @@ public class MapsActivity extends FragmentActivity {
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (mMarkerPoints.size() == 1 || mMarkerPoints.size() == 2) {
-//                    Intent i = new Intent(MapsActivity.this, MapsActivity.class);
-//                    startActivity(i);
-//                }
                 if(firstMarker != null){
                     firstMarker.remove();
                     firstMarker = null;
@@ -274,29 +274,6 @@ public class MapsActivity extends FragmentActivity {
     private void drawMarker(LatLng point) {
         List<LatLng> drawnPoints = globalPoly.getPoints();
         if (PolyUtil.isLocationOnPath(point, drawnPoints, true, 200.0)) {
-
-           /* // Setting the position of the markerOptions
-            markerOptions.position(point);
-            mMarkerPoints.add(point);
-            if (mMarkerPoints.size() == 1) {
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                markerOptions.draggable(true);
-                markerOptions.title("Start");
-                LatLng startPoint = markerOptions.getPosition();
-                startPoint = startPoint;
-                startEnd.add(startPoint);
-                mMap.addMarker(markerOptions);
-
-            } else if (mMarkerPoints.size() == 2) {
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                markerOptions.draggable(true);
-                markerOptions.title("End");
-                LatLng endPoint = markerOptions.getPosition();
-                endPoint = endPoint;
-                startEnd.add(endPoint);
-                mMap.addMarker(markerOptions);
-            }*/
-            
             if(firstMarker == null){
                 firstMarker = mMap.addMarker(new MarkerOptions().position(point).
                         icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).
