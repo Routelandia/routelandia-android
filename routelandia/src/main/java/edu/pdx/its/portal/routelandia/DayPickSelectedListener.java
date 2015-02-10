@@ -6,7 +6,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Toast;
 
 public class DayPickSelectedListener implements OnItemSelectedListener {
-    public static String weekDay;
+    protected String weekDay;
     public static int week_day;
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
          Toast.makeText(parent.getContext(),
@@ -21,6 +21,10 @@ public class DayPickSelectedListener implements OnItemSelectedListener {
     @Override
     public void onNothingSelected(AdapterView<?> arg0) {
         //TODO
+    }
+    
+    public String getWeekDay() {
+        return weekDay;
     }
 
     private int getDayOfWeek(String value) {
