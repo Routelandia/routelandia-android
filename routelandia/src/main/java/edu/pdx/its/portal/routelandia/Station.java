@@ -16,13 +16,17 @@ package edu.pdx.its.portal.routelandia;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by loc on 2/6/15.
  */
-public class Station {
+public class Station implements Serializable {
     protected int stationid;
     protected int linkedListPosition;
     List<LatLng> latLngList = new ArrayList<>();
@@ -35,6 +39,11 @@ public class Station {
         this.stationid = stationid;
     }
 
+    /**
+     * constructor with argument stationid and linkedListPosition* 
+     * @param stationid
+     * @param linkedListPosition
+     */
     public Station(int stationid, int linkedListPosition) {
         this.stationid = stationid;
         this.linkedListPosition = linkedListPosition;
@@ -55,7 +64,11 @@ public class Station {
     public List<LatLng> getLatLngList() {
         return latLngList;
     }
-    
+
+    /**
+     * concatenate the value in class into string* 
+     * @return  the content in class bt String literal
+     */
     public String toString(){
         String temp = "station: " + stationid + " has postion at  " + String.valueOf(linkedListPosition) + '\n';
         
@@ -68,5 +81,29 @@ public class Station {
             }
         }
         return temp;
+    }
+
+    /**
+     * implement write out LatLng object*
+     * @param out
+     * @throws IOException
+     */
+    private void writeObject(ObjectOutputStream out) throws IOException {        
+        for (int i = 0; i <latLngList.size() ; i++) {
+            out.writeDouble(latLngList.get(i).latitude);
+            out.writeDouble(latLngList.get(i).longitude);    
+        }
+        
+    }
+
+    /**
+     * implement get back the latlng object after serializable*
+     * @param in
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        latLngList.add(new LatLng(in.readDouble(), in.readDouble()));
     }
 }
