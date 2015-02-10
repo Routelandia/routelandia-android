@@ -24,20 +24,27 @@ import java.io.InputStreamReader;
  */
 public class HttpAsyncTask extends AsyncTask<String, Void, JSONObject>{
 
-    //private LatLng startPoint = new LatLng(45.509534, -122.681081);
-    //private LatLng endPoint =  new LatLng(45.509534, -122.681081);
-    private LatLng startPoint = MapsActivity.startPoint;
-    private LatLng endPoint =  MapsActivity.endPoint;
-    String midpoint = "17:30";
-    String weekday = DayPickSelectedListener.weekDay;
+    protected LatLng startPoint ;
+    protected LatLng endPoint ;
+    protected String midpoint ; //backend call time field is midpoint
+    protected String weekday ;// DayPickSelectedListener.weekDay;
 
-    String url = "http://capstoneaa.cs.pdx.edu/api/trafficstats";
+    final String url = "http://capstoneaa.cs.pdx.edu/api/trafficstats";
+
+    public HttpAsyncTask(LatLng startPoint, LatLng endPoint, String midpoint, String weekday) {
+        this.startPoint = startPoint;
+        this.endPoint = endPoint;
+        this.midpoint = midpoint;
+        this.weekday = weekday;
+    }
 
     @Override
     protected JSONObject doInBackground(String... params) {
+        System.out.println("jsoncreated " + makingJson());
         return postJsonObject(url, makingJson());
     }
     protected void onPostExecute(JSONObject result) {
+        System.out.println("json download " + result);
         super.onPostExecute(result);
 
     }
