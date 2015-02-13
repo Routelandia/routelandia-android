@@ -21,10 +21,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -48,9 +50,9 @@ public class DatePickUp extends Activity {
         setContentView(R.layout.activity_date_pick_up);
      
         setCurrentTimeOnView();
-        addListenerOnButton();
-        weekDay = addListenerOnWeekDaySpinnerSelection();
-        departureTime = addListenerOnTime();
+
+        addListenerOnWeekDaySpinnerSelection();
+        addListenerOnTime();
         
         if(getIntent().getExtras() != null) {
             startPoint = new LatLng(getIntent().getExtras().getDouble("lat of first point"), 
@@ -60,21 +62,22 @@ public class DatePickUp extends Activity {
                     getIntent().getExtras().getDouble("lng of second point"));
 
         }
+        addListenerOnButton();
 
     }
 
-    private String addListenerOnWeekDaySpinnerSelection() {
+    private void addListenerOnWeekDaySpinnerSelection() {
         weekDaySpinner = (Spinner) findViewById(R.id.spinner);
         DayPickSelectedListener dayPickSelectedListener = new DayPickSelectedListener();
         weekDaySpinner.setOnItemSelectedListener(dayPickSelectedListener);
-        return dayPickSelectedListener.getWeekDay();
+//        return dayPickSelectedListener.getWeekDay();
     }
 
-    private String addListenerOnTime(){
+    private void addListenerOnTime(){
         thisTimePicker = (TimePicker) findViewById(R.id.timePicker);
         TimePickSelectedListener timePickSelectedListener = new TimePickSelectedListener();
         thisTimePicker.setOnTimeChangedListener(timePickSelectedListener);
-        return timePickSelectedListener.getDepartureTime();
+//        return timePickSelectedListener.getDepartureTime();
     }
 
     //Display current time
@@ -134,5 +137,66 @@ public class DatePickUp extends Activity {
                 break;
         }
         return pmAm;
+    }
+
+    private class DayPickSelectedListener implements AdapterView.OnItemSelectedListener {
+        protected int week_day;
+        public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+            Toast.makeText(parent.getContext(),
+                    "Departure day: " + parent.getItemAtPosition(pos).toString(),
+                    Toast.LENGTH_SHORT).show();
+            String s = parent.getItemAtPosition(pos).toString();
+            weekDay = s;
+            // Backend might prefer integer for days
+            week_day = getDayOfWeek(s);
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> arg0) {
+            //TODO
+        }
+
+        public String getWeekDay() {
+            return weekDay;
+        }
+
+        private int getDayOfWeek(String value) {
+            int day = 0;
+            switch (value) {
+                case "Sunday":
+                    day = 0;
+                    break;
+                case "Monday":
+                    day = 1;
+                    break;
+                case "Tuesday":
+                    day = 2;
+                    break;
+                case "Wednesday":
+                    day = 3;
+                    break;
+                case "Thursday":
+                    day = 4;
+                    break;
+                case "Friday":
+                    day = 5;
+                    break;
+                case "Saturday":
+                    day = 6;
+                    break;
+            }
+            return day;
+        }
+    }
+
+    private class TimePickSelectedListener implements TimePicker.OnTimeChangedListener {
+
+
+        @Override
+        public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+            StringBuilder s = new StringBuilder().append(hourOfDay).append(":").append(minute);
+            departureTime = s.toString();
+        }
+
     }
 }
