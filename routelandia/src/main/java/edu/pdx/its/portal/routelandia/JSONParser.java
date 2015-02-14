@@ -105,10 +105,10 @@ public class JSONParser {
                 int stationid = jsonObject.getInt("stationid");
 
                 //Get linked list position in the object
-                int linkedListPosition = jsonObject.getInt("linked_list_position");
+//                int linkedListPosition = jsonObject.getInt("linked_list_position");
 
                 //add the highway to the list highway
-                stationList.add(linkedListPosition, new Station(stationid, linkedListPosition));
+                stationList.add(new Station(stationid));
 
                 if (!jsonObject.isNull("geojson_raw")) {
                     JSONObject geojsonRaw = jsonObject.getJSONObject("geojson_raw");
