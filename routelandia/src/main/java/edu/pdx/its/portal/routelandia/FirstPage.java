@@ -15,14 +15,23 @@
 package edu.pdx.its.portal.routelandia;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
+
+import java.util.logging.Handler;
 
 
 public class FirstPage extends Activity{
+    private AnimationProgressDialog spinner;
+
+    public FirstPage() {
+    }
+
     /**
      * Called when the activity is starting.  This is where most initialization
      * should go: calling {@link #setContentView(int)} to inflate the
@@ -52,13 +61,28 @@ public class FirstPage extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first_page);
-
         Button button = (Button) findViewById(R.id.button);
+        spinner = new AnimationProgressDialog(this, R.drawable.spinner_xhdpi);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                startActivity(intent);
+                spinner.setCancelable(true);
+                spinner.show();
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(4000); // Thread goes to sleep for 4 seconds
+                        } catch (Exception e) {
+                        }
+                        spinner.dismiss();
+                    }
+                }).start();
+
+            Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+            startActivity(intent);
             }
         });
     }
@@ -95,4 +119,5 @@ public class FirstPage extends Activity{
         getMenuInflater().inflate(R.menu.menu_first_page, menu);
         return true;
     }
+
 }
