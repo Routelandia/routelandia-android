@@ -88,7 +88,7 @@ public class MapsActivity extends FragmentActivity {
             //have a list of highway and some highway have no data
             
             //The URL to download all highway data from the back end
-/*            String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";
+            String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";
             try {
                 //Create downloadtask to do the http connect and download json from API
                 DownloadListofHighway downloadListofHighway = new DownloadListofHighway();
@@ -100,65 +100,13 @@ public class MapsActivity extends FragmentActivity {
                 e.printStackTrace();
             } catch (ExecutionException e) {
                 e.printStackTrace();
-            }*/
+            }
 
 //            manualCreateHighwayList();
-//
-//            if(savedInstanceState != null){
-//                //get the hashmap list of station before users rotate the phone
-//                listOfStationsBaseOnHighwayid = (HashMap<Integer, List<Station>>) savedInstanceState.get("a hashmap of list stations");
-//
-//                //if users drag first marker, get the latlng back and re-create that marker
-//                if(savedInstanceState.get("lat of first marker") != null) {
-//                    LatLng latLngOfFirstMarker = new LatLng((Double) savedInstanceState.get("lat of first marker"), (Double) savedInstanceState.get("lng of first marker"));
-//                    firstMarker = mMap.addMarker(new MarkerOptions().position(latLngOfFirstMarker).
-//                            icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).
-//                            draggable(true).title("Start"));
-//                    startPoint = firstMarker.getPosition();
-//                }
-//
-//                //if users drag second marker, get the latlng back and re-create that marker
-//                if(savedInstanceState.get("lat of second marker") != null) {
-//                    LatLng latLngOfSecondMarker = new LatLng((Double) savedInstanceState.get("lat of second marker"), (Double) savedInstanceState.get("lng of second marker"));
-//                    secondMarker = mMap.addMarker(new MarkerOptions().position(latLngOfSecondMarker).
-//                            icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).
-//                            draggable(true).title("End"));
-//                    endPoint = secondMarker.getPosition();
-//                }
-//            }
-//            else {
-//                for (int i = 0; i < highwayList.size(); i++) {
-//
-//                    String urlStations = urlForAllStationsInEachHighWay(highwayList.get(i).getHighwayid());
-//
-//
-//                    try {
-//                        DownloadTask downloadTask = new DownloadTask();
-//
-//                        ParserTask parserTask = new ParserTask();
-//
-//                        List<Station> stationList = parserTask.execute(downloadTask.execute(urlStations).get()).get();
-//
-////                        drawHighway(stationList);
-//
-//                        listOfStationsBaseOnHighwayid.put(highwayList.get(i).getHighwayid(), stationList);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    } catch (ExecutionException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//            for (int i =0; i<highwayList.size(); i++){
-//                List<Station> stations = listOfStationsBaseOnHighwayid.get(highwayList.get(i).getHighwayid());
-//                drawHighway(stations);
-//            }
 
             if(savedInstanceState != null){
                 //get the hashmap list of station before users rotate the phone
-//                listOfStationsBaseOnHighwayid = (HashMap<Integer, List<Station>>) savedInstanceState.get("a hashmap of list stations");
-
-                stationList = (List<Station>) savedInstanceState.get("a list for all stations");
+                listOfStationsBaseOnHighwayid = (HashMap<Integer, List<Station>>) savedInstanceState.get("a hashmap of list stations");
 
                 //if users drag first marker, get the latlng back and re-create that marker
                 if(savedInstanceState.get("lat of first marker") != null) {
@@ -179,21 +127,65 @@ public class MapsActivity extends FragmentActivity {
                 }
             }
             else {
-                String urlListStations = "http://capstoneaa.cs.pdx.edu/api/stations.json";
+                for (int i = 0; i < highwayList.size(); i++) {
 
-                try {
-                    DownloadTask downloadTask = new DownloadTask();
+                    String urlStations = urlForAllStationsInEachHighWay(highwayList.get(i).getHighwayid());
 
-                    ParserTask parserTask = new ParserTask();
 
-                    stationList = parserTask.execute(downloadTask.execute(urlListStations).get()).get();
+                    try {
+                        DownloadTask downloadTask = new DownloadTask();
 
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
+                        ParserTask parserTask = new ParserTask();
+
+                        List<Station> stationList = parserTask.execute(downloadTask.execute(urlStations).get()).get();
+
+//                        drawHighway(stationList);
+
+                        listOfStationsBaseOnHighwayid.put(highwayList.get(i).getHighwayid(), stationList);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+            for (int i =0; i<highwayList.size(); i++){
+                int colorHighlightTheFreeWay = 0;
+                List<Station> stations = listOfStationsBaseOnHighwayid.get(highwayList.get(i).getHighwayid());
+                if(highwayList.get(i).getHighwayid() == 9 || highwayList.get(i).getHighwayid() == 10 ){
+                    colorHighlightTheFreeWay = Color.RED;
+                }
+                else if(highwayList.get(i).getHighwayid() == 5 || highwayList.get(i).getHighwayid() == 6 ){
+                    colorHighlightTheFreeWay = Color.BLUE;
+                }
+                else if(highwayList.get(i).getHighwayid() == 52 || highwayList.get(i).getHighwayid() == 53 ){
+                    colorHighlightTheFreeWay = Color.GREEN;
+                }
+                else if(highwayList.get(i).getHighwayid() == 7 || highwayList.get(i).getHighwayid() == 8 ){
+                    colorHighlightTheFreeWay = Color.BLACK;
+                }
+                else if(highwayList.get(i).getHighwayid() == 11 || highwayList.get(i).getHighwayid() == 12 ){
+                    colorHighlightTheFreeWay = Color.GRAY;
+                }
+                else if(highwayList.get(i).getHighwayid() == 50 || highwayList.get(i).getHighwayid() == 51 ){
+                    colorHighlightTheFreeWay = Color.MAGENTA;
+                }
+                else if(highwayList.get(i).getHighwayid() == 3 || highwayList.get(i).getHighwayid() == 4 ){
+                    colorHighlightTheFreeWay = Color.YELLOW;
+                }
+                else if(highwayList.get(i).getHighwayid() == 501 || highwayList.get(i).getHighwayid() == 502 ){
+                    colorHighlightTheFreeWay = Color.DKGRAY;
+                }
+                else if(highwayList.get(i).getHighwayid() == 1 || highwayList.get(i).getHighwayid() == 2 ){
+                    colorHighlightTheFreeWay = Color.DKGRAY;
+                }
+                else if(highwayList.get(i).getHighwayid() == 54 || highwayList.get(i).getHighwayid() == 5 ){
+                    colorHighlightTheFreeWay = Color.LTGRAY;
+                }
+//                drawHighway(stations);
+                drawHighway(stations, colorHighlightTheFreeWay);
+            }
+
         }
         drawHighway(stationList);
         //overwrite onMapClickListener to let users drag markerOptions in the map
@@ -294,10 +286,10 @@ public class MapsActivity extends FragmentActivity {
         super.onSaveInstanceState(outState);
 
         //save the hashmap of list station
-//        outState.putSerializable("a hashmap of list stations", listOfStationsBaseOnHighwayid);
+        outState.putSerializable("a hashmap of list stations", listOfStationsBaseOnHighwayid);
 
         //save the list of station
-        outState.putSerializable("a list for all stations", (java.io.Serializable) stationList);
+//        outState.putSerializable("a list for all stations", (java.io.Serializable) stationList);
         //save the location of first marker
         if(firstMarker != null) {
             outState.putSerializable("lat of first marker", firstMarker.getPosition().latitude);
@@ -323,7 +315,7 @@ public class MapsActivity extends FragmentActivity {
                 firstMarker = mMap.addMarker(new MarkerOptions().position(point).
                         icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).
                         draggable(true).title("Start"));
-                startPoint = firstMarker.getPosition();                
+                startPoint = firstMarker.getPosition();
             }
             else if(secondMarker == null ){
                 secondMarker = mMap.addMarker(new MarkerOptions().position(point).
@@ -359,6 +351,21 @@ public class MapsActivity extends FragmentActivity {
                     globalPoly.addAll(points);
                     PolylineOptions polylineOptions = new PolylineOptions();
                     polylineOptions.addAll(points).width(10).color(Color.GREEN).geodesic(true);
+                    mMap.addPolyline(polylineOptions);
+                }
+            }
+        }
+    }
+
+    public void drawHighway(List<Station> stations, int color){
+
+        for (int i=0; i<stations.size(); i++){
+            if(stations.get(i).getLatLngList().size() !=0) {
+                List<LatLng> points = stations.get(i).getLatLngList();
+                if (points != null) {
+                    globalPoly.addAll(points);
+                    PolylineOptions polylineOptions = new PolylineOptions();
+                    polylineOptions.addAll(points).width(10).color(color).geodesic(true);
                     mMap.addPolyline(polylineOptions);
                 }
             }
