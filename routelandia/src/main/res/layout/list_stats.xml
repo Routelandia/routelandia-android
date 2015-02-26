@@ -10,18 +10,24 @@
         android:layout_gravity="center_horizontal"
         android:text="Map" />
 
-    <ListView
-        android:id="@android:id/list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="@color/wallet_dim_foreground_inverse_disabled_holo_dark"
-        android:clickable="false"
-        style="@style/Base.TextAppearance.AppCompat.Body1"
-        android:stackFromBottom="false"
-        android:smoothScrollbar="true"
-        android:scrollingCache="true"
-        android:textFilterEnabled="false">
+    <!--<ListView-->
+        <!--android:id="@android:id/list"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="fill_parent"-->
+        <!--android:background="@color/wallet_dim_foreground_inverse_disabled_holo_dark"-->
+        <!--android:clickable="false"-->
+        <!--style="@style/Base.TextAppearance.AppCompat.Body1"-->
+        <!--android:stackFromBottom="false"-->
+        <!--android:smoothScrollbar="true"-->
+        <!--android:scrollingCache="true"-->
+        <!--android:textFilterEnabled="false">-->
+        <!--</ListView>-->
 
-        </ListView>
+    <LinearLayout
+        android:id="@+id/chart_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    </LinearLayout>
 
 </LinearLayout>
