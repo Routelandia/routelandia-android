@@ -15,6 +15,9 @@
 package edu.pdx.its.portal.routelandia;
 
 import java.util.Calendar;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -44,6 +47,7 @@ public class DatePickUp extends Activity {
     protected LatLng startPoint;
     protected LatLng endPoint;
     protected String departureTime;
+    protected List<TravelingInfo> travelingInfoList;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +112,26 @@ public class DatePickUp extends Activity {
             @Override
             public void onClick(View v) {
                 HttpAsyncTask httpAsyncTask = new HttpAsyncTask(startPoint, endPoint, departureTime, weekDay);
-                httpAsyncTask.execute();
+//                httpAsyncTask.execute();
+                JSONParser jsonParser = new JSONParser();
+                try {
+                    travelingInfoList = jsonParser.parseTravelingInfo(httpAsyncTask.execute().get());
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                if(travelingInfoList == null){
+                    System.out.println("error");
+                }
+                else{
+                    for (int j =0; j < travelingInfoList.size(); j++){
+                        System.out.println(travelingInfoList.get(j).toString());
+                    }
+                }
+
                 Intent i = new Intent(getApplicationContext(),ListStat.class);
                 startActivity(i);
             }
