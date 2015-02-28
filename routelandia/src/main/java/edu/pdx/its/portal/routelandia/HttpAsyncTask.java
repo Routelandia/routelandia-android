@@ -136,6 +136,7 @@ public class HttpAsyncTask extends AsyncTask<String, Void, JSONArray>{
             if(json instanceof JSONObject){
                 jsonObjectRespone = new JSONObject(result);
 //                jsonArray.put(jsonObjectRespone);
+                return null;
             }
             else if (json instanceof JSONArray){
                 jsonArray = new JSONArray(result);

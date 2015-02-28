@@ -153,34 +153,34 @@ public class MapsActivity extends FragmentActivity {
                 int colorHighlightTheFreeWay = 0;
                 List<Station> stations = listOfStationsBaseOnHighwayid.get(highwayList.get(i).getHighwayid());
                 if(highwayList.get(i).getHighwayid() == 9 || highwayList.get(i).getHighwayid() == 10 ){
-                    colorHighlightTheFreeWay = Color.RED;
+                    colorHighlightTheFreeWay = Color.rgb(255,0,0);
                 }
                 else if(highwayList.get(i).getHighwayid() == 5 || highwayList.get(i).getHighwayid() == 6 ){
-                    colorHighlightTheFreeWay = Color.BLUE;
+                    colorHighlightTheFreeWay = Color.rgb(0,255,0);
                 }
                 else if(highwayList.get(i).getHighwayid() == 52 || highwayList.get(i).getHighwayid() == 53 ){
-                    colorHighlightTheFreeWay = Color.GREEN;
+                    colorHighlightTheFreeWay = Color.rgb(0,0,255);
                 }
                 else if(highwayList.get(i).getHighwayid() == 7 || highwayList.get(i).getHighwayid() == 8 ){
-                    colorHighlightTheFreeWay = Color.BLACK;
+                    colorHighlightTheFreeWay = Color.rgb(0,0,0);
                 }
                 else if(highwayList.get(i).getHighwayid() == 11 || highwayList.get(i).getHighwayid() == 12 ){
-                    colorHighlightTheFreeWay = Color.GRAY;
+                    colorHighlightTheFreeWay = Color.rgb(255,0,255);
                 }
                 else if(highwayList.get(i).getHighwayid() == 50 || highwayList.get(i).getHighwayid() == 51 ){
-                    colorHighlightTheFreeWay = Color.MAGENTA;
+                    colorHighlightTheFreeWay = Color.rgb(0,255,255);
                 }
                 else if(highwayList.get(i).getHighwayid() == 3 || highwayList.get(i).getHighwayid() == 4 ){
-                    colorHighlightTheFreeWay = Color.YELLOW;
+                    colorHighlightTheFreeWay = Color.rgb(255,0,128);
                 }
                 else if(highwayList.get(i).getHighwayid() == 501 || highwayList.get(i).getHighwayid() == 502 ){
-                    colorHighlightTheFreeWay = Color.DKGRAY;
+                    colorHighlightTheFreeWay = Color.rgb(128,0,255);
                 }
                 else if(highwayList.get(i).getHighwayid() == 1 || highwayList.get(i).getHighwayid() == 2 ){
-                    colorHighlightTheFreeWay = Color.DKGRAY;
+                    colorHighlightTheFreeWay = Color.rgb(0,128,255);
                 }
                 else if(highwayList.get(i).getHighwayid() == 54 || highwayList.get(i).getHighwayid() == 5 ){
-                    colorHighlightTheFreeWay = Color.LTGRAY;
+                    colorHighlightTheFreeWay = Color.rgb(0,255,128);
                 }
 //                drawHighway(stations);
                 drawHighway(stations, colorHighlightTheFreeWay);
@@ -279,7 +279,7 @@ public class MapsActivity extends FragmentActivity {
     /**
      * Save all appropriate fragment state.
      *
-     * @param outState
+     * @param outState to write into the byte code
      */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -329,7 +329,7 @@ public class MapsActivity extends FragmentActivity {
     /**
      * url request the list of station for each highway*
      * @param highwayid the number's associated for highway
-     * @return
+     * @return the url to download the list of station
      */
     private String urlForAllStationsInEachHighWay(int highwayid){
         String url = "http://capstoneaa.cs.pdx.edu/api/highways.json/";
