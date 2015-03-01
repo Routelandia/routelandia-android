@@ -25,6 +25,7 @@ import org.achartengine.GraphicalView;
 import org.achartengine.model.XYSeries;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -49,11 +50,18 @@ public class ListStat extends Activity {
 
     private Button mapbtn;
     private GraphicalView mChart;
+    protected ArrayList<TravelingInfo> travelingInfoList;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_stats);
 
+        travelingInfoList = getIntent().getParcelableArrayListExtra("travel info");
+
+        for (int j =0; j < travelingInfoList.size(); j++){
+            Log.i("RESULT", travelingInfoList.get(j).toString());
+        }
+        
         addListenerOnButton();
         openChart();
 
