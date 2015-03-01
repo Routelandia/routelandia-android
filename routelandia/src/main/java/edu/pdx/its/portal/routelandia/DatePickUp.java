@@ -14,6 +14,7 @@
 
 package edu.pdx.its.portal.routelandia;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -49,7 +50,7 @@ public class DatePickUp extends Activity {
     protected LatLng startPoint;
     protected LatLng endPoint;
     protected String departureTime;
-    protected List<TravelingInfo> travelingInfoList;
+    protected ArrayList<TravelingInfo> travelingInfoList;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,13 +131,14 @@ public class DatePickUp extends Activity {
                 }
                 else{
                     // For now just print them out.
-                    for (int j =0; j < travelingInfoList.size(); j++){
-                        Log.i("RESULT", travelingInfoList.get(j).toString());
-                    }
+//                    for (int j =0; j < travelingInfoList.size(); j++){
+//                        Log.i("RESULT", travelingInfoList.get(j).toString());
+//                    }
                 }
 
-                Intent i = new Intent(getApplicationContext(),ListStat.class);
-                startActivity(i);
+                Intent intent = new Intent(getApplicationContext(),ListStat.class);
+                intent.putParcelableArrayListExtra("travel info", travelingInfoList);
+                startActivity(intent);
             }
         });
     }
