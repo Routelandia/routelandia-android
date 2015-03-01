@@ -45,7 +45,7 @@ public class HttpAsyncTask extends AsyncTask<String, Void, JSONObject>{
 
     @Override
     protected JSONObject doInBackground(String... params) {
-        System.out.println("jsoncreated " + makingJson());
+        Log.i("JSON POST", "json created: " + makingJson());
         return postJsonObject(url, makingJson());
     }
 //    protected void onPostExecute(JSONArray result) {
@@ -113,10 +113,10 @@ public class HttpAsyncTask extends AsyncTask<String, Void, JSONObject>{
             HttpResponse httpResponse = httpclient.execute(httpPost);
 
             result = EntityUtils.toString(httpResponse.getEntity());
-            Log.i("resulr", result);
+            //Log.i("RAW HTTP RESULT", result);
 
         } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
+            Log.e("InputStream", e.getLocalizedMessage());
         }
 
         try {

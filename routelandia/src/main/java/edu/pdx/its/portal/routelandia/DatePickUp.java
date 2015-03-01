@@ -126,11 +126,12 @@ public class DatePickUp extends Activity {
                 }
 
                 if(travelingInfoList == null){
-                    System.out.println("error");
+                    Log.e("RESULT", "No results returned from statistics query.");
                 }
                 else{
+                    // For now just print them out.
                     for (int j =0; j < travelingInfoList.size(); j++){
-                        System.out.println(travelingInfoList.get(j).toString());
+                        Log.i("RESULT", travelingInfoList.get(j).toString());
                     }
                 }
 
