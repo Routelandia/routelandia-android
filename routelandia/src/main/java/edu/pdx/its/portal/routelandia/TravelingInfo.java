@@ -14,13 +14,16 @@
 
 package edu.pdx.its.portal.routelandia;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
  * Created by locle on 2/27/15.
  */
-public class TravelingInfo {
+public class TravelingInfo implements Parcelable{
     protected int hour;
     protected int minutes;
     protected double speed;
@@ -55,6 +58,15 @@ public class TravelingInfo {
         }
 
     }
+    
+    public TravelingInfo(Parcel parcel){
+        this.hour = parcel.readInt();
+        this.minutes = parcel.readInt();
+        this.speed = parcel.readDouble();
+        this.travelTime = parcel.readDouble();
+        this.accuracy = parcel.readDouble();
+        
+    }
 
     public int getHour() {
         return hour;
@@ -79,4 +91,45 @@ public class TravelingInfo {
     public String toString(){
         return "hour: " + hour + " minute: " + minutes + " speed: " + speed + " traveltime: " + travelTime + " accuracy: " + accuracy + "\n";
     }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     *
+     * @return a bitmask indicating the set of special object types marshalled
+     * by the Parcelable.
+     */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param dest  The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written.
+     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(hour);
+        dest.writeInt(minutes);
+        dest.writeDouble(speed);
+        dest.writeDouble(travelTime);
+        dest.writeDouble(accuracy);
+    }
+    
+    @SuppressWarnings("unused")
+    public static final Creator<TravelingInfo> CREATOR = new Creator<TravelingInfo>() {
+        @Override
+        public TravelingInfo createFromParcel(Parcel source) {
+            return new TravelingInfo(source);
+        }
+
+        @Override
+        public TravelingInfo[] newArray(int size) {
+            return new TravelingInfo[size];
+        }
+    };
 }
