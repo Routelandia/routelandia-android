@@ -134,8 +134,8 @@ public class JSONParser {
         return stationList;
     }
 
-    List<TravelingInfo> parseTravelingInfo(JSONObject jObj){
-        List<TravelingInfo> travelingInfoList = new ArrayList<>();
+    ArrayList<TravelingInfo> parseTravelingInfo(JSONObject jObj){
+        ArrayList<TravelingInfo> travelingInfoList = new ArrayList<>();
 
         try {
             JSONArray jResult = jObj.getJSONArray("results");
