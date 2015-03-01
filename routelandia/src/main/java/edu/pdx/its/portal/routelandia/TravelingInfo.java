@@ -25,13 +25,15 @@ public class TravelingInfo {
     protected int minutes;
     protected double speed;
     protected double travelTime;
+    protected double accuracy;
 
 
-    public TravelingInfo(int hour, int minutes, double speed, double travelTime) {
+    public TravelingInfo(int hour, int minutes, double speed, double travelTime, double accuracy) {
         this.hour = hour;
         this.minutes = minutes;
         this.speed = speed;
         this.travelTime = travelTime;
+        this.accuracy = accuracy;
     }
 
     public TravelingInfo(JSONObject jsonObject) throws JSONException {
@@ -46,6 +48,10 @@ public class TravelingInfo {
         this.travelTime = 0.0;
         if (!jsonObject.isNull("traveltime")) {
             this.travelTime = Double.parseDouble(jsonObject.getString("traveltime"));
+        }
+        this.accuracy = 0.0;
+        if(!jsonObject.isNull("accuracy")) {
+            this.accuracy = Double.parseDouble(jsonObject.getString("accuracy"));
         }
 
     }
@@ -66,7 +72,11 @@ public class TravelingInfo {
         return travelTime;
     }
 
+    public double getAccuracy() {
+        return accuracy;
+    }
+
     public String toString(){
-        return "hour: " + hour + " minute: " + minutes + " speed: " + speed + " traveltime: " + travelTime +'\n';
+        return "hour: " + hour + " minute: " + minutes + " speed: " + speed + " traveltime: " + travelTime + " accuracy: " + accuracy + "\n";
     }
 }
