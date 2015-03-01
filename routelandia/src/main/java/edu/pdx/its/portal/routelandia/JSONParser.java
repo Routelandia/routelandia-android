@@ -138,29 +138,12 @@ public class JSONParser {
 
         if(jsonArray == null){
             return null;
-        }
-
-        else {
+        } else {
             try {
                 for (int i = 0; i < jsonArray.length(); i++) {
-                    //Create JSON Object for each array index
+                    //Create a JSONObject and use it to construct a TravelingInfo to add to the list
                     JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-
-                    //get hour, minute, speed, and travle time from each json obj
-                    int hour = Integer.parseInt(jsonObject.getString("hour"));
-                    int minute = Integer.parseInt(jsonObject.getString("minute"));
-                    double speed = 0.0;
-
-                    if (!jsonObject.isNull("speed")) {
-                        speed = Double.parseDouble(jsonObject.getString("speed"));
-                    }
-                    double travelTime = 0.0;
-                    if (!jsonObject.isNull("traveltime")) {
-                        travelTime = Double.parseDouble(jsonObject.getString("traveltime"));
-                    }
-                    //add new obj traveling info to the list
-                    travelingInfoList.add(new TravelingInfo(hour, minute, speed, travelTime));
-
+                    travelingInfoList.add(new TravelingInfo(jsonObject));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

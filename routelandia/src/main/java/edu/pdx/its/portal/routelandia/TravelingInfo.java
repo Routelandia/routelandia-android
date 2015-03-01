@@ -14,6 +14,9 @@
 
 package edu.pdx.its.portal.routelandia;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by locle on 2/27/15.
  */
@@ -29,6 +32,22 @@ public class TravelingInfo {
         this.minutes = minutes;
         this.speed = speed;
         this.travelTime = travelTime;
+    }
+
+    public TravelingInfo(JSONObject jsonObject) throws JSONException {
+        //get hour, minute, speed, and travel time from each json obj
+        this.hour    = Integer.parseInt(jsonObject.getString("hour"));
+        this.minutes = Integer.parseInt(jsonObject.getString("minute"));
+        this.speed   = 0.0;
+
+        if (!jsonObject.isNull("speed")) {
+            this.speed = Double.parseDouble(jsonObject.getString("speed"));
+        }
+        this.travelTime = 0.0;
+        if (!jsonObject.isNull("traveltime")) {
+            this.travelTime = Double.parseDouble(jsonObject.getString("traveltime"));
+        }
+
     }
 
     public int getHour() {
