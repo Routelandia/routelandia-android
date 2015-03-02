@@ -27,7 +27,7 @@ import java.io.InputStreamReader;
 /**
  * Created by loc on 1/30/15.
  */
-public class HttpAsyncTask extends AsyncTask<String, Void, JSONArray>{
+public class HttpAsyncTask extends AsyncTask<String, Void, JSONObject>{
 
     protected LatLng startPoint ;
     protected LatLng endPoint ;
@@ -44,8 +44,8 @@ public class HttpAsyncTask extends AsyncTask<String, Void, JSONArray>{
     }
 
     @Override
-    protected JSONArray doInBackground(String... params) {
-        System.out.println("jsoncreated " + makingJson());
+    protected JSONObject doInBackground(String... params) {
+        Log.i("JSON POST", "json created: " + makingJson());
         return postJsonObject(url, makingJson());
     }
 //    protected void onPostExecute(JSONArray result) {
@@ -78,7 +78,7 @@ public class HttpAsyncTask extends AsyncTask<String, Void, JSONArray>{
         return jsonObject;
     }
 
-    public JSONArray postJsonObject(String url, JSONObject jsonObject){
+    public JSONObject postJsonObject(String url, JSONObject jsonObject){
         InputStream inputStream = null;
         String result = "";
         try {
@@ -113,49 +113,24 @@ public class HttpAsyncTask extends AsyncTask<String, Void, JSONArray>{
             HttpResponse httpResponse = httpclient.execute(httpPost);
 
             result = EntityUtils.toString(httpResponse.getEntity());
-            Log.i("resulr", result);
+            //Log.i("RAW HTTP RESULT", result);
 
-//            // 9. receive response as inputStream
-//            inputStream = httpResponse.getEntity().getContent();
-//
-////            Log.i("input stream", inputStream.toString());
-//            // 10. convert inputstream to string
-//            if(inputStream != null)
-//                result = convertInputStreamToString(inputStream);
-//            else
-//                result = "Did not work!";
-//            Log.i("result", result);
         } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
+            Log.e("InputStream", e.getLocalizedMessage());
         }
 
-        JSONArray jsonArray = null;
-        JSONObject jsonObjectRespone = null;
         try {
             Object json = new JSONTokener(result).nextValue();
             if(json instanceof JSONObject){
-                jsonObjectRespone = new JSONObject(result);
-//                jsonArray.put(jsonObjectRespone);
-                return null;
+                return (JSONObject)json;
             }
-            else if (json instanceof JSONArray){
-                jsonArray = new JSONArray(result);
-            }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
-//        Log.i("final", jsonArray.toString());
 
-//        JSONArray jsonArray = null;
-//        try {
-//            jsonArray = new JSONArray(result);
-//            Log.i("json response", jsonArray.toString());
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-        // 11. return result
-        return jsonArray;
+        // If we got this far, we got something very wrong...
+        Log.e("RESULT", "Didn't get a valid JSON response!");
+        return null;
     }
 
     private String convertInputStreamToString(InputStream inputStream) throws IOException {

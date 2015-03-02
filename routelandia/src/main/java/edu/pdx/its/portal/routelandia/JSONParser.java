@@ -14,6 +14,7 @@
 
 package edu.pdx.its.portal.routelandia;
 
+import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -133,39 +134,31 @@ public class JSONParser {
         return stationList;
     }
 
-    List<TravelingInfo> parseTravelingInfo(JSONArray jsonArray){
-        List<TravelingInfo> travelingInfoList = new ArrayList<>();
+    ArrayList<TravelingInfo> parseTravelingInfo(JSONObject jObj){
+        ArrayList<TravelingInfo> travelingInfoList = new ArrayList<>();
 
-        if(jsonArray == null){
-            return null;
-        }
-
-        else {
-            try {
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    //Create JSON Object for each array index
-                    JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-
-                    //get hour, minute, speed, and travle time from each json obj
-                    int hour = Integer.parseInt(jsonObject.getString("hour"));
-                    int minute = Integer.parseInt(jsonObject.getString("minute"));
-                    double speed = 0.0;
-
-                    if (!jsonObject.isNull("speed")) {
-                        speed = Double.parseDouble(jsonObject.getString("speed"));
+        try {
+            JSONArray jResult = jObj.getJSONArray("results");
+            if (jResult == null) {
+                // No items were found? Sounds suspicious, but I guess we're done.
+                Log.i("RESULT", "Apparently nothing was in the results array...");
+                return travelingInfoList;
+            } else {
+                try {
+                    for (int i = 0; i < jResult.length(); i++) {
+                        //Create a JSONObject and use it to construct a TravelingInfo to add to the list
+                        JSONObject jsonObject = (JSONObject) jResult.get(i);
+                        travelingInfoList.add(new TravelingInfo(jsonObject));
                     }
-                    double travelTime = 0.0;
-                    if (!jsonObject.isNull("traveltime")) {
-                        travelTime = Double.parseDouble(jsonObject.getString("traveltime"));
-                    }
-                    //add new obj traveling info to the list
-                    travelingInfoList.add(new TravelingInfo(hour, minute, speed, travelTime));
-
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
 
+                return travelingInfoList;
+            }
+        } catch(JSONException je) {
+            // Going to log a message, but not abort the app... We'll just pretend there were no results.
+            Log.e("RESULT", "Could not parse result out of JSON array");
             return travelingInfoList;
         }
     }

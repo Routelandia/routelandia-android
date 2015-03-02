@@ -14,6 +14,7 @@
 
 package edu.pdx.its.portal.routelandia;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -33,6 +34,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONObject;
+
 
 public class DatePickUp extends Activity {
     private TextView tvDisplayDay;
@@ -47,7 +50,7 @@ public class DatePickUp extends Activity {
     protected LatLng startPoint;
     protected LatLng endPoint;
     protected String departureTime;
-    protected List<TravelingInfo> travelingInfoList;
+    protected ArrayList<TravelingInfo> travelingInfoList;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,16 +127,18 @@ public class DatePickUp extends Activity {
                 }
 
                 if(travelingInfoList == null){
-                    System.out.println("error");
+                    Log.e("RESULT", "No results returned from statistics query.");
                 }
                 else{
-                    for (int j =0; j < travelingInfoList.size(); j++){
-                        System.out.println(travelingInfoList.get(j).toString());
-                    }
+                    // For now just print them out.
+//                    for (int j =0; j < travelingInfoList.size(); j++){
+//                        Log.i("RESULT", travelingInfoList.get(j).toString());
+//                    }
                 }
 
-                Intent i = new Intent(getApplicationContext(),ListStat.class);
-                startActivity(i);
+                Intent intent = new Intent(getApplicationContext(),ListStat.class);
+                intent.putParcelableArrayListExtra("travel info", travelingInfoList);
+                startActivity(intent);
             }
         });
     }
