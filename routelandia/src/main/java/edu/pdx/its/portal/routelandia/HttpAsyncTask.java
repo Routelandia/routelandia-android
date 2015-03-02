@@ -129,6 +129,14 @@ public class HttpAsyncTask extends AsyncTask<String, Void, JSONArray>{
             result = EntityUtils.toString(httpResponse.getEntity());
             Log.i("resulr", result);
 
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode >= 400 && responseCode <= 499){
+
+            }
+            if(responseCode >= 500){
+
+            }
+
 //            // 9. receive response as inputStream
 //            inputStream = httpResponse.getEntity().getContent();
 //
