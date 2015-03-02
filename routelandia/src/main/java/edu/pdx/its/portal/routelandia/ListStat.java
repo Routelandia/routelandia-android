@@ -15,10 +15,13 @@
 package edu.pdx.its.portal.routelandia;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 
 import org.achartengine.GraphicalView;
@@ -44,6 +47,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class ListStat extends Activity {
@@ -57,13 +63,28 @@ public class ListStat extends Activity {
         setContentView(R.layout.list_stats);
 
         travelingInfoList = getIntent().getParcelableArrayListExtra("travel info");
-
         for (int j =0; j < travelingInfoList.size(); j++){
             Log.i("RESULT", travelingInfoList.get(j).toString());
         }
-        
         addListenerOnButton();
-        openChart();
+        
+        if(getRotation(getBaseContext()) == 1 || getRotation(getBaseContext()) == 1) {
+            openChart();
+        }
+        else{
+            TableLayout tableLayout = (TableLayout) findViewById(R.id.tableLayout);
+            int columns = 4;
+            int rows = travelingInfoList.size() ;
+            
+            if(travelingInfoList.size() ==0){
+                Toast.makeText(ListStat.this, "please re pick 2 points", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                buildTable(rows, columns, travelingInfoList, tableLayout);
+            }
+            
+        }
+
 
     }
 
@@ -194,4 +215,86 @@ public class ListStat extends Activity {
         });
     }
 
+    public int getRotation(Context context){
+        final int rotation = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getOrientation();
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                return 1; //portrait
+            case Surface.ROTATION_90:
+                return 0;//landscape
+            case Surface.ROTATION_180:
+                return 1;//reverse portrait
+            default:
+                return 0;//reverse landscape
+        }
+    }
+
+    private void buildTable(int rows, int cols, ArrayList<TravelingInfo> travelingInfos, TableLayout tableLayout) {
+
+        // outer for loop
+        for (int i = -1; i < rows; i++) {
+
+            TableRow row = new TableRow(this);
+            row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                    TableRow.LayoutParams.MATCH_PARENT));
+
+            if (i == -1) {
+                for (int j = 0; j < cols; j++) {
+
+                    TextView tv = new TextView(this);
+                    tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                            TableRow.LayoutParams.MATCH_PARENT));
+                    tv.setBackgroundResource(R.drawable.cell_shape);
+                    tv.setPadding(40, 40, 40, 40);
+                    tv.setTextColor(Color.BLACK);
+                    if (j == 0) {
+                        tv.setText("hour");
+                    } else if (j == 1) {
+                        tv.setText("speed");
+                    } else if (j == 2) {
+                        tv.setText("duration");
+                    } else {
+                        tv.setText("accuracy");
+                    }
+                    row.addView(tv);
+                }
+            }
+            else{
+                // inner for loop
+                for (int j = 0; j < cols; j++) {
+
+                    TextView tv = new TextView(this);
+                    tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                            TableRow.LayoutParams.MATCH_PARENT));
+                    tv.setBackgroundResource(R.drawable.cell_shape);
+                    tv.setPadding(40, 40, 40, 40);
+                    tv.setTextColor(Color.BLACK);
+                    if (j == 0) {
+                        if (travelingInfos.get(i).getMinutes() == 0) {
+
+                            tv.setText(travelingInfos.get(i).getHour() + ":"
+                                    + travelingInfos.get(i).getMinutes()
+                                    + travelingInfos.get(i).getMinutes());
+
+                        } else {
+                            tv.setText(travelingInfos.get(i).getHour() + ":"
+                                    + travelingInfos.get(i).getMinutes());
+                        }
+                    } else if (j == 1) {
+                        tv.setText(travelingInfos.get(i).getSpeed() + " miles/hour");
+                    } else if (j == 2) {
+                        tv.setText(travelingInfos.get(i).getTravelTime() + " minutes");
+                    } else {
+                        tv.setText(travelingInfos.get(i).getAccuracy() + " percentage accuracy");
+                    }
+
+                    row.addView(tv);
+
+                }
+            }
+
+            tableLayout.addView(row);
+
+        }
+    }
 }
