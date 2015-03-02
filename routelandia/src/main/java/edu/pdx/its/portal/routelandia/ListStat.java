@@ -232,47 +232,65 @@ public class ListStat extends Activity {
     private void buildTable(int rows, int cols, ArrayList<TravelingInfo> travelingInfos, TableLayout tableLayout) {
 
         // outer for loop
-        for (int i = 0; i < rows; i++) {
+        for (int i = -1; i < rows; i++) {
 
             TableRow row = new TableRow(this);
             row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
                     TableRow.LayoutParams.MATCH_PARENT));
 
+            if (i == -1) {
+                for (int j = 0; j < cols; j++) {
 
-            // inner for loop
-            for (int j = 0; j < cols; j++) {
-
-                TextView tv = new TextView(this);
-                tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
-                        TableRow.LayoutParams.MATCH_PARENT));
-                tv.setBackgroundResource(R.drawable.cell_shape);
-                tv.setPadding(5, 5, 5, 5);
-                tv.setTextColor(Color.BLACK);
-                if(j == 0){
-                    if(travelingInfos.get(i).getMinutes() == 0){
-                        
-                        tv.setText(travelingInfos.get(i).getHour() + ":"
-                                + travelingInfos.get(i).getMinutes()
-                                + travelingInfos.get(i).getMinutes());
-
+                    TextView tv = new TextView(this);
+                    tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                            TableRow.LayoutParams.MATCH_PARENT));
+                    tv.setBackgroundResource(R.drawable.cell_shape);
+                    tv.setPadding(40, 40, 40, 40);
+                    tv.setTextColor(Color.BLACK);
+                    if (j == 0) {
+                        tv.setText("hour");
+                    } else if (j == 1) {
+                        tv.setText("speed");
+                    } else if (j == 2) {
+                        tv.setText("duration");
+                    } else {
+                        tv.setText("accuracy");
                     }
-                    else{
-                        tv.setText(travelingInfos.get(i).getHour() + ":"
-                                + travelingInfos.get(i).getMinutes());
+                    row.addView(tv);
+                }
+            }
+            else{
+                // inner for loop
+                for (int j = 0; j < cols; j++) {
+
+                    TextView tv = new TextView(this);
+                    tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                            TableRow.LayoutParams.MATCH_PARENT));
+                    tv.setBackgroundResource(R.drawable.cell_shape);
+                    tv.setPadding(40, 40, 40, 40);
+                    tv.setTextColor(Color.BLACK);
+                    if (j == 0) {
+                        if (travelingInfos.get(i).getMinutes() == 0) {
+
+                            tv.setText(travelingInfos.get(i).getHour() + ":"
+                                    + travelingInfos.get(i).getMinutes()
+                                    + travelingInfos.get(i).getMinutes());
+
+                        } else {
+                            tv.setText(travelingInfos.get(i).getHour() + ":"
+                                    + travelingInfos.get(i).getMinutes());
+                        }
+                    } else if (j == 1) {
+                        tv.setText(travelingInfos.get(i).getSpeed() + " miles/hour");
+                    } else if (j == 2) {
+                        tv.setText(travelingInfos.get(i).getTravelTime() + " minutes");
+                    } else {
+                        tv.setText(travelingInfos.get(i).getAccuracy() + " percentage accuracy");
                     }
-                }
-                else if(j == 1){
-                    tv.setText(travelingInfos.get(i).getSpeed() + " miles/hour");
-                }
-                else if(j ==2){
-                    tv.setText(travelingInfos.get(i).getTravelTime() + " minutes");
-                }
-                else{
-                    tv.setText(travelingInfos.get(i).getAccuracy() + " percentage accuracy");
-                }
 
-                row.addView(tv);
+                    row.addView(tv);
 
+                }
             }
 
             tableLayout.addView(row);
