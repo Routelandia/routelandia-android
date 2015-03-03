@@ -12,7 +12,7 @@
    limitations under the License.
 */
 
-package edu.pdx.its.portal.routelandia;
+package edu.pdx.its.portal.routelandia.entities;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Created by loc on 2/6/15.
  */
-public class Station implements Serializable {
+public class Station extends ApiEntity implements Serializable {
     protected int stationid;
     protected int linkedListPosition;
     List<LatLng> latLngList = new ArrayList<>();

@@ -20,6 +20,7 @@ import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
+import edu.pdx.its.portal.routelandia.entities.*;
 
 /**
  * Created by loc on 2/6/15.

@@ -12,7 +12,7 @@
    limitations under the License.
 */
 
-package edu.pdx.its.portal.routelandia;
+package edu.pdx.its.portal.routelandia.entities;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Created by loc on 1/24/15.
  */
-public class Highway {
+public class Highway extends ApiEntity {
     private String name;
     private int highwayid;
     private List<LatLng> latLngList = new ArrayList<>();

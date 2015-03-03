@@ -52,6 +52,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import edu.pdx.its.portal.routelandia.entities.TravelingInfo;
 public class ListStat extends Activity {
 
     private Button mapbtn;

@@ -35,6 +35,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONObject;
+import edu.pdx.its.portal.routelandia.entities.TravelingInfo;
 
 
 public class DatePickUp extends Activity {

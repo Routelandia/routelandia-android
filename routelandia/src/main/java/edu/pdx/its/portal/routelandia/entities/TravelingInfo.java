@@ -12,7 +12,7 @@
    limitations under the License.
 */
 
-package edu.pdx.its.portal.routelandia;
+package edu.pdx.its.portal.routelandia.entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -23,7 +23,7 @@ import org.json.JSONObject;
 /**
  * Created by locle on 2/27/15.
  */
-public class TravelingInfo implements Parcelable{
+public class TravelingInfo extends ApiEntity implements Parcelable {
     protected int hour;
     protected int minutes;
     protected double speed;
