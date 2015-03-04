@@ -85,26 +85,8 @@ public class MapsActivity extends FragmentActivity {
             // Getting Map for the SupportMapFragment
             mMap = fm.getMap();
 
-
-            //Manually create highway list has data instead request to
-            //have a list of highway and some highway have no data
-            
-            //The URL to download all highway data from the back end
-            String url = "http://capstoneaa.cs.pdx.edu/api/highways.json";
-            try {
-                //Create downloadtask to do the http connect and download json from API
-                DownloadListofHighway downloadListofHighway = new DownloadListofHighway();
-
-                ParserListofHighway parserListofHighway = new ParserListofHighway();
-
-                highwayList =  parserListofHighway.execute(downloadListofHighway.execute(url).get()).get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-
-//            manualCreateHighwayList();
+            // Get a list of all highways from the API
+            highwayList = APIEntity.fetchListForEntity(Highway.class);
 
             if(savedInstanceState != null){
                 //get the hashmap list of station before users rotate the phone
@@ -130,25 +112,11 @@ public class MapsActivity extends FragmentActivity {
             }
             else {
                 for (int i = 0; i < highwayList.size(); i++) {
-
-                    String urlStations = urlForAllStationsInEachHighWay(highwayList.get(i).getHighwayid());
-
-
-                    try {
-                        DownloadTask downloadTask = new DownloadTask();
-
-                        ParserTask parserTask = new ParserTask();
-
-                        List<Station> stationList = parserTask.execute(downloadTask.execute(urlStations).get()).get();
-
-//                        drawHighway(stationList);
-
-                        listOfStationsBaseOnHighwayid.put(highwayList.get(i).getHighwayid(), stationList);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    }
+                    // Get a list of all stations from the API.
+                    Highway tHighway = highwayList.get(i);
+                    List<Station> stationList = tHighway.fetchStations();
+                    // And add them to the list!
+                    listOfStationsBaseOnHighwayid.put(tHighway.getHighwayid(), stationList);
                 }
             }
             for (int i =0; i<highwayList.size(); i++){
@@ -326,18 +294,6 @@ public class MapsActivity extends FragmentActivity {
                 endPoint = secondMarker.getPosition();
             }
         }
-    }
-
-    /**
-     * url request the list of station for each highway*
-     * @param highwayid the number's associated for highway
-     * @return the url to download the list of station
-     */
-    private String urlForAllStationsInEachHighWay(int highwayid){
-        String url = "http://capstoneaa.cs.pdx.edu/api/highways.json/";
-        String station = "/stations";
-        
-        return url + highwayid + station;
     }
 
     /**

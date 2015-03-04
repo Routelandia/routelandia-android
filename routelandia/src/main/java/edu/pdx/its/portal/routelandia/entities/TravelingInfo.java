@@ -23,7 +23,8 @@ import org.json.JSONObject;
 /**
  * Created by locle on 2/27/15.
  */
-public class TravelingInfo extends ApiEntity implements Parcelable {
+public class TravelingInfo extends APIEntity implements Parcelable {
+    private static final String TAG = "TravelingInfo Entity";
     protected int hour;
     protected int minutes;
     protected double speed;
@@ -68,22 +69,27 @@ public class TravelingInfo extends ApiEntity implements Parcelable {
         
     }
 
+    /* Implement ApiEntity methods */
+    public String getListUrlComponent(){
+        return API_ROOT+"trafficstats/";
+    }
+    public String getItemUrlComponent(int itemid){
+        return API_ROOT+"";
+    }
+
+    /* Simple accessors */
     public int getHour() {
         return hour;
     }
-
     public int getMinutes() {
         return minutes;
     }
-
     public double getSpeed() {
         return speed;
     }
-
     public double getTravelTime() {
         return travelTime;
     }
-
     public double getAccuracy() {
         return accuracy;
     }
