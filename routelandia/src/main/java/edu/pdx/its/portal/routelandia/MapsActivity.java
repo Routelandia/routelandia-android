@@ -129,7 +129,7 @@ public class MapsActivity extends FragmentActivity {
                 else if(highwayList.get(i).getHighwayid() == 5 || highwayList.get(i).getHighwayid() == 6 ){
                     colorHighlightTheFreeWay = Color.rgb(0,255,0);
                 }
-                else if(highwayList.get(i).getHighwayid() == 52 || highwayist.get(i).getHighwayid() == 53 ){
+                else if(highwayList.get(i).getHighwayid() == 52 || highwayList.get(i).getHighwayid() == 53 ){
                     colorHighlightTheFreeWay = Color.rgb(0,0,255);
                 }
                 else if(highwayList.get(i).getHighwayid() == 7 || highwayList.get(i).getHighwayid() == 8 ){

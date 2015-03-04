@@ -34,8 +34,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import org.json.JSONObject;
-import edu.pdx.its.portal.routelandia.entities.TravelingInfo;
+import edu.pdx.its.portal.routelandia.entities.TrafficStat;
 
 
 public class DatePickUp extends Activity {
@@ -51,7 +50,7 @@ public class DatePickUp extends Activity {
     protected LatLng startPoint;
     protected LatLng endPoint;
     protected String departureTime;
-    protected ArrayList<TravelingInfo> travelingInfoList;
+    protected ArrayList<TrafficStat> trafficStatList;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,30 +114,20 @@ public class DatePickUp extends Activity {
 
             @Override
             public void onClick(View v) {
-                HttpAsyncTask httpAsyncTask = new HttpAsyncTask(startPoint, endPoint, departureTime, weekDay);
-//                httpAsyncTask.execute();
-                JSONParser jsonParser = new JSONParser();
-                try {
-                    travelingInfoList = jsonParser.parseTravelingInfo(httpAsyncTask.execute().get());
+                trafficStatList = (ArrayList)TrafficStat.getStatsResultListFor(startPoint, endPoint, departureTime, weekDay);
 
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-
-                if(travelingInfoList == null){
+                if(trafficStatList == null){
                     Log.e("RESULT", "No results returned from statistics query.");
                 }
                 else{
                     // For now just print them out.
-//                    for (int j =0; j < travelingInfoList.size(); j++){
-//                        Log.i("RESULT", travelingInfoList.get(j).toString());
-//                    }
+    //                    for (int j =0; j < travelingInfoList.size(); j++){
+    //                        Log.i("RESULT", travelingInfoList.get(j).toString());
+    //                    }
                 }
 
                 Intent intent = new Intent(getApplicationContext(),ListStat.class);
-                intent.putParcelableArrayListExtra("travel info", travelingInfoList);
+                intent.putParcelableArrayListExtra("travel info", trafficStatList);
                 startActivity(intent);
             }
         });

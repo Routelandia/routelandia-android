@@ -66,8 +66,4 @@ public class Highway extends APIEntity {
         return highwayid;
     }
 
-    public List<Station> getStations() {
-        return Station.fetchStationListForHighway(this.highwayid);
-    }
-
 }
