@@ -21,17 +21,18 @@ import java.net.URL;
  *
  * Created by joshproehl on 3/2/15.
  */
-public class ApiFetcher extends AsyncTask<String, Integer, JSONObject> {
+public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
     private final String TAG = "ApiFetcher";
 
     @Override
-    protected JSONObject doInBackground(String... params) {
-        JSONObject retVal = null;
+    protected APIResultWrapper doInBackground(String... params) {
+        APIResultWrapper retVal = new APIResultWrapper();
 
         try {
             // Fetch the HTTP Result and parse it into the JSON to be returned.
             String rawResult = fetchRawResult(params[0]);
-            retVal = parseRawResult(rawResult);
+            retVal.setRawResponse(rawResult);
+            retVal.setParsedResponse(parseRawResult(rawResult));
         } catch (IOException e) {
             Log.e(TAG, "Error doing background API Fetch: " + e.toString());
         } catch (JSONException e) {
@@ -71,6 +72,12 @@ public class ApiFetcher extends AsyncTask<String, Integer, JSONObject> {
 
             // Connecting to url
             urlConnection.connect();
+
+            // Make sure we've got a good response from the API.
+            int status = urlConnection.getResponseCode();
+            if(status != 200) {
+                // TODO: We have an error here!!!
+            }
 
             // Reading data from url
             iStream = urlConnection.getInputStream();

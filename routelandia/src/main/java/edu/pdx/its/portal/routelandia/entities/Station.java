@@ -84,6 +84,10 @@ public class Station extends APIEntity implements Serializable {
     }
 
 
+    public int getEntityId() {
+        return stationid;
+    }
+
     /**
      * * add new latlng location to the list of latlng in station
      * @param latLng: a new location
@@ -184,7 +188,7 @@ public class Station extends APIEntity implements Serializable {
     public static List<Station> fetchStationListForHighway(int highwayid) {
         List<Station> retVal = new ArrayList<>();
         try{
-            JSONObject res = new ApiFetcher().execute(getListUrlNestedInHighway(highwayid)).get();
+            JSONObject res = ((APIResultWrapper)new ApiFetcher().execute(getListUrlNestedInHighway(highwayid)).get()).getParsedResponse();
             JSONArray stations = (JSONArray)res.get("results");
             for (int i = 0; i <stations.length() ; i++) {
                 //Create a Station from the JSONObject for each array index

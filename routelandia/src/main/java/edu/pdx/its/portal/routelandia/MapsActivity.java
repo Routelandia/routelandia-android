@@ -114,7 +114,8 @@ public class MapsActivity extends FragmentActivity {
                 for (int i = 0; i < highwayList.size(); i++) {
                     // Get a list of all stations from the API.
                     Highway tHighway = highwayList.get(i);
-                    List<Station> stationList = tHighway.fetchStations();
+                    String nestedStationsUrl = tHighway.getNestedEntityUrl(Station.class);
+                    List<Station> stationList = tHighway.fetchListForURLAsEntity(nestedStationsUrl, Station.class);
                     // And add them to the list!
                     listOfStationsBaseOnHighwayid.put(tHighway.getHighwayid(), stationList);
                 }
@@ -128,7 +129,7 @@ public class MapsActivity extends FragmentActivity {
                 else if(highwayList.get(i).getHighwayid() == 5 || highwayList.get(i).getHighwayid() == 6 ){
                     colorHighlightTheFreeWay = Color.rgb(0,255,0);
                 }
-                else if(highwayList.get(i).getHighwayid() == 52 || highwayList.get(i).getHighwayid() == 53 ){
+                else if(highwayList.get(i).getHighwayid() == 52 || highwayist.get(i).getHighwayid() == 53 ){
                     colorHighlightTheFreeWay = Color.rgb(0,0,255);
                 }
                 else if(highwayList.get(i).getHighwayid() == 7 || highwayList.get(i).getHighwayid() == 8 ){

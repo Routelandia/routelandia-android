@@ -69,12 +69,8 @@ public class TravelingInfo extends APIEntity implements Parcelable {
         
     }
 
-    /* Implement ApiEntity methods */
-    public String getListUrlComponent(){
-        return API_ROOT+"trafficstats/";
-    }
-    public String getItemUrlComponent(int itemid){
-        return API_ROOT+"";
+    public int getEntityId() {
+        return -1; //This one is a bit special since it's not really an actual entity...
     }
 
     /* Simple accessors */
