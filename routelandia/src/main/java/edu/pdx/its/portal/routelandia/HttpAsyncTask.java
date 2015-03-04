@@ -130,11 +130,8 @@ public class HttpAsyncTask extends AsyncTask<String, Void, JSONArray>{
             Log.i("resulr", result);
 
             int responseCode = httpResponse.getStatusLine().getStatusCode();
-            if(responseCode >= 400 && responseCode <= 499){
-
-            }
-            if(responseCode >= 500){
-
+            if(responseCode != 200){
+                return null;
             }
 
 //            // 9. receive response as inputStream

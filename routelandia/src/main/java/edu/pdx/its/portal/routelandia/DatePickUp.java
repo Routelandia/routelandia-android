@@ -116,6 +116,9 @@ public class DatePickUp extends Activity {
                 JSONParser jsonParser = new JSONParser();
                 try {
                     travelingInfoList = jsonParser.parseTravelingInfo(httpAsyncTask.execute().get());
+                    if(travelingInfoList == null){
+                        //implement a popup window giving a general error
+                    }
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
