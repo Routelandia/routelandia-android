@@ -12,17 +12,27 @@
    limitations under the License.
 */
 
-package edu.pdx.its.portal.routelandia;
+package edu.pdx.its.portal.routelandia.entities;
+
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import edu.pdx.its.portal.routelandia.ApiFetcher;
 
 /**
  * Created by loc on 1/24/15.
  */
-public class Highway {
+public class Highway extends APIEntity {
+    private static final String TAG = "Highway Entity";
     private String name;
     private int highwayid;
     private List<LatLng> latLngList = new ArrayList<>();
@@ -30,6 +40,11 @@ public class Highway {
     public Highway(String name, int highwayid) {
         this.name = name;
         this.highwayid = highwayid;
+    }
+
+    public Highway(JSONObject j) throws JSONException {
+        this.highwayid = j.getInt("highwayid");
+        this.name = j.getString("highwayname");
     }
 
     public void addLatLng(LatLng latLng) {
@@ -47,4 +62,8 @@ public class Highway {
     public int getHighwayid() {
         return highwayid;
     }
+    public int getEntityId() {
+        return highwayid;
+    }
+
 }

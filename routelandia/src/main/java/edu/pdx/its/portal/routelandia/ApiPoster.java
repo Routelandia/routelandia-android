@@ -1,3 +1,17 @@
+/*
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 package edu.pdx.its.portal.routelandia;
 
 import android.os.AsyncTask;
@@ -24,61 +38,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import edu.pdx.its.portal.routelandia.entities.APIPostWrapper;
+import edu.pdx.its.portal.routelandia.entities.APIResultWrapper;
+
 /**
+ * Takes an API Postable and returns the result of the POST operation.
+ *
  * Created by loc on 1/30/15.
  */
-public class HttpAsyncTask extends AsyncTask<String, Void, JSONObject>{
-
-    protected LatLng startPoint ;
-    protected LatLng endPoint ;
-    protected String midpoint ; //backend call time field is midpoint
-    protected String weekday ;// DayPickSelectedListener.weekDay;
-
-    final String url = "http://capstoneaa.cs.pdx.edu/api/trafficstats";
-
-    public HttpAsyncTask(LatLng startPoint, LatLng endPoint, String midpoint, String weekday) {
-        this.startPoint = startPoint;
-        this.endPoint = endPoint;
-        this.midpoint = midpoint;
-        this.weekday = weekday;
-    }
+public class ApiPoster extends AsyncTask<APIPostWrapper, Void, APIResultWrapper>{
+    private final String TAG = "APIPoster";
 
     @Override
-    protected JSONObject doInBackground(String... params) {
-        Log.i("JSON POST", "json created: " + makingJson());
-        return postJsonObject(url, makingJson());
+    protected APIResultWrapper doInBackground(APIPostWrapper... params) {
+        // Foolishly assume that only the first param matters...
+        APIResultWrapper retVal = new APIResultWrapper();
+        retVal.setParsedResponse(postJsonObjectToUrl(params[0].getFullUrl(), params[0].getPostObj()));
+        return retVal;
     }
 //    protected void onPostExecute(JSONArray result) {
 //        super.onPostExecute(result);
 //
 //    }
 
-    public JSONObject makingJson() {
 
-        JSONObject jsonObject = new JSONObject();
-        try {
-            JSONObject startJsonObject = new JSONObject();
-            startJsonObject.put("lng", startPoint.longitude);
-            startJsonObject.put("lat", startPoint.latitude);
-
-            JSONObject endJsonObject = new JSONObject();
-            endJsonObject.put("lng", endPoint.longitude);
-            endJsonObject.put("lat", endPoint.latitude);
-
-            JSONObject time = new JSONObject();
-            time.put("midpoint", midpoint);
-            time.put("weekday", weekday);
-
-            jsonObject.put("startpt", startJsonObject);
-            jsonObject.put("endpt", endJsonObject);
-            jsonObject.put("time", time);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
-    }
-
-    public JSONObject postJsonObject(String url, JSONObject jsonObject){
+    public JSONObject postJsonObjectToUrl(String url, JSONObject jsonObject){
         InputStream inputStream = null;
         String result = "";
         try {
@@ -129,7 +113,7 @@ public class HttpAsyncTask extends AsyncTask<String, Void, JSONObject>{
         }
 
         // If we got this far, we got something very wrong...
-        Log.e("RESULT", "Didn't get a valid JSON response!");
+        Log.e(TAG, "Didn't get a valid JSON response!");
         return null;
     }
 

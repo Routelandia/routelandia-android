@@ -52,19 +52,20 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import edu.pdx.its.portal.routelandia.entities.TrafficStat;
 public class ListStat extends Activity {
 
     private Button mapbtn;
     private GraphicalView mChart;
-    protected ArrayList<TravelingInfo> travelingInfoList;
+    protected ArrayList<TrafficStat> trafficStatList;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_stats);
 
-        travelingInfoList = getIntent().getParcelableArrayListExtra("travel info");
-        for (int j =0; j < travelingInfoList.size(); j++){
-            Log.i("RESULT", travelingInfoList.get(j).toString());
+        trafficStatList = getIntent().getParcelableArrayListExtra("travel info");
+        for (int j =0; j < trafficStatList.size(); j++){
+            Log.i("RESULT", trafficStatList.get(j).toString());
         }
         addListenerOnButton();
         
@@ -74,13 +75,13 @@ public class ListStat extends Activity {
         else{
             TableLayout tableLayout = (TableLayout) findViewById(R.id.tableLayout);
             int columns = 4;
-            int rows = travelingInfoList.size() ;
+            int rows = trafficStatList.size() ;
             
-            if(travelingInfoList.size() ==0){
+            if(trafficStatList.size() ==0){
                 Toast.makeText(ListStat.this, "please re pick 2 points", Toast.LENGTH_SHORT).show();
             }
             else{
-                buildTable(rows, columns, travelingInfoList, tableLayout);
+                buildTable(rows, columns, trafficStatList, tableLayout);
             }
             
         }
@@ -229,7 +230,7 @@ public class ListStat extends Activity {
         }
     }
 
-    private void buildTable(int rows, int cols, ArrayList<TravelingInfo> travelingInfos, TableLayout tableLayout) {
+    private void buildTable(int rows, int cols, ArrayList<TrafficStat> trafficStats, TableLayout tableLayout) {
 
         // outer for loop
         for (int i = -1; i < rows; i++) {
@@ -270,22 +271,22 @@ public class ListStat extends Activity {
                     tv.setPadding(40, 40, 40, 40);
                     tv.setTextColor(Color.BLACK);
                     if (j == 0) {
-                        if (travelingInfos.get(i).getMinutes() == 0) {
+                        if (trafficStats.get(i).getMinutes() == 0) {
 
-                            tv.setText(travelingInfos.get(i).getHour() + ":"
-                                    + travelingInfos.get(i).getMinutes()
-                                    + travelingInfos.get(i).getMinutes());
+                            tv.setText(trafficStats.get(i).getHour() + ":"
+                                    + trafficStats.get(i).getMinutes()
+                                    + trafficStats.get(i).getMinutes());
 
                         } else {
-                            tv.setText(travelingInfos.get(i).getHour() + ":"
-                                    + travelingInfos.get(i).getMinutes());
+                            tv.setText(trafficStats.get(i).getHour() + ":"
+                                    + trafficStats.get(i).getMinutes());
                         }
                     } else if (j == 1) {
-                        tv.setText(travelingInfos.get(i).getSpeed() + " miles/hour");
+                        tv.setText(trafficStats.get(i).getSpeed() + " miles/hour");
                     } else if (j == 2) {
-                        tv.setText(travelingInfos.get(i).getTravelTime() + " minutes");
+                        tv.setText(trafficStats.get(i).getTravelTime() + " minutes");
                     } else {
-                        tv.setText(travelingInfos.get(i).getAccuracy() + " percentage accuracy");
+                        tv.setText(trafficStats.get(i).getAccuracy() + " percentage accuracy");
                     }
 
                     row.addView(tv);

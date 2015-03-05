@@ -12,9 +12,15 @@
    limitations under the License.
 */
 
-package edu.pdx.its.portal.routelandia;
+package edu.pdx.its.portal.routelandia.entities;
+
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -22,14 +28,23 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import edu.pdx.its.portal.routelandia.ApiFetcher;
 
 /**
  * Created by loc on 2/6/15.
  */
-public class Station implements Serializable {
+public class Station extends APIEntity implements Serializable {
+    private static final String TAG = "Station Entity";
     protected int stationid;
     protected int linkedListPosition;
     List<LatLng> latLngList = new ArrayList<>();
+
+    // This really should be more dynamic.. But we're going to go with it for now.
+    public static String getListUrlNestedInHighway(int highwayid) {
+        return "highways/"+highwayid+"/stations/";
+    }
 
     /**
      * * constructor with argument stationid
@@ -47,6 +62,30 @@ public class Station implements Serializable {
     public Station(int stationid, int linkedListPosition) {
         this.stationid = stationid;
         this.linkedListPosition = linkedListPosition;
+    }
+
+    public Station(JSONObject json) throws JSONException {
+        this.stationid = json.getInt("stationid");
+
+        if (!json.isNull("geojson_raw")) {
+            JSONObject geojsonRaw = json.getJSONObject("geojson_raw");
+
+            //Create json array from coordinates
+            JSONArray coordinates = (JSONArray) geojsonRaw.get("coordinates");
+
+            //for each json array coordinates, create latlng and
+            //add it to the list latlng of its station
+            for (int j = 0; j < coordinates.length(); j++) {
+                double latitude = Double.parseDouble(((JSONArray) coordinates.get(j)).get(1).toString());
+                double longtitude = Double.parseDouble(((JSONArray) coordinates.get(j)).get(0).toString());
+                this.addLatLng(new LatLng(latitude, longtitude));
+            }
+        }
+    }
+
+
+    public int getEntityId() {
+        return stationid;
     }
 
     /**
@@ -106,4 +145,5 @@ public class Station implements Serializable {
         in.defaultReadObject();
         latLngList.add(new LatLng(in.readDouble(), in.readDouble()));
     }
+
 }
