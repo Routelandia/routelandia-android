@@ -17,6 +17,7 @@ package edu.pdx.its.portal.routelandia;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Surface;
@@ -25,6 +26,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 
 import org.achartengine.GraphicalView;
+import org.achartengine.chart.BarChart;
 import org.achartengine.model.XYSeries;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -53,6 +55,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import edu.pdx.its.portal.routelandia.entities.TrafficStat;
+
+import static android.graphics.Paint.Align.CENTER;
+
 public class ListStat extends Activity {
 
     private Button mapbtn;
@@ -70,7 +75,12 @@ public class ListStat extends Activity {
         addListenerOnButton();
         
         if(getRotation(getBaseContext()) == 1 || getRotation(getBaseContext()) == 1) {
-            openChart();
+            if(trafficStatList.size() ==0){
+                Toast.makeText(ListStat.this, "please re pick 2 points", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                openChart();
+            }
         }
         else{
             TableLayout tableLayout = (TableLayout) findViewById(R.id.tableLayout);
@@ -91,110 +101,85 @@ public class ListStat extends Activity {
 
     private void openChart(){
 
-        int count = 5;
-        Date[] dt = new Date[5];
-        for(int i=0;i<count;i++){
-            GregorianCalendar gc = new GregorianCalendar(2012, 10, i+1);
-            dt[i] = gc.getTime();
+        // Time series for duration of travel
+        TimeSeries durationSeries = new TimeSeries("Duration of travel");
+        int timeLength = trafficStatList.size();
+        for(int i = 0; i < timeLength; i++){
+            durationSeries.add(trafficStatList.get(i).getHour(), trafficStatList.get(i).getTravelTime());
         }
 
-        int[] visits = { 2000,2500,2700,2100,2800};
-        int[] views = {2200, 2700, 2900, 2800, 3200};
-
-        // Creating TimeSeries for Visits
-        TimeSeries visitsSeries = new TimeSeries("Visits");
-
-        // Creating TimeSeries for Views
-        TimeSeries viewsSeries = new TimeSeries("Views");
-
-        // Adding data to Visits and Views Series
-        for(int i=0;i<dt.length;i++){
-            visitsSeries.add(dt[i], visits[i]);
-            viewsSeries.add(dt[i],views[i]);
+        // Time series for speed
+        TimeSeries speedSeries = new TimeSeries("Speed");
+        for(int i = 0; i < timeLength; i++){
+            speedSeries.add(trafficStatList.get(i).getHour(), trafficStatList.get(i).getSpeed());
         }
+        
+        //Collects all series and adds them under one object here called data
+        XYMultipleSeriesDataset data = new  XYMultipleSeriesDataset();
+        data.addSeries(durationSeries);
+        data.addSeries(speedSeries);
 
-        // Creating a dataset to hold each series
-        XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
+        //Gives the line it's property
+        XYSeriesRenderer durRenderer = new XYSeriesRenderer();
+        XYSeriesRenderer speedRenderer = new XYSeriesRenderer();
 
-        // Adding Visits Series to the dataset
-        dataset.addSeries(visitsSeries);
-
-        // Adding Visits Series to dataset
-        dataset.addSeries(viewsSeries);
-
-        // Creating XYSeriesRenderer to customize visitsSeries
-        XYSeriesRenderer visitsRenderer = new XYSeriesRenderer();
-        visitsRenderer.setColor(Color.WHITE);
-        visitsRenderer.setPointStyle(PointStyle.CIRCLE);
-        visitsRenderer.setFillPoints(true);
-        visitsRenderer.setLineWidth(2);
-        visitsRenderer.setDisplayChartValues(true);
+        durRenderer.setColor(Color.CYAN);
+        durRenderer.setPointStyle(PointStyle.CIRCLE);
+        durRenderer.setFillPoints(true);
+        durRenderer.setLineWidth(2);
+        durRenderer.setDisplayChartValues(true);
 
         // Creating XYSeriesRenderer to customize viewsSeries
-        XYSeriesRenderer viewsRenderer = new XYSeriesRenderer();
-        viewsRenderer.setColor(Color.YELLOW);
-        viewsRenderer.setPointStyle(PointStyle.CIRCLE);
-        viewsRenderer.setFillPoints(true);
-        viewsRenderer.setLineWidth(2);
-        viewsRenderer.setDisplayChartValues(true);
+        speedRenderer.setColor(Color.YELLOW);
+        speedRenderer.setPointStyle(PointStyle.CIRCLE);
+        speedRenderer.setFillPoints(true);
+        speedRenderer.setLineWidth(2);
+        speedRenderer.setDisplayChartValues(true);
 
-        // Creating a XYMultipleSeriesRenderer to customize the whole chart
-        XYMultipleSeriesRenderer multiRenderer = new XYMultipleSeriesRenderer();
-
-        multiRenderer.setChartTitle("Travel Time");
-        multiRenderer.setXTitle("Time");
-        multiRenderer.setYTitle("Duration");
-        multiRenderer.setZoomButtonsVisible(true);
-
-        // Adding visitsRenderer and viewsRenderer to multipleRenderer
-        // Note: The order of adding dataseries to dataset and renderers to multipleRenderer
-        // should be same
-        multiRenderer.addSeriesRenderer(visitsRenderer);
-        multiRenderer.addSeriesRenderer(viewsRenderer);
+        XYMultipleSeriesRenderer mRender = new XYMultipleSeriesRenderer();
+        mRender.addSeriesRenderer(durRenderer);
+        mRender.addSeriesRenderer(speedRenderer);
+        mRender.setChartTitle("Travel Time and Speed");
+        mRender.setXTitle("Departure Time");
+        mRender.setYTitle("Duration and Speed");
+        mRender.setZoomButtonsVisible(true);
+        mRender.setLabelsTextSize(20);
+        mRender.setLegendTextSize(15);
+        mRender.setChartTitleTextSize(28);
+        mRender.setAxisTitleTextSize(25);
+        mRender.setXAxisMin(trafficStatList.get(1).getHour());
+        mRender.setXAxisMax(trafficStatList.size());
+        for (int i = 0; i < timeLength; i++)
+        {
+            mRender.addTextLabel(i + 1, String.valueOf((int) trafficStatList.get(i).getHour() + ":" + (int) trafficStatList.get(i).getMinutes() ));
+        }
+        mRender.setXLabelsAlign(CENTER);
+        mRender.setXLabels(0);
 
         // Getting a reference to LinearLayout of the MainActivity Layout
         LinearLayout chartContainer = (LinearLayout) findViewById(R.id.chart_container);
 
         // Creating a Time Chart
-        mChart = (GraphicalView) ChartFactory.getTimeChartView(getBaseContext(), dataset, multiRenderer,"dd-MMM-yyyy");
-
-        multiRenderer.setClickEnabled(true);
-        multiRenderer.setSelectableBuffer(10);
+        mChart = (GraphicalView) ChartFactory.getTimeChartView(getBaseContext(), data, mRender, "Title of Graph");
+        mRender.setClickEnabled(true);
+        mRender.setSelectableBuffer(10);
 
         // Setting a click event listener for the graph
         mChart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Format formatter = new SimpleDateFormat("dd-MMM-yyyy");
-
                 SeriesSelection seriesSelection = mChart.getCurrentSeriesAndPoint();
-
                 if (seriesSelection != null) {
                     int seriesIndex = seriesSelection.getSeriesIndex();
-                    String selectedSeries="Visits";
+                    String selectedSeries = "Duration";
                     if(seriesIndex==0)
-                        selectedSeries = "Visits";
+                        selectedSeries = "Duration";
                     else
-                        selectedSeries = "Views";
-
-                    // Getting the clicked Date ( x value )
-                    long clickedDateSeconds = (long) seriesSelection.getXValue();
-                    Date clickedDate = new Date(clickedDateSeconds);
-                    String strDate = formatter.format(clickedDate);
-
-                    // Getting the y value
-                    int amount = (int) seriesSelection.getValue();
-
-                    // Displaying Toast Message
-                    Toast.makeText(
-                            getBaseContext(),
-                            selectedSeries + " on "  + strDate + " : " + amount ,
-                            Toast.LENGTH_SHORT).show();
+                        selectedSeries = "Speed";
                 }
             }
         });
 
-        // Adding the Line Chart to the LinearLayout
         chartContainer.addView(mChart);
     }
 
