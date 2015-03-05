@@ -30,6 +30,8 @@ public class APIResultWrapper {
     private String rawResponse;
     private JSONObject parsedResponse;
 
+    private int httpStatus;
+
 
     /**
      * Gets the "results" object out of the raw JSON.
@@ -47,16 +49,20 @@ public class APIResultWrapper {
     public String getRawResponse() {
         return rawResponse;
     }
-
     public void setRawResponse(String rawResponse) {
         this.rawResponse = rawResponse;
     }
-
     public JSONObject getParsedResponse() {
         return parsedResponse;
     }
-
     public void setParsedResponse(JSONObject parsedResponse) {
         this.parsedResponse = parsedResponse;
     }
+    public int getHttpStatus() {
+        return httpStatus;
+    }
+    public void setHttpStatus(int httpStatus) {
+        this.httpStatus = httpStatus;
+    }
+
 }
