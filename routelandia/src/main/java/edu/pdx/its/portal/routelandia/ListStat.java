@@ -75,7 +75,12 @@ public class ListStat extends Activity {
         addListenerOnButton();
         
         if(getRotation(getBaseContext()) == 1 || getRotation(getBaseContext()) == 1) {
-            openChart();
+            if(trafficStatList.size() ==0){
+                Toast.makeText(ListStat.this, "please re pick 2 points", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                openChart();
+            }
         }
         else{
             TableLayout tableLayout = (TableLayout) findViewById(R.id.tableLayout);
