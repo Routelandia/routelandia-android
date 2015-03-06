@@ -14,6 +14,7 @@
 
 package edu.pdx.its.portal.routelandia;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -44,6 +45,7 @@ import java.util.concurrent.ExecutionException;
 import edu.pdx.its.portal.routelandia.entities.*;
 
 public class MapsActivity extends FragmentActivity {
+    private final String TAG = "Maps Activity";
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     protected ArrayList<LatLng> mMarkerPoints = new ArrayList<>();
@@ -85,8 +87,21 @@ public class MapsActivity extends FragmentActivity {
             // Getting Map for the SupportMapFragment
             mMap = fm.getMap();
 
-            // Get a list of all highways from the API
-            highwayList = APIEntity.fetchListForEntity(Highway.class);
+            try {
+                // Get a list of all highways from the API
+                highwayList = APIEntity.fetchListForEntity(Highway.class);
+            } catch(APIException e) {
+                Log.e(TAG, "CAUGHT API EXCEPTION, status code: ("+e.getResultWrapper().getHttpStatus()+"), message: "+e.getMessage());
+
+                AlertDialog.Builder messageBox = new AlertDialog.Builder(this);
+                messageBox.setTitle("Server Error");
+                messageBox.setMessage("Encountered an unrecoverable error trying to fetch highway data: \n\n" + e.getMessage());
+                messageBox.setCancelable(false);
+                messageBox.setNeutralButton("OK", null);
+                messageBox.show();
+
+                return; // Bail out of the function.
+            }
 
             if(savedInstanceState != null){
                 //get the hashmap list of station before users rotate the phone
@@ -115,7 +130,19 @@ public class MapsActivity extends FragmentActivity {
                     // Get a list of all stations from the API.
                     Highway tHighway = highwayList.get(i);
                     String nestedStationsUrl = tHighway.getNestedEntityUrl(Station.class);
-                    List<Station> stationList = tHighway.fetchListForURLAsEntity(nestedStationsUrl, Station.class);
+                    List<Station> stationList = null;
+                    try {
+                        stationList= tHighway.fetchListForURLAsEntity(nestedStationsUrl, Station.class);
+                    } catch (APIException e) {
+                        Log.e(TAG, "API ERROR: could not fetch stations for highway "+tHighway.getHighwayid());
+
+                        AlertDialog.Builder messageBox = new AlertDialog.Builder(this);
+                        messageBox.setTitle("Server Error");
+                        messageBox.setMessage("Failed to fetch data for highway "+tHighway.getHighwayid()+".\n\n"+e.getMessage());
+                        messageBox.setCancelable(false);
+                        messageBox.setNeutralButton("OK", null);
+                        messageBox.show();
+                    }
                     // And add them to the list!
                     listOfStationsBaseOnHighwayid.put(tHighway.getHighwayid(), stationList);
                 }
