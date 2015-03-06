@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import edu.pdx.its.portal.routelandia.entities.APIException;
 import edu.pdx.its.portal.routelandia.entities.TrafficStat;
 
 
@@ -114,7 +115,13 @@ public class DatePickUp extends Activity {
 
             @Override
             public void onClick(View v) {
-                trafficStatList = (ArrayList)TrafficStat.getStatsResultListFor(startPoint, endPoint, departureTime, weekDay);
+                try {
+                    trafficStatList = (ArrayList) TrafficStat.getStatsResultListFor(startPoint, endPoint, departureTime, weekDay);
+                }
+                catch (APIException e) {
+                    // TODO: RESTART ACTIVITY AFTER TELLING USER THAT THEY NEED TO DO SOMETHING!!
+                    // (Did they pick bad points? Going to have to read the e.getResultWrapper().getParsedResponse() JSON to see...)
+                }
 
                 if(trafficStatList == null){
                     Log.e("RESULT", "No results returned from statistics query.");
