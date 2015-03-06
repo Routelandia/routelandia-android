@@ -130,7 +130,7 @@ public abstract class APIEntity {
      * @return String representing the URL component
      */
     public String getEntityListUrlComponent() {
-        return this.getClass().getSimpleName().toLowerCase() + "/";
+        return this.getClass().getSimpleName().toLowerCase() + "s/";
     }
     public String getEntityListUrl() {
         return API_ROOT + getEntityListUrlComponent();
