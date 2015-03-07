@@ -205,10 +205,13 @@ public class TrafficStat extends APIEntity implements Parcelable {
         try {
             APIResultWrapper resWrap = new ApiPoster().execute(postReq).get();
             if(resWrap.getHttpStatus() != 200) {
-                throw new APIException("Error or POST", resWrap);
+                Log.e(TAG, "API Returned non-200, throwing error!");
+                Log.e(TAG, resWrap.getParsedResponse().toString());
+                throw new APIException("Error on POST", resWrap);
             }
             JSONObject parsedRawRes = resWrap.getParsedResponse();
             JSONArray jResult = parsedRawRes.getJSONArray("results");
+            Log.i(TAG, "Got results array: "+jResult);
             // Now loop through all the results and make the list
             if (jResult == null) {
                 // No items were found? Sounds suspicious, but I guess we're done.
