@@ -74,7 +74,7 @@ public class FirstPage extends Activity{
                     @Override
                     public void run() {
                         try {
-                            Thread.sleep(4000); // Thread goes to sleep for 4 seconds
+                            Thread.sleep(8000); // Thread goes to sleep for 8 seconds
                         } catch (Exception e) {
                         }
                         spinner.dismiss();
