@@ -48,16 +48,21 @@ public abstract class APIEntity {
      * @param <T> The type of the objects that we'll be returning. (Entity class)
      * @return A list of objects of the given type, representing all of the results returned by the API.
      */
-    public static <T> List<T> fetchListForEntity(Class<T> klass) {
+    public static <T> List<T> fetchListForEntity(Class<T> klass) throws APIException {
         String entityListUrl = API_ROOT + klass.getSimpleName().toLowerCase() + "s/";
         return fetchListForURLAsEntity(entityListUrl, klass);
     }
-    public static <T> List<T> fetchListForURLAsEntity(String url, Class<T> klass) {
+    public static <T> List<T> fetchListForURLAsEntity(String url, Class<T> klass) throws APIException {
         Log.i(TAG, "Preparing to fetch <"+klass.getSimpleName()+"> list with URL: "+url);
         List<T> retVal = new ArrayList<>();
 
         try{
-            JSONObject res = ((APIResultWrapper)new ApiFetcher().execute(url).get()).getParsedResponse();
+            APIResultWrapper resWrap = new ApiFetcher().execute(url).get();
+            if(resWrap.getHttpStatus() != 200) {
+                // Apparently our HTTP response contained an error, so we'll be bailing now...
+                throw new APIException("Problem communicating with the server...", resWrap);
+            }
+            JSONObject res = resWrap.getParsedResponse();
             JSONArray resArray = (JSONArray)res.get("results");
             for (int i = 0; i <resArray.length() ; i++) {
                 //Create a entity object from the JSONObject for each array index and add it to the list
@@ -87,15 +92,20 @@ public abstract class APIEntity {
      * @param <T> The type of the objects that we'll be returning. (Entity class)
      * @return A list of objects of the given type, representing all of the results returned by the API.
      */
-    public static <T> T fetchIdForEntity(int iid, Class<T> klass) {
+    public static <T> T fetchIdForEntity(int iid, Class<T> klass) throws APIException {
         String entityUrl = API_ROOT + klass.getSimpleName().toLowerCase() + "s/" + iid + "/";
         return fetchItemAtURLAsEntity(entityUrl, klass);
     }
-    public static <T> T fetchItemAtURLAsEntity(String url, Class<T> klass) {
+    public static <T> T fetchItemAtURLAsEntity(String url, Class<T> klass) throws APIException {
         Log.i(TAG, "Preparing to fetch by ID with URL: "+url);
 
         try{
-            JSONObject res = ((APIResultWrapper)new ApiFetcher().execute(url).get()).getParsedResponse();
+            APIResultWrapper resWrap = new ApiFetcher().execute(url).get();
+            JSONObject res = resWrap.getParsedResponse();
+            if(resWrap.getHttpStatus() != 200) {
+                // Apparently our HTTP response contained an error, so we'll be bailing now...
+                throw new APIException("Problem communicating with the server...", resWrap);
+            }
             JSONObject resObj = (JSONObject)res.get("results");
             return klass.getConstructor(JSONObject.class).newInstance(resObj);
         } catch (JSONException e) {
@@ -120,7 +130,7 @@ public abstract class APIEntity {
      * @return String representing the URL component
      */
     public String getEntityListUrlComponent() {
-        return this.getClass().getSimpleName().toLowerCase() + "/";
+        return this.getClass().getSimpleName().toLowerCase() + "s/";
     }
     public String getEntityListUrl() {
         return API_ROOT + getEntityListUrlComponent();
