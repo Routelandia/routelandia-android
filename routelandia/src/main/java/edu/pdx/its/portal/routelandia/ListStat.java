@@ -100,43 +100,37 @@ public class ListStat extends Activity {
     }
 
     private void openChart(){
-
-        // Time series for duration of travel
-        TimeSeries durationSeries = new TimeSeries("Duration of travel");
+        XYSeries durationSeries = new XYSeries("Duration of travel");
         int timeLength = trafficStatList.size();
         for(int i = 0; i < timeLength; i++){
-            durationSeries.add(trafficStatList.get(i).getHour(), trafficStatList.get(i).getTravelTime());
+            durationSeries.add((i + 1), trafficStatList.get(i).getTravelTime());
         }
 
-        // Time series for speed
-        TimeSeries speedSeries = new TimeSeries("Speed");
+        XYSeries speedSeries = new XYSeries("Duration of travel");
         for(int i = 0; i < timeLength; i++){
-            speedSeries.add(trafficStatList.get(i).getHour(), trafficStatList.get(i).getSpeed());
+            speedSeries.add((i + 1), trafficStatList.get(i).getSpeed());
         }
-        
+
         //Collects all series and adds them under one object here called data
         XYMultipleSeriesDataset data = new  XYMultipleSeriesDataset();
         data.addSeries(durationSeries);
         data.addSeries(speedSeries);
 
-        //Gives the line it's property
+        //Gives the Bar it's property
         XYSeriesRenderer durRenderer = new XYSeriesRenderer();
-        XYSeriesRenderer speedRenderer = new XYSeriesRenderer();
-
-        durRenderer.setColor(Color.CYAN);
-        durRenderer.setPointStyle(PointStyle.CIRCLE);
-        durRenderer.setFillPoints(true);
-        durRenderer.setLineWidth(2);
+        durRenderer.setColor(Color.GREEN);
         durRenderer.setDisplayChartValues(true);
+        durRenderer.setChartValuesTextAlign(Paint.Align.CENTER);
+        durRenderer.setChartValuesTextSize(15);
 
-        // Creating XYSeriesRenderer to customize viewsSeries
-        speedRenderer.setColor(Color.YELLOW);
-        speedRenderer.setPointStyle(PointStyle.CIRCLE);
-        speedRenderer.setFillPoints(true);
-        speedRenderer.setLineWidth(2);
+        XYSeriesRenderer speedRenderer = new XYSeriesRenderer();
+        speedRenderer.setColor(Color.CYAN);
         speedRenderer.setDisplayChartValues(true);
+        speedRenderer.setChartValuesTextAlign(Paint.Align.CENTER);
+        speedRenderer.setChartValuesTextSize(15);
 
         XYMultipleSeriesRenderer mRender = new XYMultipleSeriesRenderer();
+        mRender.setBarSpacing(1);
         mRender.addSeriesRenderer(durRenderer);
         mRender.addSeriesRenderer(speedRenderer);
         mRender.setChartTitle("Travel Time and Speed");
@@ -149,6 +143,7 @@ public class ListStat extends Activity {
         mRender.setAxisTitleTextSize(25);
         mRender.setXAxisMin(trafficStatList.get(1).getHour());
         mRender.setXAxisMax(trafficStatList.size());
+
         for (int i = 0; i < timeLength; i++)
         {
             mRender.addTextLabel(i + 1, String.valueOf((int) trafficStatList.get(i).getHour() + ":" + (int) trafficStatList.get(i).getMinutes() ));
@@ -160,11 +155,11 @@ public class ListStat extends Activity {
         LinearLayout chartContainer = (LinearLayout) findViewById(R.id.chart_container);
 
         // Creating a Time Chart
-        mChart = (GraphicalView) ChartFactory.getTimeChartView(getBaseContext(), data, mRender, "Title of Graph");
+        mChart = (GraphicalView) ChartFactory.getBarChartView(getBaseContext(), data, mRender, BarChart.Type.DEFAULT);
+        //return intent;
         mRender.setClickEnabled(true);
         mRender.setSelectableBuffer(10);
 
-        // Setting a click event listener for the graph
         mChart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
