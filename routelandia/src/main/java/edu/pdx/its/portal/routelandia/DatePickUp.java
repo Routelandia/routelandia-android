@@ -14,11 +14,13 @@
 
 package edu.pdx.its.portal.routelandia;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,6 +29,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -53,6 +56,7 @@ public class DatePickUp extends Activity {
     protected LatLng endPoint;
     protected String departureTime;
     protected ArrayList<TrafficStat> trafficStatList;
+    private int TIME_PICKER_INTERVAL = 15;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -219,9 +223,37 @@ public class DatePickUp extends Activity {
 
 
         @Override
-        public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+        public void onTimeChanged(TimePicker timePicker, int hourOfDay, int minute) {
+            setTimePickerInterval(timePicker);
+
             StringBuilder s = new StringBuilder().append(hourOfDay).append(":").append(minute);
             departureTime = s.toString();
+
+        }
+
+        @SuppressLint("NewApi")
+        private void setTimePickerInterval(TimePicker timePicker) {
+            try {
+                Class<?> classForid = Class.forName("com.android.internal.R$id");
+
+                Field field = classForid.getField("minute");
+                NumberPicker minutePicker = (NumberPicker) timePicker
+                        .findViewById(field.getInt(null));
+
+                minutePicker.setMinValue(0);
+                minutePicker.setMaxValue(7);
+                ArrayList<String> displayedValues = new ArrayList<>();
+                for (int i = 0; i < 60; i += TIME_PICKER_INTERVAL) {
+                    displayedValues.add(String.format("%02d", i));
+                }
+                for (int i = 0; i < 60; i += TIME_PICKER_INTERVAL) {
+                    displayedValues.add(String.format("%02d", i));
+                }
+                minutePicker.setDisplayedValues(displayedValues
+                        .toArray(new String[0]));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
