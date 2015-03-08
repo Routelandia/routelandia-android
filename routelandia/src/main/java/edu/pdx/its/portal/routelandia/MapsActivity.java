@@ -93,7 +93,7 @@ public class MapsActivity extends FragmentActivity {
             } catch(APIException e) {
                 Log.e(TAG, "CAUGHT API EXCEPTION, status code: ("+e.getResultWrapper().getHttpStatus()+"), message: "+e.getMessage());
 
-                new ErrorPopup("Server Error", "Encountered an unrecoverable error trying to fetch highway data: \n\n" + e.getMessage()).givePopup(this);
+                new ErrorPopup("Server Error", "Encountered an unrecoverable error trying to fetch highway data: \n\n" + e.getMessage()).givePopup(this).show();
 
                 /*AlertDialog.Builder messageBox = new AlertDialog.Builder(this);
                 messageBox.setTitle("Server Error");
@@ -138,7 +138,7 @@ public class MapsActivity extends FragmentActivity {
                     } catch (APIException e) {
                         Log.e(TAG, "API ERROR: could not fetch stations for highway "+tHighway.getHighwayid());
 
-                        new ErrorPopup("Server Error", "Failed to fetch data for highway "+tHighway.getHighwayid()+".\n\n"+e.getMessage()).givePopup(this);
+                        new ErrorPopup("Server Error", "Failed to fetch data for highway "+tHighway.getHighwayid()+".\n\n"+e.getMessage()).givePopup(this).show();
                         /*AlertDialog.Builder messageBox = new AlertDialog.Builder(this);
                         messageBox.setTitle("Server Error");
                         messageBox.setMessage("Failed to fetch data for highway "+tHighway.getHighwayid()+".\n\n"+e.getMessage());
