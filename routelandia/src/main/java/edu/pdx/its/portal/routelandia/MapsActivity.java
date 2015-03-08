@@ -93,12 +93,14 @@ public class MapsActivity extends FragmentActivity {
             } catch(APIException e) {
                 Log.e(TAG, "CAUGHT API EXCEPTION, status code: ("+e.getResultWrapper().getHttpStatus()+"), message: "+e.getMessage());
 
-                AlertDialog.Builder messageBox = new AlertDialog.Builder(this);
+                new ErrorPopup("Server Error", "Encountered an unrecoverable error trying to fetch highway data: \n\n" + e.getMessage()).givePopup(this);
+
+                /*AlertDialog.Builder messageBox = new AlertDialog.Builder(this);
                 messageBox.setTitle("Server Error");
                 messageBox.setMessage("Encountered an unrecoverable error trying to fetch highway data: \n\n" + e.getMessage());
                 messageBox.setCancelable(false);
                 messageBox.setNeutralButton("OK", null);
-                messageBox.show();
+                messageBox.show();*/
 
                 return; // Bail out of the function.
             }
