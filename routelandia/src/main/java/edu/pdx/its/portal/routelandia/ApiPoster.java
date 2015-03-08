@@ -53,7 +53,7 @@ public class ApiPoster extends AsyncTask<APIPostWrapper, Void, APIResultWrapper>
     protected APIResultWrapper doInBackground(APIPostWrapper... params) {
         // Foolishly assume that only the first param matters...
         APIResultWrapper retVal = new APIResultWrapper();
-        retVal.setParsedResponse(postJsonObjectToUrl(params[0].getFullUrl(), params[0].getPostObj()));
+        postJsonObjectToUrl(params[0].getFullUrl(), params[0].getPostObj(), retVal);
         return retVal;
     }
 //    protected void onPostExecute(JSONArray result) {
@@ -62,7 +62,7 @@ public class ApiPoster extends AsyncTask<APIPostWrapper, Void, APIResultWrapper>
 //    }
 
 
-    public JSONObject postJsonObjectToUrl(String url, JSONObject jsonObject){
+    public JSONObject postJsonObjectToUrl(String url, JSONObject jsonObject, APIResultWrapper retVal){
         InputStream inputStream = null;
         String result = "";
         try {
@@ -96,8 +96,13 @@ public class ApiPoster extends AsyncTask<APIPostWrapper, Void, APIResultWrapper>
             // 8. Execute POST request to the given URL
             HttpResponse httpResponse = httpclient.execute(httpPost);
 
+            // Make sure we've got a good response from the API.
+            int status =  httpResponse.getStatusLine().getStatusCode();
+            retVal.setHttpStatus(status);
+
             result = EntityUtils.toString(httpResponse.getEntity());
             //Log.i("RAW HTTP RESULT", result);
+            retVal.setRawResponse(result);
 
         } catch (Exception e) {
             Log.e("InputStream", e.getLocalizedMessage());
@@ -106,6 +111,7 @@ public class ApiPoster extends AsyncTask<APIPostWrapper, Void, APIResultWrapper>
         try {
             Object json = new JSONTokener(result).nextValue();
             if(json instanceof JSONObject){
+                retVal.setParsedResponse((JSONObject)json);
                 return (JSONObject)json;
             }
         } catch (JSONException e) {

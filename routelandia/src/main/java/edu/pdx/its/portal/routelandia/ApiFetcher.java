@@ -44,8 +44,7 @@ public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
 
         try {
             // Fetch the HTTP Result and parse it into the JSON to be returned.
-            String rawResult = fetchRawResult(params[0]);
-            retVal.setRawResponse(rawResult);
+            String rawResult = fetchRawResult(params[0], retVal);
             retVal.setParsedResponse(parseRawResult(rawResult));
         } catch (IOException e) {
             Log.e(TAG, "Error doing background API Fetch: " + e.toString());
@@ -71,7 +70,7 @@ public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
      * @return a string containing the returned result of the HTTP request.
      * @throws IOException
      */
-    private String fetchRawResult(String stringURL) throws IOException {
+    private String fetchRawResult(String stringURL, APIResultWrapper retVal) throws IOException {
         String data = "";
         InputStream iStream;
         HttpURLConnection urlConnection;
@@ -89,9 +88,7 @@ public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
 
             // Make sure we've got a good response from the API.
             int status = urlConnection.getResponseCode();
-            if(status != 200) {
-                // TODO: We have an error here!!!
-            }
+            retVal.setHttpStatus(status);
 
             // Reading data from url
             iStream = urlConnection.getInputStream();
@@ -118,6 +115,7 @@ public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
             Log.e(TAG, "Error in getting raw HTTP result: "+e.toString());
         }
 
+        retVal.setRawResponse(data);
         return data;
     }
 
