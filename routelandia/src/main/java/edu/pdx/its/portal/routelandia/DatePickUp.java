@@ -163,6 +163,12 @@ public class DatePickUp extends Activity {
                         Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                         startActivity(intent);
                     }
+                    else if(response == 404 || response == 412){
+                        new ErrorPopup("Error", "Could not complete request: \n\n" + e.getMessage()).givePopup(DatePickUp.this);
+                    }
+                    else if(response >= 500){
+                        new ErrorPopup("Server Error", "There was an error on the server. Please try again later.").givePopup(DatePickUp.this);
+                    }
                     else{
                         new ErrorPopup("Error", "Could not complete request: \n\n" + e.getMessage()).givePopup(DatePickUp.this);
                     }
