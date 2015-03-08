@@ -156,8 +156,7 @@ public class DatePickUp extends Activity {
                 catch (APIException e) {
                     // TODO: RESTART ACTIVITY AFTER TELLING USER THAT THEY NEED TO DO SOMETHING!!
                     // (Did they pick bad points? Going to have to read the e.getResultWrapper().getParsedResponse() JSON to see...)
-                    Intent intent = new Intent(DatePickUp.this,MapsActivity.class);
-                    Toast.makeText(DatePickUp.this, "please re pick 2 points", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                     startActivity(intent);
                 }
 
