@@ -105,7 +105,8 @@ public class DatePickUp extends Activity {
         minute = c.get(Calendar.MINUTE);
         am_pm = c.get(Calendar.AM_PM);
         dayofweek =  getDayOfWeekInStr(c.get(Calendar.DAY_OF_WEEK));
-
+        departureTime = (new StringBuilder().append(hour).append(":").append(minute)).toString();
+        
         tvDisplayDay.setText(
                 new StringBuilder().append(hour)
                         .append(":").append(minute));
@@ -155,6 +156,9 @@ public class DatePickUp extends Activity {
                 catch (APIException e) {
                     // TODO: RESTART ACTIVITY AFTER TELLING USER THAT THEY NEED TO DO SOMETHING!!
                     // (Did they pick bad points? Going to have to read the e.getResultWrapper().getParsedResponse() JSON to see...)
+                    Intent intent = new Intent(DatePickUp.this,MapsActivity.class);
+                    Toast.makeText(DatePickUp.this, "please re pick 2 points", Toast.LENGTH_SHORT).show();
+                    startActivity(intent);
                 }
 
 
