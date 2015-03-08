@@ -49,6 +49,7 @@ public class DatePickUp extends Activity {
     private int hour;
     private int minute;
     private int am_pm;
+    protected String dayofweek;
     static final int TIME_DIALOG_ID = 100;
     private Spinner weekDaySpinner;
     public String weekDay;// = "Sunday";
@@ -76,21 +77,21 @@ public class DatePickUp extends Activity {
 
         }
         addListenerOnButton();
-
     }
+
 
     private void addListenerOnWeekDaySpinnerSelection() {
         weekDaySpinner = (Spinner) findViewById(R.id.spinner);
         DayPickSelectedListener dayPickSelectedListener = new DayPickSelectedListener();
         weekDaySpinner.setOnItemSelectedListener(dayPickSelectedListener);
-//        return dayPickSelectedListener.getWeekDay();
+        //return dayPickSelectedListener.getWeekDay();
     }
 
     private void addListenerOnTime(){
         thisTimePicker = (TimePicker) findViewById(R.id.timePicker);
         TimePickSelectedListener timePickSelectedListener = new TimePickSelectedListener();
         thisTimePicker.setOnTimeChangedListener(timePickSelectedListener);
-//        return timePickSelectedListener.getDepartureTime();
+        //return timePickSelectedListener.getDepartureTime();
     }
 
     //Display current time
@@ -103,7 +104,7 @@ public class DatePickUp extends Activity {
         hour = c.get(Calendar.HOUR_OF_DAY);
         minute = c.get(Calendar.MINUTE);
         am_pm = c.get(Calendar.AM_PM);
-//        dayOfWeek = getPmAm(c.get(Calendar.AM_PM));
+        dayofweek =  getDayOfWeekInStr(c.get(Calendar.DAY_OF_WEEK));
 
         tvDisplayDay.setText(
                 new StringBuilder().append(hour)
@@ -111,6 +112,34 @@ public class DatePickUp extends Activity {
 
         thisTimePicker.setCurrentHour(hour);
         thisTimePicker.setCurrentMinute(minute);
+    }
+
+    public String getDayOfWeekInStr(int value) {
+        String day = "Sunday";
+        switch (value) {
+            case 0:
+                day = "Sunday";
+                break;
+            case 1:
+                day = "Monday";
+                break;
+            case 2:
+                day = "Tuesday";
+                break;
+            case 3:
+                day = "Wednesday";
+                break;
+            case 4:
+                day = "Thursday";
+                break;
+            case 5:
+                day = "Friday";
+                break;
+            case 6:
+                day = "Saturday";
+                break;
+        }
+        return day;
     }
 
     public void addListenerOnButton() {
@@ -127,6 +156,7 @@ public class DatePickUp extends Activity {
                     // TODO: RESTART ACTIVITY AFTER TELLING USER THAT THEY NEED TO DO SOMETHING!!
                     // (Did they pick bad points? Going to have to read the e.getResultWrapper().getParsedResponse() JSON to see...)
                 }
+
 
                 if(trafficStatList == null){
                     Log.e(TAG, "No results returned from statistics query.");
@@ -152,6 +182,7 @@ public class DatePickUp extends Activity {
             return "0" + String.valueOf(c);
     }
 
+    // for jason use if needed
     private String getPmAm(int value) {
         String pmAm = "";
         switch (value) {
@@ -169,16 +200,20 @@ public class DatePickUp extends Activity {
         return pmAm;
     }
 
-    private class DayPickSelectedListener implements AdapterView.OnItemSelectedListener {
-        protected int week_day;
+    protected class DayPickSelectedListener implements AdapterView.OnItemSelectedListener {
+        //protected int week_day;
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
             Toast.makeText(parent.getContext(),
                     "Departure day: " + parent.getItemAtPosition(pos).toString(),
                     Toast.LENGTH_SHORT).show();
             String s = parent.getItemAtPosition(pos).toString();
-            weekDay = s;
+            if(s == null){
+                weekDay = dayofweek;
+            }else {
+                weekDay = s;
+            }
             // Backend might prefer integer for days
-            week_day = getDayOfWeek(s);
+            //week_day = getDayOfWeekInInt(s);
         }
 
         @Override
@@ -186,11 +221,13 @@ public class DatePickUp extends Activity {
             //TODO
         }
 
+
         public String getWeekDay() {
             return weekDay;
         }
 
-        private int getDayOfWeek(String value) {
+        // Backend might prefer integer for days
+        private int getDayOfWeekInInt(String value) {
             int day = 0;
             switch (value) {
                 case "Sunday":
