@@ -138,7 +138,7 @@ public class MapsActivity extends FragmentActivity {
                     } catch (APIException e) {
                         Log.e(TAG, "API ERROR: could not fetch stations for highway "+tHighway.getHighwayid());
 
-                        new ErrorPopup("Server Error", "Failed to fetch data for highway "+tHighway.getHighwayid()+".\n\n"+e.getMessage()).givePopup(this).show();
+                        new ErrorPopup("Server Error", "Failed to fetch data for highway "+tHighway.getHighwayid()+".\n\n"+e.getMessage()).givePopup(this);
                         /*AlertDialog.Builder messageBox = new AlertDialog.Builder(this);
                         messageBox.setTitle("Server Error");
                         messageBox.setMessage("Failed to fetch data for highway "+tHighway.getHighwayid()+".\n\n"+e.getMessage());
