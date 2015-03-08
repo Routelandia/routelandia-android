@@ -156,8 +156,16 @@ public class DatePickUp extends Activity {
                 catch (APIException e) {
                     // TODO: RESTART ACTIVITY AFTER TELLING USER THAT THEY NEED TO DO SOMETHING!!
                     // (Did they pick bad points? Going to have to read the e.getResultWrapper().getParsedResponse() JSON to see...)
-                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                    startActivity(intent);
+                    int response = e.getResultWrapper().getHttpStatus();
+                    if(response == 400) {
+                        new ErrorPopup("User Error", "Could not locate points on same highway: \n\n" + e.getMessage()).givePopup(DatePickUp.this);
+
+                        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                        startActivity(intent);
+                    }
+                    else{
+                        new ErrorPopup("Error", "Could not complete request: \n\n" + e.getMessage()).givePopup(DatePickUp.this);
+                    }
                 }
 
 
