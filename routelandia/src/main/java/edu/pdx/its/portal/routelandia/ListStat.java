@@ -72,6 +72,12 @@ public class ListStat extends Activity {
         for (int j =0; j < trafficStatList.size(); j++){
             Log.i("RESULT", trafficStatList.get(j).toString());
         }
+
+
+        if(getAverageAccuracy(trafficStatList) < 60) {
+          Toast.makeText(ListStat.this, "Warning! Low Accuracy Percentage!", Toast.LENGTH_LONG).show();
+        }
+
         addListenerOnButton();
         
         if(getRotation(getBaseContext()) == 1 || getRotation(getBaseContext()) == 1) {
@@ -277,5 +283,22 @@ public class ListStat extends Activity {
             tableLayout.addView(row);
 
         }
+    }
+
+    /**
+     * Take a list of traffic stats and get the average accuracy
+     *
+     * @param l The list to get avg accuracy for
+     * @return float representing the average accuracy of this list
+     */
+    private float getAverageAccuracy(ArrayList<TrafficStat> l) {
+        float sum=0;
+        if(!l.isEmpty()) {
+            for (TrafficStat ts : l) {
+               sum += ts.getAccuracy();
+            }
+            return sum / l.size();
+        }
+        return 0;
     }
 }
