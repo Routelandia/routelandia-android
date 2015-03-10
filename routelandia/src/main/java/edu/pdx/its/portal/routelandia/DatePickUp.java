@@ -158,7 +158,7 @@ public class DatePickUp extends Activity {
                     // (Did they pick bad points? Going to have to read the e.getResultWrapper().getParsedResponse() JSON to see...)
                     int response = e.getResultWrapper().getHttpStatus();
                     if(response == 400) {
-                        new ErrorPopup("User Error", "Could not locate points on same highway: \n\n" + e.getMessage()).givePopup(DatePickUp.this).show();
+                        new ErrorPopup("Error", "Please select two points along the same color highway segment.").givePopup(DatePickUp.this).show();
 
                         Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                         startActivity(intent);
