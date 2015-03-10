@@ -105,6 +105,7 @@ public class DatePickUp extends Activity {
     public void setCurrentTimeOnView() {
 
         thisTimePicker = (TimePicker) findViewById(R.id.timePicker);
+        weekDaySpinner = (Spinner) findViewById(R.id.spinner);
 
         final Calendar c = Calendar.getInstance();
         hour = c.get(Calendar.HOUR_OF_DAY);
@@ -115,6 +116,8 @@ public class DatePickUp extends Activity {
         
         thisTimePicker.setCurrentHour(hour);
         thisTimePicker.setCurrentMinute(minute);
+        // We have to do the -1 because DAY_OF_WEEK is 1-7, instead of 0-6.
+        weekDaySpinner.setSelection(c.get(Calendar.DAY_OF_WEEK)-1);
     }
 
     /**
