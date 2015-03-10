@@ -166,7 +166,7 @@ public class DatePickUp extends Activity {
                     else if(response == 404 || response == 412){
                         new ErrorPopup("Error", "Could not complete request: \n\n" + e.getMessage()).givePopup(DatePickUp.this).show();
                     }
-                    else if(response >= 500){
+                    else if(response >= 500 && response < 600){
                         new ErrorPopup("Server Error", "There was an error on the server. Please try again later.").givePopup(DatePickUp.this).show();
                     }
                     else{
