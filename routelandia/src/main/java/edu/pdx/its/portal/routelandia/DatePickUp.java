@@ -162,9 +162,22 @@ public class DatePickUp extends Activity {
                 catch (APIException e) {
                     // TODO: RESTART ACTIVITY AFTER TELLING USER THAT THEY NEED TO DO SOMETHING!!
                     // (Did they pick bad points? Going to have to read the e.getResultWrapper().getParsedResponse() JSON to see...)
-                    Intent intent = new Intent(DatePickUp.this,MapsActivity.class);
-                    Toast.makeText(DatePickUp.this, "please re pick 2 points", Toast.LENGTH_SHORT).show();
-                    startActivity(intent);
+                    int response = e.getResultWrapper().getHttpStatus();
+                    if(response == 400) {
+                        new ErrorPopup("User Error", "Could not locate points on same highway: \n\n" + e.getMessage()).givePopup(DatePickUp.this).show();
+
+                        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                        startActivity(intent);
+                    }
+                    else if(response == 404 || response == 412){
+                        new ErrorPopup("Error", "Could not complete request: \n\n" + e.getMessage()).givePopup(DatePickUp.this).show();
+                    }
+                    else if(response >= 500 && response < 600){
+                        new ErrorPopup("Server Error", "There was an error on the server. Please try again later.").givePopup(DatePickUp.this).show();
+                    }
+                    else{
+                        new ErrorPopup("Error", "Could not complete request: \n\n" + e.getMessage()).givePopup(DatePickUp.this).show();
+                    }
                 }
 
 

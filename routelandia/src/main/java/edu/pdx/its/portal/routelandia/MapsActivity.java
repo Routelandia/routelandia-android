@@ -93,12 +93,7 @@ public class MapsActivity extends FragmentActivity {
             } catch(APIException e) {
                 Log.e(TAG, "CAUGHT API EXCEPTION, status code: ("+e.getResultWrapper().getHttpStatus()+"), message: "+e.getMessage());
 
-                AlertDialog.Builder messageBox = new AlertDialog.Builder(this);
-                messageBox.setTitle("Server Error");
-                messageBox.setMessage("Encountered an unrecoverable error trying to fetch highway data: \n\n" + e.getMessage());
-                messageBox.setCancelable(false);
-                messageBox.setNeutralButton("OK", null);
-                messageBox.show();
+                new ErrorPopup("Server Error", "Encountered an unrecoverable error trying to fetch highway data: \n\n" + e.getMessage()).givePopup(this).show();
 
                 return; // Bail out of the function.
             }
@@ -136,12 +131,7 @@ public class MapsActivity extends FragmentActivity {
                     } catch (APIException e) {
                         Log.e(TAG, "API ERROR: could not fetch stations for highway "+tHighway.getHighwayid());
 
-                        AlertDialog.Builder messageBox = new AlertDialog.Builder(this);
-                        messageBox.setTitle("Server Error");
-                        messageBox.setMessage("Failed to fetch data for highway "+tHighway.getHighwayid()+".\n\n"+e.getMessage());
-                        messageBox.setCancelable(false);
-                        messageBox.setNeutralButton("OK", null);
-                        messageBox.show();
+                        new ErrorPopup("Server Error", "Failed to fetch data for highway "+tHighway.getHighwayid()+".\n\n"+e.getMessage()).givePopup(this).show();
                     }
                     // And add them to the list!
                     listOfStationsBaseOnHighwayid.put(tHighway.getHighwayid(), stationList);
