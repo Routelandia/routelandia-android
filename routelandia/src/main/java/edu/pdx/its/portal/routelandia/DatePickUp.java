@@ -64,7 +64,9 @@ public class DatePickUp extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_date_pick_up);
-     
+
+        setTimePickerInterval((TimePicker)findViewById(R.id.timePicker));
+
         setCurrentTimeOnView();
 
         addListenerOnWeekDaySpinnerSelection();
@@ -79,6 +81,35 @@ public class DatePickUp extends Activity {
 
         }
         addListenerOnButton();
+    }
+
+    /**
+     * change the minute interval to quarter*
+     * @param timePicker : timepicker obk in the view
+     */
+    @SuppressLint("NewApi")
+    private void setTimePickerInterval(TimePicker timePicker) {
+        try {
+            Class<?> classForid = Class.forName("com.android.internal.R$id");
+
+            Field field = classForid.getField("minute");
+            NumberPicker minutePicker = (NumberPicker) timePicker
+                    .findViewById(field.getInt(null));
+
+            minutePicker.setMinValue(0);
+            minutePicker.setMaxValue(7);
+            ArrayList<String> displayedValues = new ArrayList<>();
+            for (int i = 0; i < 60; i += TIME_PICKER_INTERVAL) {
+                displayedValues.add(String.format("%02d", i));
+            }
+            for (int i = 0; i < 60; i += TIME_PICKER_INTERVAL) {
+                displayedValues.add(String.format("%02d", i));
+            }
+            minutePicker.setDisplayedValues(displayedValues
+                    .toArray(new String[0]));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -234,47 +265,16 @@ public class DatePickUp extends Activity {
 
     private class TimePickSelectedListener implements TimePicker.OnTimeChangedListener {
         /**
-         * * 
+         * Update the string representing the time we want stats for every time the user
+         * changes the spinner.
+         *
          * @param timePicker: timepicker obk in the view 
          * @param hourOfDay The current hour.
          * @param minute The current minute.
          */
         @Override
         public void onTimeChanged(TimePicker timePicker, int hourOfDay, int minute) {
-            setTimePickerInterval(timePicker);
-
-            StringBuilder s = new StringBuilder().append(hourOfDay).append(":").append(minute);
-            departureTime = s.toString();
-
-        }
-
-        /**
-         * change the minute interval to quarter* 
-         * @param timePicker : timepicker obk in the view
-         */
-        @SuppressLint("NewApi")
-        private void setTimePickerInterval(TimePicker timePicker) {
-            try {
-                Class<?> classForid = Class.forName("com.android.internal.R$id");
-
-                Field field = classForid.getField("minute");
-                NumberPicker minutePicker = (NumberPicker) timePicker
-                        .findViewById(field.getInt(null));
-
-                minutePicker.setMinValue(0);
-                minutePicker.setMaxValue(7);
-                ArrayList<String> displayedValues = new ArrayList<>();
-                for (int i = 0; i < 60; i += TIME_PICKER_INTERVAL) {
-                    displayedValues.add(String.format("%02d", i));
-                }
-                for (int i = 0; i < 60; i += TIME_PICKER_INTERVAL) {
-                    displayedValues.add(String.format("%02d", i));
-                }
-                minutePicker.setDisplayedValues(displayedValues
-                        .toArray(new String[0]));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            departureTime = new StringBuilder().append(hourOfDay).append(":").append(minute).toString();
         }
     }
 }
