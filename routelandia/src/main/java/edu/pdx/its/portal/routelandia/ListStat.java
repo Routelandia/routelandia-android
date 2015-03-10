@@ -112,7 +112,7 @@ public class ListStat extends Activity {
             durationSeries.add((i + 1), trafficStatList.get(i).getTravelTime());
         }
 
-        XYSeries speedSeries = new XYSeries("Duration of travel");
+        XYSeries speedSeries = new XYSeries("Speed");
         for(int i = 0; i < timeLength; i++){
             speedSeries.add((i + 1), trafficStatList.get(i).getSpeed());
         }
