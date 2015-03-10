@@ -43,7 +43,6 @@ import edu.pdx.its.portal.routelandia.entities.TrafficStat;
 
 public class DatePickUp extends Activity {
     private static final String TAG = "Activity: DatePickup";
-    private TextView tvDisplayDay;
     private TimePicker thisTimePicker;
     private Button btnDepartureDate;
     private int hour;
@@ -103,7 +102,6 @@ public class DatePickUp extends Activity {
     //Display current time
     public void setCurrentTimeOnView() {
 
-        tvDisplayDay = (TextView) findViewById(R.id.tvTime);
         thisTimePicker = (TimePicker) findViewById(R.id.timePicker);
 
         final Calendar c = Calendar.getInstance();
@@ -113,10 +111,6 @@ public class DatePickUp extends Activity {
         dayofweek =  getDayOfWeekInStr(c.get(Calendar.DAY_OF_WEEK));
         departureTime = (new StringBuilder().append(hour).append(":").append(minute)).toString();
         
-        tvDisplayDay.setText(
-                new StringBuilder().append(hour)
-                        .append(":").append(minute));
-
         thisTimePicker.setCurrentHour(hour);
         thisTimePicker.setCurrentMinute(minute);
     }

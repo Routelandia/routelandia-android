@@ -13,13 +13,6 @@
         android:layout_gravity="center_horizontal"
         android:text="@string/pick_stats" />
 
-    <TextView
-        android:id="@+id/tvTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        style="@style/Bubble.TextAppearance.Light" />
-
     <TimePicker
         style="@style/Widget.AppCompat.Spinner"
         android:id="@+id/timePicker"
