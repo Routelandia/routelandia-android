@@ -73,10 +73,17 @@ public class ListStat extends Activity {
             Log.i("RESULT", trafficStatList.get(j).toString());
         }
 
-
-        if(getAverageAccuracy(trafficStatList) < 60) {
+        float avgAccuracy = getAverageAccuracy(trafficStatList);
+        if(avgAccuracy < 60) {
           Toast.makeText(ListStat.this, "Warning! Low Accuracy Percentage!", Toast.LENGTH_LONG).show();
         }
+        ((TextView) findViewById(R.id.tvPredictionAccuracy)).setText(avgAccuracy + "%");
+
+        double length = 0;
+        if(trafficStatList.size() > 0) {
+            length = trafficStatList.get(0).getDistance();
+        }
+        ((TextView) findViewById(R.id.tvRouteLength)).setText(length + " miles");
 
         addListenerOnButton();
         
