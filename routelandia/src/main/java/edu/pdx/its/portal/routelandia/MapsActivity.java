@@ -144,9 +144,6 @@ public class MapsActivity extends FragmentActivity {
                 } else {
                     new ErrorPopup("Error", "Please select a start and an end point along the same highway section.").givePopup(v.getContext()).show();
                 }
-                else{
-                    Toast.makeText(MapsActivity.this, "Please pick 2 points close to the highway!", Toast.LENGTH_LONG).show();
-                }
             }
         });
     }
