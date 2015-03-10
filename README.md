@@ -8,6 +8,8 @@ Routelandia Android application use Google Play services to load Google Map
 
 ### API keys
 
+Based on instructions from https://developers.google.com/maps/documentation/android/start
+
 Each Google Maps Web Service requires an API key or Client ID. API keys are
 freely available with a Google Account at
 https://developers.google.com/console. To generate a server key for
@@ -24,9 +26,9 @@ your project:
  5. Once you've enabled the APIs, click **Credentials** from the left navigation of the Developer
     Console.
  6. In the "Public API access", click **Create new Key**.
- 7. Choose **Server Key**.
- 8. If you'd like to restrict requests to a specific IP address, do so now.
+ 7. Choose **Android Key**.
+ 8. Enter your Certificate Fingerprint.
  9. Click **Create**.
 
 Your API key should be 40 characters long, and begin with `AIza`.
-
+You'll need to place this key your AndroidManifest.xml as the value for the com.google.android.maps.v2.API_KEY field.

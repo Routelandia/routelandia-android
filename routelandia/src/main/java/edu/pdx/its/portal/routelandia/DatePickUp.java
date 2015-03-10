@@ -43,7 +43,6 @@ import edu.pdx.its.portal.routelandia.entities.TrafficStat;
 
 public class DatePickUp extends Activity {
     private static final String TAG = "Activity: DatePickup";
-    private TextView tvDisplayDay;
     private TimePicker thisTimePicker;
     private Button btnDepartureDate;
     private int hour;
@@ -103,7 +102,6 @@ public class DatePickUp extends Activity {
     //Display current time
     public void setCurrentTimeOnView() {
 
-        tvDisplayDay = (TextView) findViewById(R.id.tvTime);
         thisTimePicker = (TimePicker) findViewById(R.id.timePicker);
 
         final Calendar c = Calendar.getInstance();
@@ -113,10 +111,6 @@ public class DatePickUp extends Activity {
         dayofweek =  getDayOfWeekInStr(c.get(Calendar.DAY_OF_WEEK));
         departureTime = (new StringBuilder().append(hour).append(":").append(minute)).toString();
         
-        tvDisplayDay.setText(
-                new StringBuilder().append(hour)
-                        .append(":").append(minute));
-
         thisTimePicker.setCurrentHour(hour);
         thisTimePicker.setCurrentMinute(minute);
     }
@@ -164,7 +158,7 @@ public class DatePickUp extends Activity {
                     // (Did they pick bad points? Going to have to read the e.getResultWrapper().getParsedResponse() JSON to see...)
                     int response = e.getResultWrapper().getHttpStatus();
                     if(response == 400) {
-                        new ErrorPopup("User Error", "Could not locate points on same highway: \n\n" + e.getMessage()).givePopup(DatePickUp.this).show();
+                        new ErrorPopup("Error", "Please select two points along the same color highway segment.").givePopup(DatePickUp.this).show();
 
                         Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                         startActivity(intent);

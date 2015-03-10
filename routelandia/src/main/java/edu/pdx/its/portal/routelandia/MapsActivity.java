@@ -190,7 +190,6 @@ public class MapsActivity extends FragmentActivity {
         timeAndDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("clicks", "you clicked date pick up");
                 if(firstMarker != null && secondMarker != null) {
                     Intent i = new Intent(getApplicationContext(), DatePickUp.class).
                             putExtra("lat of first point", startPoint.latitude).
@@ -198,6 +197,8 @@ public class MapsActivity extends FragmentActivity {
                             putExtra("lat of second point", endPoint.latitude).
                             putExtra("lng of second point", endPoint.longitude);
                     startActivity(i);
+                } else {
+                    new ErrorPopup("Error", "Please select a start and an end point along the same highway section.").givePopup(v.getContext()).show();
                 }
             }
         });
