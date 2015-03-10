@@ -14,7 +14,6 @@
 
 package edu.pdx.its.portal.routelandia;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -23,6 +22,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -40,25 +40,19 @@ import com.google.maps.android.PolyUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import edu.pdx.its.portal.routelandia.entities.*;
 
 public class MapsActivity extends FragmentActivity {
     private final String TAG = "Maps Activity";
-
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    protected ArrayList<LatLng> mMarkerPoints = new ArrayList<>();
-    protected ArrayList<LatLng> startEnd = new ArrayList<>();
     protected PolylineOptions globalPoly = new PolylineOptions();
-    protected MarkerOptions markerOptions = new MarkerOptions();
     protected List<Highway> highwayList = new ArrayList<>();
     protected HashMap<Integer, List<Station>> listOfStationsBaseOnHighwayid = new HashMap<>();
-    public static LatLng startPoint;
-    public static LatLng endPoint;
+    protected LatLng startPoint;
+    protected LatLng endPoint;
     protected Marker firstMarker;
     protected Marker secondMarker;
-    protected List<Station> stationList = new ArrayList<>();
 
     /**
      * Perform initialization of all fragments and loaders.
@@ -99,93 +93,43 @@ public class MapsActivity extends FragmentActivity {
             }
 
             if(savedInstanceState != null){
-                //get the hashmap list of station before users rotate the phone
-                listOfStationsBaseOnHighwayid = (HashMap<Integer, List<Station>>) savedInstanceState.get("a hashmap of list stations");
+                getItemsFromSaveBundle(savedInstanceState);
 
-                //if users drag first marker, get the latlng back and re-create that marker
-                if(savedInstanceState.get("lat of first marker") != null) {
-                    LatLng latLngOfFirstMarker = new LatLng((Double) savedInstanceState.get("lat of first marker"), (Double) savedInstanceState.get("lng of first marker"));
-                    firstMarker = mMap.addMarker(new MarkerOptions().position(latLngOfFirstMarker).
-                            icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).
-                            draggable(true).title("Start"));
-                    startPoint = firstMarker.getPosition();
-                }
-
-                //if users drag second marker, get the latlng back and re-create that marker
-                if(savedInstanceState.get("lat of second marker") != null) {
-                    LatLng latLngOfSecondMarker = new LatLng((Double) savedInstanceState.get("lat of second marker"), (Double) savedInstanceState.get("lng of second marker"));
-                    secondMarker = mMap.addMarker(new MarkerOptions().position(latLngOfSecondMarker).
-                            icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).
-                            draggable(true).title("End"));
-                    endPoint = secondMarker.getPosition();
-                }
             }
             else {
-                for (int i = 0; i < highwayList.size(); i++) {
-                    // Get a list of all stations from the API.
-                    Highway tHighway = highwayList.get(i);
-                    String nestedStationsUrl = tHighway.getNestedEntityUrl(Station.class);
-                    List<Station> stationList = null;
-                    try {
-                        stationList= tHighway.fetchListForURLAsEntity(nestedStationsUrl, Station.class);
-                    } catch (APIException e) {
-                        Log.e(TAG, "API ERROR: could not fetch stations for highway "+tHighway.getHighwayid());
-
-                        new ErrorPopup("Server Error", "Failed to fetch data for highway "+tHighway.getHighwayid()+".\n\n"+e.getMessage()).givePopup(this).show();
-                    }
-                    // And add them to the list!
-                    listOfStationsBaseOnHighwayid.put(tHighway.getHighwayid(), stationList);
-                }
+                downloadStationsBasedOnHighway();
             }
             for (int i =0; i<highwayList.size(); i++){
-                int colorHighlightTheFreeWay = 0;
                 List<Station> stations = listOfStationsBaseOnHighwayid.get(highwayList.get(i).getHighwayid());
-                if(highwayList.get(i).getHighwayid() == 9 || highwayList.get(i).getHighwayid() == 10 ){
-                    colorHighlightTheFreeWay = Color.rgb(255,0,0);
-                }
-                else if(highwayList.get(i).getHighwayid() == 5 || highwayList.get(i).getHighwayid() == 6 ){
-                    colorHighlightTheFreeWay = Color.rgb(0,255,0);
-                }
-                else if(highwayList.get(i).getHighwayid() == 52 || highwayList.get(i).getHighwayid() == 53 ){
-                    colorHighlightTheFreeWay = Color.rgb(0,0,255);
-                }
-                else if(highwayList.get(i).getHighwayid() == 7 || highwayList.get(i).getHighwayid() == 8 ){
-                    colorHighlightTheFreeWay = Color.rgb(0,0,0);
-                }
-                else if(highwayList.get(i).getHighwayid() == 11 || highwayList.get(i).getHighwayid() == 12 ){
-                    colorHighlightTheFreeWay = Color.rgb(255,0,255);
-                }
-                else if(highwayList.get(i).getHighwayid() == 50 || highwayList.get(i).getHighwayid() == 51 ){
-                    colorHighlightTheFreeWay = Color.rgb(0,255,255);
-                }
-                else if(highwayList.get(i).getHighwayid() == 3 || highwayList.get(i).getHighwayid() == 4 ){
-                    colorHighlightTheFreeWay = Color.rgb(255,0,128);
-                }
-                else if(highwayList.get(i).getHighwayid() == 501 || highwayList.get(i).getHighwayid() == 502 ){
-                    colorHighlightTheFreeWay = Color.rgb(128,0,255);
-                }
-                else if(highwayList.get(i).getHighwayid() == 1 || highwayList.get(i).getHighwayid() == 2 ){
-                    colorHighlightTheFreeWay = Color.rgb(0,128,255);
-                }
-                else if(highwayList.get(i).getHighwayid() == 54 || highwayList.get(i).getHighwayid() == 5 ){
-                    colorHighlightTheFreeWay = Color.rgb(0,255,128);
-                }
-//                drawHighway(stations);
+                int colorHighlightTheFreeWay = generatePairhighWayColor(highwayList.get(i).getHighwayid());
                 drawHighway(stations, colorHighlightTheFreeWay);
             }
-
         }
-        drawHighway(stationList);
-        //overwrite onMapClickListener to let users drag markerOptions in the map
+        usersDragTheMarkers();
+
+        goToDatePickUp();
+        
+        removeMarker();
+
+    }
+
+    /**
+     * overwrite onMapClickListener to let users drag markerOptions in the map*
+     */
+    private void usersDragTheMarkers() {
         mMap.setOnMapClickListener(new OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
                 drawMarker(point);
             }
         });
+    }
 
-        //Create a time and data button so users can go to the next page
-        //which allow them to choose the time when they want to commute
+    /**
+     * Create a time and data button so users can go to the next page
+     * which allow them to choose the time when they want to commute*
+     */
+    private void goToDatePickUp() {
         Button timeAndDateButton = (Button) findViewById(R.id.button3);
         timeAndDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,14 +144,109 @@ public class MapsActivity extends FragmentActivity {
                 } else {
                     new ErrorPopup("Error", "Please select a start and an end point along the same highway section.").givePopup(v.getContext()).show();
                 }
+                else{
+                    Toast.makeText(MapsActivity.this, "Please pick 2 points close to the highway!", Toast.LENGTH_LONG).show();
+                }
             }
         });
+    }
 
-        //Create a clear button so users can re-drag the markers
+    private void downloadStationsBasedOnHighway() {
+        for (int i = 0; i < this.highwayList.size(); i++) {
+            // Get a list of all stations from the API.
+            Highway tHighway = this.highwayList.get(i);
+            String nestedStationsUrl = tHighway.getNestedEntityUrl(Station.class);
+            List<Station> stationList = null;
+            try {
+                stationList= tHighway.fetchListForURLAsEntity(nestedStationsUrl, Station.class);
+            } catch (APIException e) {
+                Log.e(TAG, "API ERROR: could not fetch stations for highway " + tHighway.getHighwayid());
+
+                new ErrorPopup("Server Error", "Failed to fetch data for highway "+tHighway.getHighwayid()+".\n\n"+e.getMessage()).givePopup(this).show();
+            }
+            // And add them to the list!
+            listOfStationsBaseOnHighwayid.put(tHighway.getHighwayid(), stationList);
+        }
+    }
+
+    /**
+     * get all the data from save bundle* 
+     * @param savedInstanceState: bundle from the activities
+     */
+    private void getItemsFromSaveBundle(Bundle savedInstanceState) {
+        //get the hashmap list of station before users rotate the phone
+        listOfStationsBaseOnHighwayid = (HashMap<Integer, List<Station>>) savedInstanceState.get("a hashmap of list stations");
+
+        //if users drag first marker, get the latlng back and re-create that marker
+        if(savedInstanceState.get("lat of first marker") != null) {
+            LatLng latLngOfFirstMarker = new LatLng((Double) savedInstanceState.get("lat of first marker"), (Double) savedInstanceState.get("lng of first marker"));
+            firstMarker = mMap.addMarker(new MarkerOptions().position(latLngOfFirstMarker).
+                    icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).
+                    draggable(true).title("Start"));
+            startPoint = firstMarker.getPosition();
+        }
+
+        //if users drag second marker, get the latlng back and re-create that marker
+        if(savedInstanceState.get("lat of second marker") != null) {
+            LatLng latLngOfSecondMarker = new LatLng((Double) savedInstanceState.get("lat of second marker"), (Double) savedInstanceState.get("lng of second marker"));
+            secondMarker = mMap.addMarker(new MarkerOptions().position(latLngOfSecondMarker).
+                    icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).
+                    draggable(true).title("End"));
+            endPoint = secondMarker.getPosition();
+        }
+    }
+
+    /**
+     * * 
+     * @param highwayID: highway number
+     * @return the pair color based on pair high
+     */
+    private int generatePairhighWayColor(int highwayID) {
+        int colorHighlightTheFreeWay = 0;
+        if(highwayID == 9 || highwayID == 10 ){
+            colorHighlightTheFreeWay = Color.rgb(255, 0, 0);
+        }
+        else if(highwayID == 5 || highwayID == 6 ){
+            colorHighlightTheFreeWay = Color.rgb(0,255,0);
+        }
+        else if(highwayID == 52 || highwayID == 53 ){
+            colorHighlightTheFreeWay = Color.rgb(0,0,255);
+        }
+        else if(highwayID == 7 || highwayID == 8 ){
+            colorHighlightTheFreeWay = Color.rgb(0,0,0);
+        }
+        else if(highwayID == 11 || highwayID == 12 ){
+            colorHighlightTheFreeWay = Color.rgb(255,0,255);
+        }
+        else if(highwayID == 50 || highwayID == 51 ){
+            colorHighlightTheFreeWay = Color.rgb(0,255,255);
+        }
+        else if(highwayID == 3 || highwayID == 4 ){
+            colorHighlightTheFreeWay = Color.rgb(255,0,128);
+        }
+        else if(highwayID == 501 || highwayID == 502 ){
+            colorHighlightTheFreeWay = Color.rgb(128,0,255);
+        }
+        else if(highwayID == 1 || highwayID == 2 ){
+            colorHighlightTheFreeWay = Color.rgb(0,128,255);
+        }
+        else if(highwayID == 54 || highwayID == 5 ){
+            colorHighlightTheFreeWay = Color.rgb(0,255,128);
+        }
+        return colorHighlightTheFreeWay;
+    }
+
+    /**
+     * Create a clear button so users can re-drag the markers
+     */
+    private void removeMarker() {
         Button clearButton = (Button) findViewById(R.id.button2);
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(firstMarker == null && secondMarker == null){
+                    Toast.makeText(MapsActivity.this, "You have no marker to remove", Toast.LENGTH_LONG).show();
+                }
                 if(firstMarker != null){
                     firstMarker.remove();
                     firstMarker = null;
@@ -218,7 +257,6 @@ public class MapsActivity extends FragmentActivity {
                 }
             }
         });
-
     }
 
     /**
@@ -277,8 +315,6 @@ public class MapsActivity extends FragmentActivity {
         //save the hashmap of list station
         outState.putSerializable("a hashmap of list stations", listOfStationsBaseOnHighwayid);
 
-        //save the list of station
-//        outState.putSerializable("a list for all stations", (java.io.Serializable) stationList);
         //save the location of first marker
         if(firstMarker != null) {
             outState.putSerializable("lat of first marker", firstMarker.getPosition().latitude);
@@ -319,21 +355,6 @@ public class MapsActivity extends FragmentActivity {
      * draw polyline for each station based on its list latlng*
      * @param stations: in its highway
      */
-    public void drawHighway(List<Station> stations){
-       
-        for (int i=0; i<stations.size(); i++){
-            if(stations.get(i).getLatLngList().size() !=0) {
-                List<LatLng> points = stations.get(i).getLatLngList();
-                if (points != null) {
-                    globalPoly.addAll(points);
-                    PolylineOptions polylineOptions = new PolylineOptions();
-                    polylineOptions.addAll(points).width(10).color(Color.GREEN).geodesic(true);
-                    mMap.addPolyline(polylineOptions);
-                }
-            }
-        }
-    }
-
     public void drawHighway(List<Station> stations, int color){
 
         for (int i=0; i<stations.size(); i++){
@@ -347,22 +368,5 @@ public class MapsActivity extends FragmentActivity {
                 }
             }
         }
-    }
-
-    /**
-     * manually create list of highway has data* 
-     */
-    private void manualCreateHighwayList(){
-        highwayList.add(new Highway("I-5 ", 1));
-        highwayList.add(new Highway("I-5 ", 2));
-        highwayList.add(new Highway("I-205 ", 4));
-        highwayList.add(new Highway("I-84 ", 7));
-        highwayList.add(new Highway("OR 217 ", 9));
-        highwayList.add(new Highway("OR 217 ", 10));
-        highwayList.add(new Highway("US 26 ", 11));
-        highwayList.add(new Highway("US 26 ", 12));
-        highwayList.add(new Highway("WA I-205 ", 54));
-        highwayList.add(new Highway("WA I-5 ", 502));
-    }
-    
+    }  
 }
