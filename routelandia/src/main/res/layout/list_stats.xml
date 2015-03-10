@@ -10,6 +10,23 @@
         android:layout_gravity="center_horizontal"
         android:text="Map" />
 
+    <TableLayout
+        android:id="@+id/stats_info_table"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TableRow>
+            <TextView
+                android:text="Route Length: " />
+            <TextView android:id="@+id/tvRouteLength" />
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="Prediction Accuracy: " />
+            <TextView android:id="@+id/tvPredictionAccuracy" />
+        </TableRow>
+
+    </TableLayout>
+
     <!--<ListView-->
         <!--android:id="@android:id/list"-->
         <!--android:layout_width="fill_parent"-->

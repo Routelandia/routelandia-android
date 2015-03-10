@@ -73,10 +73,17 @@ public class ListStat extends Activity {
             Log.i("RESULT", trafficStatList.get(j).toString());
         }
 
-
-        if(getAverageAccuracy(trafficStatList) < 60) {
+        float avgAccuracy = getAverageAccuracy(trafficStatList);
+        if(avgAccuracy < 60) {
           Toast.makeText(ListStat.this, "Warning! Low Accuracy Percentage!", Toast.LENGTH_LONG).show();
         }
+        ((TextView) findViewById(R.id.tvPredictionAccuracy)).setText(avgAccuracy + "%");
+
+        double length = 0;
+        if(trafficStatList.size() > 0) {
+            length = trafficStatList.get(0).getDistance();
+        }
+        ((TextView) findViewById(R.id.tvRouteLength)).setText(length + " miles");
 
         addListenerOnButton();
         
@@ -235,13 +242,13 @@ public class ListStat extends Activity {
                     tv.setPadding(40, 40, 40, 40);
                     tv.setTextColor(Color.BLACK);
                     if (j == 0) {
-                        tv.setText("hour");
+                        tv.setText("Time");
                     } else if (j == 1) {
-                        tv.setText("speed");
+                        tv.setText("Speed");
                     } else if (j == 2) {
-                        tv.setText("duration");
+                        tv.setText("Travel Time");
                     } else {
-                        tv.setText("accuracy");
+                        tv.setText("Prediction Accuracy");
                     }
                     row.addView(tv);
                 }
@@ -268,11 +275,11 @@ public class ListStat extends Activity {
                                     + trafficStats.get(i).getMinutes());
                         }
                     } else if (j == 1) {
-                        tv.setText(trafficStats.get(i).getSpeed() + " miles/hour");
+                        tv.setText(trafficStats.get(i).getSpeed() + " MPH");
                     } else if (j == 2) {
-                        tv.setText(trafficStats.get(i).getTravelTime() + " minutes");
+                        tv.setText(trafficStats.get(i).getTravelTime() + " Min");
                     } else {
-                        tv.setText(trafficStats.get(i).getAccuracy() + " percentage accuracy");
+                        tv.setText(trafficStats.get(i).getAccuracy() + "%");
                     }
 
                     row.addView(tv);
