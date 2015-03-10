@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import edu.pdx.its.portal.routelandia.ApiFetcher;
+import edu.pdx.its.portal.routelandia.AsyncResult;
 
 /**
  * Created by joshproehl on 3/3/15.
@@ -48,16 +49,16 @@ public abstract class APIEntity {
      * @param <T> The type of the objects that we'll be returning. (Entity class)
      * @return A list of objects of the given type, representing all of the results returned by the API.
      */
-    public static <T> List<T> fetchListForEntity(Class<T> klass) throws APIException {
+    public static <T> List<T> fetchListForEntity(Class<T> klass, AsyncResult ar) throws APIException {
         String entityListUrl = API_ROOT + klass.getSimpleName().toLowerCase() + "s/";
-        return fetchListForURLAsEntity(entityListUrl, klass);
+        return fetchListForURLAsEntity(entityListUrl, klass, ar);
     }
-    public static <T> List<T> fetchListForURLAsEntity(String url, Class<T> klass) throws APIException {
+    public static <T> List<T> fetchListForURLAsEntity(String url, Class<T> klass, AsyncResult ar) throws APIException {
         Log.i(TAG, "Preparing to fetch <"+klass.getSimpleName()+"> list with URL: "+url);
         List<T> retVal = new ArrayList<>();
 
         try{
-            APIResultWrapper resWrap = new ApiFetcher().execute(url).get();
+            APIResultWrapper resWrap = new ApiFetcher(ar).execute(url).get();
             if(resWrap.getHttpStatus() != 200) {
                 // Apparently our HTTP response contained an error, so we'll be bailing now...
                 throw new APIException("Problem communicating with the server...", resWrap);
@@ -92,15 +93,15 @@ public abstract class APIEntity {
      * @param <T> The type of the objects that we'll be returning. (Entity class)
      * @return A list of objects of the given type, representing all of the results returned by the API.
      */
-    public static <T> T fetchIdForEntity(int iid, Class<T> klass) throws APIException {
+    public static <T> T fetchIdForEntity(int iid, Class<T> klass, AsyncResult ar) throws APIException {
         String entityUrl = API_ROOT + klass.getSimpleName().toLowerCase() + "s/" + iid + "/";
-        return fetchItemAtURLAsEntity(entityUrl, klass);
+        return fetchItemAtURLAsEntity(entityUrl, klass, ar);
     }
-    public static <T> T fetchItemAtURLAsEntity(String url, Class<T> klass) throws APIException {
+    public static <T> T fetchItemAtURLAsEntity(String url, Class<T> klass, AsyncResult ar) throws APIException {
         Log.i(TAG, "Preparing to fetch by ID with URL: "+url);
 
         try{
-            APIResultWrapper resWrap = new ApiFetcher().execute(url).get();
+            APIResultWrapper resWrap = new ApiFetcher(ar).execute(url).get();
             JSONObject res = resWrap.getParsedResponse();
             if(resWrap.getHttpStatus() != 200) {
                 // Apparently our HTTP response contained an error, so we'll be bailing now...

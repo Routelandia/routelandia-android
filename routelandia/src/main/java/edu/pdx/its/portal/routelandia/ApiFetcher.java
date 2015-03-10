@@ -38,6 +38,10 @@ import java.net.URL;
 public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
     private final String TAG = "ApiFetcher";
 
+    public AsyncResult delegate;
+    public ApiFetcher(AsyncResult d) { this.delegate = d; }
+
+
     @Override
     protected APIResultWrapper doInBackground(String... params) {
         APIResultWrapper retVal = new APIResultWrapper();
@@ -54,13 +58,10 @@ public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
         return retVal;
     }
 
-    /*
-    // TODO: Is this needed/correct?
     @Override
-    protected void onPostExecute(String result) {
-        super.onPostExecute(result);
+    protected void onPostExecute(APIResultWrapper result) {
+        delegate.onApiResult(result);
     }
-    */
 
 
     /**

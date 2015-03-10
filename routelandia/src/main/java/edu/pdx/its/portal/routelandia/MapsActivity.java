@@ -47,7 +47,7 @@ import java.util.List;
 
 import edu.pdx.its.portal.routelandia.entities.*;
 
-public class MapsActivity extends ActionBarActivity {
+public class MapsActivity extends ActionBarActivity implements AsyncResult {
     private final String TAG = "Maps Activity";
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     protected PolylineOptions globalPoly = new PolylineOptions();
@@ -84,6 +84,8 @@ public class MapsActivity extends ActionBarActivity {
 
             // Getting Map for the SupportMapFragment
             mMap = fm.getMap();
+
+
 
             try {
                 // Get a list of all highways from the API
@@ -268,6 +270,16 @@ public class MapsActivity extends ActionBarActivity {
             colorHighlightTheFreeWay = Color.rgb(0,255,0);
         }
         return colorHighlightTheFreeWay;
+    }
+
+
+    /**
+     * The method that will be called when we get back the results of our API Query for highways.
+     *
+     * @param resWrap the result object.
+     */
+    public void onApiResult(APIResultWrapper resWrap) {
+
     }
 
     /**
