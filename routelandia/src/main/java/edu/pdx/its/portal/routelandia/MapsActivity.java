@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -43,7 +44,7 @@ import java.util.List;
 
 import edu.pdx.its.portal.routelandia.entities.*;
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends ActionBarActivity {
     private final String TAG = "Maps Activity";
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     protected PolylineOptions globalPoly = new PolylineOptions();

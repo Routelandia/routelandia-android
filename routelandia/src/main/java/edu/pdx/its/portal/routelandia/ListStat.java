@@ -19,7 +19,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
@@ -58,7 +61,7 @@ import edu.pdx.its.portal.routelandia.entities.TrafficStat;
 
 import static android.graphics.Paint.Align.CENTER;
 
-public class ListStat extends Activity {
+public class ListStat extends ActionBarActivity {
 
     private Button mapbtn;
     private GraphicalView mChart;
@@ -66,6 +69,7 @@ public class ListStat extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.list_stats);
 
         trafficStatList = getIntent().getParcelableArrayListExtra("travel info");
@@ -108,8 +112,17 @@ public class ListStat extends Activity {
             }
             
         }
+    }
 
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void openChart(){
