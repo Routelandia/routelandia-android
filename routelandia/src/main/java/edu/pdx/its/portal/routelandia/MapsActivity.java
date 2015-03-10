@@ -143,7 +143,7 @@ public class MapsActivity extends ActionBarActivity {
                             putExtra("lng of second point", endPoint.longitude);
                     startActivity(i);
                 } else {
-                    new ErrorPopup("Error", "Please select a start and an end point along the same highway section.").givePopup(v.getContext()).show();
+                    new ErrorPopup("Error", "Please select a start and an end point along the same color of highway section.").givePopup(v.getContext()).show();
                 }
             }
         });
