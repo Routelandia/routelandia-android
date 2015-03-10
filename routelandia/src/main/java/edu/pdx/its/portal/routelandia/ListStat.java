@@ -235,13 +235,13 @@ public class ListStat extends Activity {
                     tv.setPadding(40, 40, 40, 40);
                     tv.setTextColor(Color.BLACK);
                     if (j == 0) {
-                        tv.setText("hour");
+                        tv.setText("Time");
                     } else if (j == 1) {
-                        tv.setText("speed");
+                        tv.setText("Speed");
                     } else if (j == 2) {
-                        tv.setText("duration");
+                        tv.setText("Travel Time");
                     } else {
-                        tv.setText("accuracy");
+                        tv.setText("Prediction Accuracy");
                     }
                     row.addView(tv);
                 }
@@ -268,11 +268,11 @@ public class ListStat extends Activity {
                                     + trafficStats.get(i).getMinutes());
                         }
                     } else if (j == 1) {
-                        tv.setText(trafficStats.get(i).getSpeed() + " miles/hour");
+                        tv.setText(trafficStats.get(i).getSpeed() + " MPH");
                     } else if (j == 2) {
-                        tv.setText(trafficStats.get(i).getTravelTime() + " minutes");
+                        tv.setText(trafficStats.get(i).getTravelTime() + " Min");
                     } else {
-                        tv.setText(trafficStats.get(i).getAccuracy() + " percentage accuracy");
+                        tv.setText(trafficStats.get(i).getAccuracy() + "%");
                     }
 
                     row.addView(tv);
