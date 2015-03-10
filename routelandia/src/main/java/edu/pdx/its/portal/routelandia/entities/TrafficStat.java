@@ -42,6 +42,9 @@ public class TrafficStat extends APIEntity implements Parcelable {
     protected double accuracy;
 
 
+    protected double distance;
+
+
     public TrafficStat(int hour, int minutes, double speed, double travelTime, double accuracy) {
         this.hour = hour;
         this.minutes = minutes;
@@ -67,7 +70,10 @@ public class TrafficStat extends APIEntity implements Parcelable {
         if(!jsonObject.isNull("accuracy")) {
             this.accuracy = Double.parseDouble(jsonObject.getString("accuracy"));
         }
-
+        this.distance = 0.0;
+        if(!jsonObject.isNull("distance")) {
+            this.distance = Double.parseDouble(jsonObject.getString("distance"));
+        }
     }
     
     public TrafficStat(Parcel parcel){
@@ -76,7 +82,7 @@ public class TrafficStat extends APIEntity implements Parcelable {
         this.speed = parcel.readDouble();
         this.travelTime = parcel.readDouble();
         this.accuracy = parcel.readDouble();
-        
+        this.distance = parcel.readDouble();
     }
 
     public int getEntityId() {
@@ -99,9 +105,12 @@ public class TrafficStat extends APIEntity implements Parcelable {
     public double getAccuracy() {
         return accuracy;
     }
+    public double getDistance() {
+        return distance;
+    }
 
     public String toString(){
-        return "hour: " + hour + " minute: " + minutes + " speed: " + speed + " traveltime: " + travelTime + " accuracy: " + accuracy + "\n";
+        return "hour: " + hour + " minute: " + minutes + " speed: " + speed + " traveltime: " + travelTime + " accuracy: " + accuracy + " distance: "+distance+"\n";
     }
 
     /**
@@ -130,6 +139,7 @@ public class TrafficStat extends APIEntity implements Parcelable {
         dest.writeDouble(speed);
         dest.writeDouble(travelTime);
         dest.writeDouble(accuracy);
+        dest.writeDouble(distance);
     }
 
 
