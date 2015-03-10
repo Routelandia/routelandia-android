@@ -58,6 +58,12 @@ public class DatePickUp extends Activity {
     protected String departureTime;
     protected ArrayList<TrafficStat> trafficStatList;
     private int TIME_PICKER_INTERVAL = 15;
+
+    /**
+     * Perform initialization of all fragments and loaders.
+     *
+     * @param savedInstanceState Bundle from Google SDK
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -166,15 +172,10 @@ public class DatePickUp extends Activity {
                     Log.e(TAG, "No results returned from statistics query.");
                 }
                 else{
-                    // For now just print them out.
-    //                    for (int j =0; j < travelingInfoList.size(); j++){
-    //                        Log.i(TAG, travelingInfoList.get(j).toString());
-    //
+                    Intent intent = new Intent(getApplicationContext(),ListStat.class);
+                    intent.putParcelableArrayListExtra("travel info", trafficStatList);
+                    startActivity(intent);
                 }
-
-                Intent intent = new Intent(getApplicationContext(),ListStat.class);
-                intent.putParcelableArrayListExtra("travel info", trafficStatList);
-                startActivity(intent);
             }
         });
     }
