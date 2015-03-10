@@ -17,8 +17,6 @@ package edu.pdx.its.portal.routelandia;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -50,9 +48,8 @@ public class DatePickUp extends Activity {
     private int minute;
     private int am_pm;
     protected String dayofweek;
-    static final int TIME_DIALOG_ID = 100;
     private Spinner weekDaySpinner;
-    public String weekDay;// = "Sunday";
+    public String weekDay;
     protected LatLng startPoint;
     protected LatLng endPoint;
     protected String departureTime;
@@ -85,22 +82,27 @@ public class DatePickUp extends Activity {
         addListenerOnButton();
     }
 
-
+    /**
+     * Handle user choose day of the week from the spinner*
+     */
     private void addListenerOnWeekDaySpinnerSelection() {
         weekDaySpinner = (Spinner) findViewById(R.id.spinner);
         DayPickSelectedListener dayPickSelectedListener = new DayPickSelectedListener();
         weekDaySpinner.setOnItemSelectedListener(dayPickSelectedListener);
-        //return dayPickSelectedListener.getWeekDay();
     }
 
+    /**
+     * Handle user choose time of the day*
+     */
     private void addListenerOnTime(){
         thisTimePicker = (TimePicker) findViewById(R.id.timePicker);
         TimePickSelectedListener timePickSelectedListener = new TimePickSelectedListener();
         thisTimePicker.setOnTimeChangedListener(timePickSelectedListener);
-        //return timePickSelectedListener.getDepartureTime();
     }
 
-    //Display current time
+    /**
+     * Display the current time* 
+     */
     public void setCurrentTimeOnView() {
 
         tvDisplayDay = (TextView) findViewById(R.id.tvTime);
@@ -121,6 +123,11 @@ public class DatePickUp extends Activity {
         thisTimePicker.setCurrentMinute(minute);
     }
 
+    /**
+     * * 
+     * @param value: number associate with date of the week
+     * @return day of the week
+     */
     public String getDayOfWeekInStr(int value) {
         String day = "Sunday";
         switch (value) {
@@ -149,13 +156,16 @@ public class DatePickUp extends Activity {
         return day;
     }
 
+    /**
+     * Method handle when user click on get statistics button* 
+     */
     public void addListenerOnButton() {
-
         btnDepartureDate = (Button) findViewById(R.id.btnDepartureDate);
         btnDepartureDate.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
+                
                 try {
                     trafficStatList = (ArrayList) TrafficStat.getStatsResultListFor(startPoint, endPoint, departureTime, weekDay);
                 }
@@ -180,7 +190,6 @@ public class DatePickUp extends Activity {
                     }
                 }
 
-
                 if(trafficStatList == null){
                     Log.e(TAG, "No results returned from statistics query.");
                 }
@@ -193,33 +202,14 @@ public class DatePickUp extends Activity {
         });
     }
 
-    private static String pad(int c) {
-        if (c >= 10)
-            return String.valueOf(c);
-        else
-            return "0" + String.valueOf(c);
-    }
-
-    // for jason use if needed
-    private String getPmAm(int value) {
-        String pmAm = "";
-        switch (value) {
-            case 1:
-                if (am_pm == 1) {
-                    pmAm = "pm";
-                }
-                break;
-            case 2:
-                if (am_pm == 0) {
-                    pmAm = "am";
-                }
-                break;
-        }
-        return pmAm;
-    }
-
     protected class DayPickSelectedListener implements AdapterView.OnItemSelectedListener {
-        //protected int week_day;
+        /**
+         * * 
+         * @param parent: parent view
+         * @param view: current view
+         * @param pos: position day in the spinner
+         * @param id
+         */
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
             Toast.makeText(parent.getContext(),
                     "Departure day: " + parent.getItemAtPosition(pos).toString(),
@@ -230,53 +220,28 @@ public class DatePickUp extends Activity {
             }else {
                 weekDay = s;
             }
-            // Backend might prefer integer for days
-            //week_day = getDayOfWeekInInt(s);
         }
 
+        /**
+         * Callback method to be invoked when the selection disappears from this
+         * view. The selection can disappear for instance when touch is activated
+         * or when the adapter becomes empty.
+         *
+         * @param parent The AdapterView that now contains no selected item.
+         */
         @Override
-        public void onNothingSelected(AdapterView<?> arg0) {
-            //TODO
-        }
-
-
-        public String getWeekDay() {
-            return weekDay;
-        }
-
-        // Backend might prefer integer for days
-        private int getDayOfWeekInInt(String value) {
-            int day = 0;
-            switch (value) {
-                case "Sunday":
-                    day = 0;
-                    break;
-                case "Monday":
-                    day = 1;
-                    break;
-                case "Tuesday":
-                    day = 2;
-                    break;
-                case "Wednesday":
-                    day = 3;
-                    break;
-                case "Thursday":
-                    day = 4;
-                    break;
-                case "Friday":
-                    day = 5;
-                    break;
-                case "Saturday":
-                    day = 6;
-                    break;
-            }
-            return day;
+        public void onNothingSelected(AdapterView<?> parent) {
+            
         }
     }
 
     private class TimePickSelectedListener implements TimePicker.OnTimeChangedListener {
-
-
+        /**
+         * * 
+         * @param timePicker: timepicker obk in the view 
+         * @param hourOfDay The current hour.
+         * @param minute The current minute.
+         */
         @Override
         public void onTimeChanged(TimePicker timePicker, int hourOfDay, int minute) {
             setTimePickerInterval(timePicker);
@@ -286,6 +251,10 @@ public class DatePickUp extends Activity {
 
         }
 
+        /**
+         * change the minute interval to quarter* 
+         * @param timePicker : timepicker obk in the view
+         */
         @SuppressLint("NewApi")
         private void setTimePickerInterval(TimePicker timePicker) {
             try {
@@ -310,6 +279,5 @@ public class DatePickUp extends Activity {
                 e.printStackTrace();
             }
         }
-
     }
 }
