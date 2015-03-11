@@ -243,23 +243,23 @@ public class MapsActivity extends ActionBarActivity {
         else if(highwayID == 7 || highwayID == 8 ){ //I-84
             colorHighlightTheFreeWay = Color.rgb(0,0,0);
         }
-        else if(highwayID == 11 || highwayID == 12 ){ //higway 26
+        else if(highwayID == 11 || highwayID == 12 ){ //highway 26
             colorHighlightTheFreeWay = Color.rgb(255,0,255);
         }
         else if(highwayID == 50 || highwayID == 51 ){ //highway 14
-            colorHighlightTheFreeWay = Color.rgb(128,255,255);
+            colorHighlightTheFreeWay = Color.rgb(255,0,0);
         }
         else if(highwayID == 3 || highwayID == 4 ){ //I-205 Oregon
-            colorHighlightTheFreeWay = Color.rgb(255,0,128);
+            colorHighlightTheFreeWay = Color.rgb(128,0,255);
         }
         else if(highwayID == 501 || highwayID == 502 ){ //I-5 Washington
             colorHighlightTheFreeWay = Color.rgb(128,0,255);
         }
-        else if(highwayID == 1 || highwayID == 2 ){ //I -5 Oregon
-            colorHighlightTheFreeWay = Color.rgb(255,127,0);
+        else if(highwayID == 1 || highwayID == 2 ){ //I-5 Oregon
+            colorHighlightTheFreeWay = Color.rgb(0,128,255);
         }
         else if(highwayID == 54 || highwayID == 55 ){ //I-205 Washington
-            colorHighlightTheFreeWay = Color.rgb(255,215,0);
+            colorHighlightTheFreeWay = Color.rgb(0,255,0);
         }
         return colorHighlightTheFreeWay;
     }
