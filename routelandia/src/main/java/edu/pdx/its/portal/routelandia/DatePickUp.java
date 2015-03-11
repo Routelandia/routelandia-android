@@ -220,8 +220,7 @@ public class DatePickUp extends ActionBarActivity {
                     if(response == 400) {
                         new ErrorPopup("Error", "Please select two points along the same color highway segment.").givePopup(DatePickUp.this).show();
 
-                        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                        startActivity(intent);
+                        ((Activity)v.getContext()).onBackPressed();
                     }
                     else if(response == 404 || response == 412){
                         new ErrorPopup("Error", "Could not complete request: \n\n" + e.getMessage()).givePopup(DatePickUp.this).show();

@@ -63,7 +63,6 @@ import static android.graphics.Paint.Align.CENTER;
 
 public class ListStat extends ActionBarActivity {
 
-    private Button mapbtn;
     private GraphicalView mChart;
     protected ArrayList<TrafficStat> trafficStatList;
     @Override
@@ -89,8 +88,7 @@ public class ListStat extends ActionBarActivity {
         }
         ((TextView) findViewById(R.id.tvRouteLength)).setText(length + " miles");
 
-        addListenerOnButton();
-        
+
         if(getRotation(getBaseContext()) == 1 || getRotation(getBaseContext()) == 1) {
             if(trafficStatList.size() ==0){
                 Toast.makeText(ListStat.this, "please re pick 2 points", Toast.LENGTH_SHORT).show();
@@ -119,7 +117,7 @@ public class ListStat extends ActionBarActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+                this.onBackPressed();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -202,24 +200,6 @@ public class ListStat extends ActionBarActivity {
         });
 
         chartContainer.addView(mChart);
-    }
-
-    public void addListenerOnButton() {
-
-        mapbtn = (Button) findViewById(R.id.map);
-        mapbtn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                //ShowDialog(DATE_DIALOG_ID);
-                //Save date in jason array and switch to map for now...
-                Log.i("clicks", "you clicked start");
-                Intent i = new Intent(
-                        ListStat.this,
-                        MapsActivity.class);
-                startActivity(i);
-            }
-        });
     }
 
     public int getRotation(Context context){
