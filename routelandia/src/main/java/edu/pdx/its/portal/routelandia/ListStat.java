@@ -19,7 +19,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
@@ -58,14 +61,14 @@ import edu.pdx.its.portal.routelandia.entities.TrafficStat;
 
 import static android.graphics.Paint.Align.CENTER;
 
-public class ListStat extends Activity {
+public class ListStat extends ActionBarActivity {
 
-    private Button mapbtn;
     private GraphicalView mChart;
     protected ArrayList<TrafficStat> trafficStatList;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.list_stats);
 
         trafficStatList = getIntent().getParcelableArrayListExtra("travel info");
@@ -85,8 +88,7 @@ public class ListStat extends Activity {
         }
         ((TextView) findViewById(R.id.tvRouteLength)).setText(length + " miles");
 
-        addListenerOnButton();
-        
+
         if(getRotation(getBaseContext()) == 1 || getRotation(getBaseContext()) == 1) {
             if(trafficStatList.size() ==0){
                 Toast.makeText(ListStat.this, "please re pick 2 points", Toast.LENGTH_SHORT).show();
@@ -108,8 +110,17 @@ public class ListStat extends Activity {
             }
             
         }
+    }
 
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                this.onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void openChart(){
@@ -189,24 +200,6 @@ public class ListStat extends Activity {
         });
 
         chartContainer.addView(mChart);
-    }
-
-    public void addListenerOnButton() {
-
-        mapbtn = (Button) findViewById(R.id.map);
-        mapbtn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                //ShowDialog(DATE_DIALOG_ID);
-                //Save date in jason array and switch to map for now...
-                Log.i("clicks", "you clicked start");
-                Intent i = new Intent(
-                        ListStat.this,
-                        MapsActivity.class);
-                startActivity(i);
-            }
-        });
     }
 
     public int getRotation(Context context){

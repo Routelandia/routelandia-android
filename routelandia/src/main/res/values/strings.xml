@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Routelandia</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_maps"></string>
     <string name="welcome_portland">Welcome to Portland!!!</string>
+    <string name="title_activity_maps">Choose Route</string>
     <string name="title_activity_time_pick_up">TimePickUp</string>
+    <string name="title_activity_datepicker">Choose Time</string>
+    <string name="title_activity_liststats">Results</string>
     <string name="pick_stats">Get Statistics</string>
     <string name="pick_date">CHOOSE YOUR DATE</string>
     <string name="start_button">START</string>
     <string name="day_pick">Choose a week day</string>
+    <string name="clear_markers">Clear Markers</string>
+    <string name="choose_datetime">Choose Time and Date</string>
 
     <string-array name="week_day">
         <item>Sunday</item>

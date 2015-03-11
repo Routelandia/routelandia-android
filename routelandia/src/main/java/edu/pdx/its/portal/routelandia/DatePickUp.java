@@ -22,7 +22,10 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -39,7 +42,7 @@ import edu.pdx.its.portal.routelandia.entities.APIException;
 import edu.pdx.its.portal.routelandia.entities.TrafficStat;
 
 
-public class DatePickUp extends Activity {
+public class DatePickUp extends ActionBarActivity {
     private static final String TAG = "Activity: DatePickup";
     private TimePicker thisTimePicker;
     private Button btnDepartureDate;
@@ -65,6 +68,8 @@ public class DatePickUp extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_date_pick_up);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         setTimePickerInterval((TimePicker)findViewById(R.id.timePicker));
 
         setCurrentTimeOnView();
@@ -81,6 +86,17 @@ public class DatePickUp extends Activity {
 
         }
         addListenerOnButton();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -204,8 +220,7 @@ public class DatePickUp extends Activity {
                     if(response == 400) {
                         new ErrorPopup("Error", "Please select two points along the same color highway segment.").givePopup(DatePickUp.this).show();
 
-                        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                        startActivity(intent);
+                        ((Activity)v.getContext()).onBackPressed();
                     }
                     else if(response == 404 || response == 412){
                         new ErrorPopup("Error", "Could not complete request: \n\n" + e.getMessage()).givePopup(DatePickUp.this).show();

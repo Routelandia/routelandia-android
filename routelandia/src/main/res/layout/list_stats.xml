@@ -3,13 +3,6 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/map"
-        android:layout_width="271dp"
-        android:layout_height="62dp"
-        android:layout_gravity="center_horizontal"
-        android:text="Map" />
-
     <TableLayout
         android:id="@+id/stats_info_table"
         android:layout_width="fill_parent"
