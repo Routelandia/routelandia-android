@@ -231,35 +231,35 @@ public class MapsActivity extends ActionBarActivity {
      */
     private int generatePairhighWayColor(int highwayID) {
         int colorHighlightTheFreeWay = 0;
-        if(highwayID == 9 || highwayID == 10 ){
+        if(highwayID == 9 || highwayID == 10 ){ //highway 210
             colorHighlightTheFreeWay = Color.rgb(255, 0, 0);
         }
-        else if(highwayID == 5 || highwayID == 6 ){
+        else if(highwayID == 5 || highwayID == 6 ){ //I-405
             colorHighlightTheFreeWay = Color.rgb(0,255,0);
         }
-        else if(highwayID == 52 || highwayID == 53 ){
+        else if(highwayID == 52 || highwayID == 53 ){ //highway 500
             colorHighlightTheFreeWay = Color.rgb(0,0,255);
         }
-        else if(highwayID == 7 || highwayID == 8 ){
+        else if(highwayID == 7 || highwayID == 8 ){ //I-84
             colorHighlightTheFreeWay = Color.rgb(0,0,0);
         }
-        else if(highwayID == 11 || highwayID == 12 ){
+        else if(highwayID == 11 || highwayID == 12 ){ //higway 26
             colorHighlightTheFreeWay = Color.rgb(255,0,255);
         }
-        else if(highwayID == 50 || highwayID == 51 ){
-            colorHighlightTheFreeWay = Color.rgb(0,255,255);
+        else if(highwayID == 50 || highwayID == 51 ){ //highway 14
+            colorHighlightTheFreeWay = Color.rgb(128,255,255);
         }
-        else if(highwayID == 3 || highwayID == 4 ){
+        else if(highwayID == 3 || highwayID == 4 ){ //I-205 Oregon
             colorHighlightTheFreeWay = Color.rgb(255,0,128);
         }
-        else if(highwayID == 501 || highwayID == 502 ){
+        else if(highwayID == 501 || highwayID == 502 ){ //I-5 Washington
             colorHighlightTheFreeWay = Color.rgb(128,0,255);
         }
-        else if(highwayID == 1 || highwayID == 2 ){
-            colorHighlightTheFreeWay = Color.rgb(0,128,255);
+        else if(highwayID == 1 || highwayID == 2 ){ //I -5 Oregon
+            colorHighlightTheFreeWay = Color.rgb(255,127,0);
         }
-        else if(highwayID == 54 || highwayID == 5 ){
-            colorHighlightTheFreeWay = Color.rgb(0,255,128);
+        else if(highwayID == 54 || highwayID == 55 ){ //I-205 Washington
+            colorHighlightTheFreeWay = Color.rgb(255,215,0);
         }
         return colorHighlightTheFreeWay;
     }
