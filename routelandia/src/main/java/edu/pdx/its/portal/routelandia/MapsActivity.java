@@ -42,6 +42,7 @@ import com.google.maps.android.PolyUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import edu.pdx.its.portal.routelandia.entities.*;
@@ -102,10 +103,15 @@ public class MapsActivity extends ActionBarActivity {
             else {
                 downloadStationsBasedOnHighway();
             }
-            for (int i =0; i<highwayList.size(); i++){
-                List<Station> stations = listOfStationsBaseOnHighwayid.get(highwayList.get(i).getHighwayid());
-                int colorHighlightTheFreeWay = generatePairhighWayColor(highwayList.get(i).getHighwayid());
-                drawHighway(stations, colorHighlightTheFreeWay);
+            Iterator<Highway> highwayIter = highwayList.iterator();
+            while(highwayIter.hasNext()) {
+                Highway h = highwayIter.next();
+                List<Station> stations = listOfStationsBaseOnHighwayid.get(h.getHighwayid());
+                int colorHighlightTheFreeWay = generatePairhighWayColor(h.getHighwayid());
+                // Don't attempt to draw if there are no stations to draw!
+                if(stations != null) {
+                    drawHighway(stations, colorHighlightTheFreeWay);
+                }
             }
         }
         usersDragTheMarkers();
@@ -361,10 +367,11 @@ public class MapsActivity extends ActionBarActivity {
      * @param stations: in its highway
      */
     public void drawHighway(List<Station> stations, int color){
-
-        for (int i=0; i<stations.size(); i++){
-            if(stations.get(i).getLatLngList().size() !=0) {
-                List<LatLng> points = stations.get(i).getLatLngList();
+        Iterator<Station> stationIter = stations.iterator();
+        while(stationIter.hasNext()) {
+            Station s = stationIter.next();
+            if(s.getLatLngList().size() !=0) {
+                List<LatLng> points = s.getLatLngList();
                 if (points != null) {
                     globalPoly.addAll(points);
                     PolylineOptions polylineOptions = new PolylineOptions();
