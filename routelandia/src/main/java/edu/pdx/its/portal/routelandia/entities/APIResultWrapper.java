@@ -66,7 +66,7 @@ public class APIResultWrapper<T> {
     }
 
 
-    // Generated getters and setters below
+    //region Generated getters and setters
     public String getRawResponse() {
         return rawResponse;
     }
@@ -79,6 +79,7 @@ public class APIResultWrapper<T> {
     public void setParsedResponse(JSONObject parsedResponse) {
         this.parsedResponse = parsedResponse;
     }
+
     public int getHttpStatus() {
         return httpStatus;
     }
@@ -119,4 +120,5 @@ public class APIResultWrapper<T> {
     public void setObjectResponse(T objectResponse) {
         this.objectResponse = objectResponse;
     }
+    //endregion
 }

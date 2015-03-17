@@ -32,7 +32,7 @@ public abstract class APIEntity {
     public abstract int getEntityId();
 
 
-
+    //region Fetching
 
     /**
      * Goes to the API Endpoint for the entity and returns the full list of instances.
@@ -72,6 +72,8 @@ public abstract class APIEntity {
 
     }
 
+    //endregion
+    //region URL Generation
 
     /**
      * Gets the specific component of the canonical URL for getting lists of this entity.
@@ -117,5 +119,6 @@ public abstract class APIEntity {
         return API_ROOT + getNestedEntityUrlComponent(klass);
     }
 
+    //endregion
 
 }
