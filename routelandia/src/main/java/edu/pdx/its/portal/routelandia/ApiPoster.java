@@ -37,9 +37,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
+import edu.pdx.its.portal.routelandia.entities.APIException;
 import edu.pdx.its.portal.routelandia.entities.APIPostWrapper;
 import edu.pdx.its.portal.routelandia.entities.APIResultWrapper;
+import edu.pdx.its.portal.routelandia.entities.TrafficStat;
 
 /**
  * Takes an API Postable and returns the result of the POST operation.
@@ -66,12 +70,46 @@ public class ApiPoster<T> extends AsyncTask<APIPostWrapper, Void, APIResultWrapp
         // Foolishly assume that only the first param matters...
         APIResultWrapper retVal = new APIResultWrapper<T>(result_type, target_class);
         postJsonObjectToUrl(params[0].getFullUrl(), params[0].getPostObj(), retVal);
+
+        ArrayList<TrafficStat> objArr = new ArrayList<>();
+        try {
+            if(retVal.getHttpStatus() != 200) {
+                Log.e(TAG, "API Returned non-200, throwing error!");
+                Log.e(TAG, retVal.getParsedResponse().toString());
+                retVal.addException(new APIException("Error on POST", retVal));
+            }
+            JSONObject parsedRawRes = retVal.getParsedResponse();
+            JSONArray jResult = parsedRawRes.getJSONArray("results");
+            Log.i(TAG, "Got results array: "+jResult);
+            // Now loop through all the results and make the list
+            if (jResult == null) {
+                // No items were found? Sounds suspicious, but I guess we're done.
+                Log.i("RESULT", "Apparently nothing was in the results array...");
+            } else {
+                try {
+                    for (int i = 0; i < jResult.length(); i++) {
+                        //Create a JSONObject and use it to construct a TravelingInfo to add to the list
+                        JSONObject jsonObject = (JSONObject) jResult.get(i);
+                        objArr.add(new TrafficStat(jsonObject));
+                    }
+                } catch (JSONException e) {
+                    // TODO: Should we bubble this up or fail out if this happens?
+                    Log.e(TAG, "Ignored a specific result due to JSON Exception!");
+                }
+            }
+        } catch(JSONException je) {
+            // Going to log a message, but not abort the app... We'll just pretend there were no results.
+            // This should never happen, as the parser should ensure that the results field exists
+            Log.e(TAG, "Could not parse result out of JSON array");
+        }
+        retVal.setListResponse(objArr);
         return retVal;
     }
-//    protected void onPostExecute(JSONArray result) {
-//        super.onPostExecute(result);
-//
-//    }
+
+    @Override
+    protected void onPostExecute(APIResultWrapper result) {
+        delegate.onApiResult(result);
+    }
 
 
     public JSONObject postJsonObjectToUrl(String url, JSONObject jsonObject, APIResultWrapper retVal){

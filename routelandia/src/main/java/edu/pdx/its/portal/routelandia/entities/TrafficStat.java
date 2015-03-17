@@ -203,51 +203,13 @@ public class TrafficStat extends APIEntity implements Parcelable {
      * @param weekday String representing the weekday to query for. (i.e. 'Thursday')
      * @return A list of TrafficStat objects representing the API Results.
      */
-    public static List<TrafficStat> getStatsResultListFor(LatLng sp, LatLng ep, String mid, String weekday, AsyncResult ar) throws APIException {
-        List<TrafficStat> retVal = new ArrayList<>();
-
+    public static void getStatsResultListFor(LatLng sp, LatLng ep, String mid, String weekday, AsyncResult ar) {
         // TODO: This should not be hardcoded here, but inflected... Sadly, static methods and all...
         String postURL = API_ROOT+"trafficstats/";
         JSONObject postObj = createPostObject(sp, ep, mid, weekday);
         APIPostWrapper postReq = new APIPostWrapper(postURL, postObj);
 
         Log.i(TAG, "POSTing  to "+postURL+" : "+postObj.toString());
-
-        try {
-            APIResultWrapper resWrap = new ApiPoster<TrafficStat>(ar, "RESULT_TRAFFIC_STAT", TrafficStat.class, APIResultWrapper.ResultType.RESULT_AS_LIST).execute(postReq).get();
-            if(resWrap.getHttpStatus() != 200) {
-                Log.e(TAG, "API Returned non-200, throwing error!");
-                Log.e(TAG, resWrap.getParsedResponse().toString());
-                throw new APIException("Error on POST", resWrap);
-            }
-            JSONObject parsedRawRes = resWrap.getParsedResponse();
-            JSONArray jResult = parsedRawRes.getJSONArray("results");
-            Log.i(TAG, "Got results array: "+jResult);
-            // Now loop through all the results and make the list
-            if (jResult == null) {
-                // No items were found? Sounds suspicious, but I guess we're done.
-                Log.i("RESULT", "Apparently nothing was in the results array...");
-                return retVal;
-            } else {
-                try {
-                    for (int i = 0; i < jResult.length(); i++) {
-                        //Create a JSONObject and use it to construct a TravelingInfo to add to the list
-                        JSONObject jsonObject = (JSONObject) jResult.get(i);
-                        retVal.add(new TrafficStat(jsonObject));
-                    }
-                } catch (JSONException e) {
-                    // TODO: Should we bubble this up or fail out if this happens?
-                    Log.e(TAG, "Ignored a specific result due to JSON Exception!");
-                }
-            }
-        } catch(JSONException je) {
-            // Going to log a message, but not abort the app... We'll just pretend there were no results.
-            // This should never happen, as the parser should ensure that the results field exists
-            Log.e(TAG, "Could not parse result out of JSON array");
-        } catch(ExecutionException|InterruptedException e) {
-            Log.e(TAG, "Failed to fetch results! " + e.toString());
-        }
-
-        return retVal;
+        ar.addActiveAsync(new ApiPoster<TrafficStat>(ar, "RESULT_TRAFFIC_STAT", TrafficStat.class, APIResultWrapper.ResultType.RESULT_AS_LIST).execute(postReq));
     }
 }
