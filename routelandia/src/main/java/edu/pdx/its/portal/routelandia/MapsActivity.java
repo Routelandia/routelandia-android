@@ -58,6 +58,9 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
     protected Marker firstMarker;
     protected Marker secondMarker;
 
+    private final String RESULT_HIGHWAY_LIST = "result_highway_list";
+    private final String RESULT_STATION_LIST = "result_station_list";
+
     /**
      * Perform initialization of all fragments and loaders.
      *
@@ -85,43 +88,17 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
             // Getting Map for the SupportMapFragment
             mMap = fm.getMap();
 
-
-
-            try {
-                // Get a list of all highways from the API
-                highwayList = APIEntity.fetchListForEntity(Highway.class);
-            } catch(APIException e) {
-                Log.e(TAG, "CAUGHT API EXCEPTION, status code: ("+e.getResultWrapper().getHttpStatus()+"), message: "+e.getMessage());
-
-                new ErrorPopup("Server Error", "Encountered an unrecoverable error trying to fetch highway data: \n\n" + e.getMessage()).givePopup(this).show();
-
-                return; // Bail out of the function.
-            }
-
             if(savedInstanceState != null){
                 getItemsFromSaveBundle(savedInstanceState);
 
             }
             else {
-                downloadStationsBasedOnHighway();
-            }
-            Iterator<Highway> highwayIter = highwayList.iterator();
-            while(highwayIter.hasNext()) {
-                Highway h = highwayIter.next();
-                List<Station> stations = listOfStationsBaseOnHighwayid.get(h.getHighwayid());
-                int colorHighlightTheFreeWay = generatePairhighWayColor(h.getHighwayid());
-                // Don't attempt to draw if there are no stations to draw!
-                if(stations != null) {
-                    drawHighway(stations, colorHighlightTheFreeWay);
-                }
+                APIEntity.fetchListForEntity(Highway.class, this, RESULT_HIGHWAY_LIST);
             }
         }
         usersDragTheMarkers();
 
         goToDatePickUp();
-        
-        //removeMarker();
-
     }
 
     @Override
@@ -188,20 +165,13 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
     }
 
     private void downloadStationsBasedOnHighway() {
-        for (int i = 0; i < this.highwayList.size(); i++) {
+        // TODO: Should use iterator. Potential crashing bug on NullPointer
+        Iterator hItr = this.highwayList.iterator();
+        while(hItr.hasNext()) {
             // Get a list of all stations from the API.
-            Highway tHighway = this.highwayList.get(i);
+            Highway tHighway = (Highway)hItr.next();
             String nestedStationsUrl = tHighway.getNestedEntityUrl(Station.class);
-            List<Station> stationList = null;
-            try {
-                stationList= tHighway.fetchListForURLAsEntity(nestedStationsUrl, Station.class);
-            } catch (APIException e) {
-                Log.e(TAG, "API ERROR: could not fetch stations for highway " + tHighway.getHighwayid());
-
-                new ErrorPopup("Server Error", "Failed to fetch data for highway "+tHighway.getHighwayid()+".\n\n"+e.getMessage()).givePopup(this).show();
-            }
-            // And add them to the list!
-            listOfStationsBaseOnHighwayid.put(tHighway.getHighwayid(), stationList);
+            tHighway.fetchListForURLAsEntity(nestedStationsUrl, Station.class, this, RESULT_STATION_LIST);
         }
     }
 
@@ -279,7 +249,52 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
      * @param resWrap the result object.
      */
     public void onApiResult(APIResultWrapper resWrap) {
+        Log.i(TAG, "Got API Result for " + resWrap.getCallbackTag() + ", which has " + resWrap.getExceptions().size() + " exceptions!");
 
+        switch(resWrap.getCallbackTag()) {
+            case RESULT_HIGHWAY_LIST:
+                if(resWrap.getExceptions().size() > 0) {
+                    String errStr = "";
+                    Iterator eItr = resWrap.getExceptions().iterator();
+                    while(eItr.hasNext()) {
+                        // TODO: Handle specific exception differently?
+                        Exception tEx = (Exception)eItr.next();
+                        errStr += tEx.getMessage() + "\n\n";
+                    }
+
+                    new ErrorPopup("Error fetching highways...", errStr).givePopup(this).show();
+                } else {
+                    // Got a list of highways successfully!
+                    // Set it into our local var, and go fetch stations for each highway.
+                    Log.i(TAG, "Got back a list of "+resWrap.getListResponse().size()+" highways.");
+                    this.highwayList = (ArrayList<Highway>)resWrap.getListResponse();
+                    downloadStationsBasedOnHighway();
+                }
+                break;
+            case RESULT_STATION_LIST:
+                if(resWrap.getExceptions().size() > 0) {
+                    String errStr = "";
+                    Iterator eItr = resWrap.getExceptions().iterator();
+                    while(eItr.hasNext()) {
+                        // TODO: Handle specific exception differently?
+                        Exception tEx = (Exception)eItr.next();
+                        errStr += tEx.getMessage() + "\n\n";
+                    }
+
+                    new ErrorPopup("Error fetching stations for highway...", errStr).givePopup(this).show();
+                } else {
+                    Log.i(TAG, "Got back a list of "+resWrap.getListResponse().size()+" stations.");
+                    List<Station> stationList = resWrap.getListResponse();
+                    if(stationList.size() > 0) {
+                        int highwayid = stationList.get(1).getHighwayId();
+
+                        listOfStationsBaseOnHighwayid.put(highwayid, stationList);
+                        int colorHighlightTheFreeWay = generatePairhighWayColor(highwayid);
+                        drawHighway(stationList, colorHighlightTheFreeWay);
+                    }
+                }
+                break;
+        }
     }
 
     /**
