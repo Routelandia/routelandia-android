@@ -15,8 +15,10 @@
 package edu.pdx.its.portal.routelandia;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
@@ -57,6 +59,8 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
     protected LatLng endPoint;
     protected Marker firstMarker;
     protected Marker secondMarker;
+    private ProgressDialog loadingDialog;
+    private int activeAsyncs = 0;
 
     private final String RESULT_HIGHWAY_LIST = "result_highway_list";
     private final String RESULT_STATION_LIST = "result_station_list";
@@ -100,6 +104,8 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
                 }
             }
             else {
+                activeAsyncs = 0;    // Make sure that we don't get stuck somehow
+                initLoadingDialog();
                 fetchHighwayData();
             }
         }
@@ -108,6 +114,16 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
         goToDatePickUp();
     }
 
+    /**
+     * Start up the dialog to prevent user from clicking while things are loading...
+     */
+    private void initLoadingDialog() {
+        loadingDialog = new ProgressDialog(this);
+        loadingDialog.setMessage("Loading data...");
+        loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        loadingDialog.setCancelable(false);
+        loadingDialog.show();
+    }
     /**
      * Start the async running to go and get highway data. Will draw fetched data on the map.
      */
@@ -159,6 +175,7 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
                     clearMarkers();
                 }
                 clearMap();
+                initLoadingDialog();
                 fetchHighwayData();
                 return true;
             default:
@@ -331,6 +348,16 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
                 }
                 break;
         }
+
+        activeAsyncs--;
+
+        if(activeAsyncs == 0) {
+            loadingDialog.dismiss();
+        }
+    }
+
+    public void addActiveAsync(AsyncTask t) {
+        activeAsyncs++;
     }
 
     /**

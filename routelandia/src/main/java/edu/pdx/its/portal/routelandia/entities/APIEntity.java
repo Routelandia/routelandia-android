@@ -49,7 +49,7 @@ public abstract class APIEntity {
     }
     public static <T> void fetchListForURLAsEntity(String url, Class<T> klass, AsyncResult ar, String callback_tag) {
         Log.i(TAG, "Preparing async fetch <"+klass.getSimpleName()+"> list with URL: "+url);
-        new ApiFetcher<T>(ar, callback_tag, klass, APIResultWrapper.ResultType.RESULT_AS_LIST).execute(url);
+        ar.addActiveAsync(new ApiFetcher<T>(ar, callback_tag, klass, APIResultWrapper.ResultType.RESULT_AS_LIST).execute(url));
     }
 
 
@@ -68,31 +68,8 @@ public abstract class APIEntity {
     public static <T> void fetchItemAtURLAsEntity(String url, Class<T> klass, AsyncResult ar, String callback_tag) {
         Log.i(TAG, "Preparing to fetch by ID with URL: "+url);
 
-        new ApiFetcher<T>(ar, callback_tag, klass, APIResultWrapper.ResultType.RESULT_AS_OBJECT).execute(url);
+        ar.addActiveAsync(new ApiFetcher<T>(ar, callback_tag, klass, APIResultWrapper.ResultType.RESULT_AS_OBJECT).execute(url));
 
-        /*
-        try{
-            APIResultWrapper resWrap = new ApiFetcher(ar).execute(url).get();
-            JSONObject res = resWrap.getParsedResponse();
-            if(resWrap.getHttpStatus() != 200) {
-                // Apparently our HTTP response contained an error, so we'll be bailing now...
-                throw new APIException("Problem communicating with the server...", resWrap);
-            }
-            JSONObject resObj = (JSONObject)res.get("results");
-            return klass.getConstructor(JSONObject.class).newInstance(resObj);
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-            // TODO: This should get back to the UI probably!
-        } catch (InterruptedException|ExecutionException e) {
-            Log.e(TAG, e.getMessage());
-            // TODO: Probably should do *something* eh?
-        } catch (NoSuchMethodException|InstantiationException|IllegalAccessException|InvocationTargetException e) {
-            Log.e(TAG, "Generics problem! "+e.toString());
-            e.printStackTrace();
-            // TODO: The app needs to shut down now...
-        }
-        return null; // Should never arrive...
-        */
     }
 
 

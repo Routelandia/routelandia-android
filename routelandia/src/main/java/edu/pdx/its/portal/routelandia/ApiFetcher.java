@@ -100,8 +100,32 @@ public class ApiFetcher<T> extends AsyncTask<String, Integer, APIResultWrapper> 
 
                 retVal.setListResponse(objArr);
             } else if(fetch_type == APIResultWrapper.ResultType.RESULT_AS_OBJECT ) {
-                // Things
+                // Things should happen here... if we were to ever fetch single objects rather than lists...
 
+                /* Copied from APIEntity when moved to async as prototype..
+                   TODO: Mimic above list process, but only add this ONE to the list?
+                try{
+                    APIResultWrapper resWrap = new ApiFetcher(ar).execute(url).get();
+                    JSONObject res = resWrap.getParsedResponse();
+                    if(resWrap.getHttpStatus() != 200) {
+                        // Apparently our HTTP response contained an error, so we'll be bailing now...
+                        throw new APIException("Problem communicating with the server...", resWrap);
+                    }
+                    JSONObject resObj = (JSONObject)res.get("results");
+                    return klass.getConstructor(JSONObject.class).newInstance(resObj);
+                } catch (JSONException e) {
+                    Log.e(TAG, e.getMessage());
+                    // TODO: This should get back to the UI probably!
+                } catch (InterruptedException|ExecutionException e) {
+                    Log.e(TAG, e.getMessage());
+                    // TODO: Probably should do *something* eh?
+                } catch (NoSuchMethodException|InstantiationException|IllegalAccessException|InvocationTargetException e) {
+                    Log.e(TAG, "Generics problem! "+e.toString());
+                    e.printStackTrace();
+                    // TODO: The app needs to shut down now...
+                }
+                return null; // Should never arrive...
+                */
             }
 
         } catch (IOException e) {

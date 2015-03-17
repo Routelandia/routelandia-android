@@ -1,5 +1,7 @@
 package edu.pdx.its.portal.routelandia;
 
+import android.os.AsyncTask;
+
 import edu.pdx.its.portal.routelandia.entities.APIResultWrapper;
 
 /**
@@ -9,4 +11,5 @@ import edu.pdx.its.portal.routelandia.entities.APIResultWrapper;
  */
 public interface AsyncResult {
     void onApiResult(APIResultWrapper result);
+    void addActiveAsync(AsyncTask t);
 }

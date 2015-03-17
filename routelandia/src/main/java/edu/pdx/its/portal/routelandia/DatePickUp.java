@@ -21,6 +21,7 @@ import java.util.Calendar;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
@@ -248,6 +249,10 @@ public class DatePickUp extends ActionBarActivity implements AsyncResult {
 
     @Override
     public void onApiResult(APIResultWrapper result) {
+        // For now, do nothing...
+    }
+    @Override
+    public void addActiveAsync(AsyncTask t){
         // For now, do nothing...
     }
 
