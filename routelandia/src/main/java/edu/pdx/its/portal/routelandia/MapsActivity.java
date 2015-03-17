@@ -93,7 +93,7 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
      */
     private void initLoadingDialog() {
         loadingDialog = new ProgressDialog(this);
-        loadingDialog.setMessage("Loading data...");
+        loadingDialog.setMessage("Loading highway data...");
         loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         loadingDialog.setCancelable(false);
         loadingDialog.show();
