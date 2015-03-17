@@ -168,6 +168,7 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.miClearMap:
+                clearMarkers();
                 return true;
             case R.id.miRefresh:
                 if(firstMarker != null || secondMarker != null) {
