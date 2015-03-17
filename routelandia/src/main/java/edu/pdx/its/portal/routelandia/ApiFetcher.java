@@ -27,33 +27,89 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 /**
  * This class is designed to be the one-stop-shop for getting JSON results back from the API.
  *
  * Created by joshproehl on 3/2/15.
  */
-public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
+public class ApiFetcher<T> extends AsyncTask<String, Integer, APIResultWrapper> {
     private final String TAG = "ApiFetcher";
 
-    public AsyncResult delegate;
-    public ApiFetcher(AsyncResult d) { this.delegate = d; }
+    private AsyncResult delegate;
+    private String callback_tag;
+    private Class<T> target_class;
+
+
+    public APIResultWrapper.ResultType fetch_type;
+
+
+
+    public ApiFetcher(AsyncResult d, String callback_tag, Class<T> klass, APIResultWrapper.ResultType rt) {
+        this.delegate = d;
+        this.callback_tag = callback_tag;
+        this.target_class = klass;
+        this.fetch_type = rt;
+    }
 
 
     @Override
     protected APIResultWrapper doInBackground(String... params) {
-        APIResultWrapper retVal = new APIResultWrapper();
+        APIResultWrapper retVal = new APIResultWrapper<T>(fetch_type, target_class);
+        retVal.setCallbackTag(callback_tag);
 
         try {
             // Fetch the HTTP Result and parse it into the JSON to be returned.
             String rawResult = fetchRawResult(params[0], retVal);
             retVal.setParsedResponse(parseRawResult(rawResult));
+
+            if(fetch_type == APIResultWrapper.ResultType.RESULT_AS_LIST) {
+                // This is a list response type, so we're going to convert the parsedResponse into
+                // an array of objects...
+                ArrayList<T> objArr = new ArrayList<>();
+
+                try {
+                    if (retVal.getHttpStatus() != 200) {
+                        // Apparently our HTTP response contained an error, so we'll be bailing now...
+
+                        retVal.addException(new APIException("Problem communicating with the server...", retVal));
+                    }
+                    JSONObject res = retVal.getParsedResponse();
+                    JSONArray resArray = (JSONArray) res.get("results");
+                    for (int i = 0; i < resArray.length(); i++) {
+                        //Create a entity object from the JSONObject for each array index and add it to the list
+                        JSONObject tObj = (JSONObject) resArray.get(i);
+                        objArr.add(target_class.getConstructor(JSONObject.class).newInstance(tObj));
+                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, e.getMessage());
+                    // TODO: This should get back to the UI probably!
+                //} catch (InterruptedException | ExecutionException e) {
+                //    Log.e(TAG, e.getMessage());
+                //    // TODO: Probably should do *something* eh?
+                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    Log.e(TAG, "Generics problem! " + e.toString());
+                    e.printStackTrace();
+                    // TODO: The app needs to shut down now...
+                }
+
+                retVal.setListResponse(objArr);
+            } else if(fetch_type == APIResultWrapper.ResultType.RESULT_AS_OBJECT ) {
+                // Things
+
+            }
+
         } catch (IOException e) {
-            Log.e(TAG, "Error doing background API Fetch: " + e.toString());
+            Log.e(TAG, callback_tag + ": Error doing background API Fetch: " + e.toString());
+            retVal.addException(e);
         } catch (JSONException e) {
-            Log.e(TAG, "Could not parse raw result into JSON..." + e.toString());
+            Log.e(TAG, callback_tag + ": Could not parse raw result into JSON..." + e.toString());
+            retVal.addException(e);
         }
         return retVal;
     }
@@ -113,7 +169,8 @@ public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
             bufferedReader.close();
 
         } catch (Exception e) {
-            Log.e(TAG, "Error in getting raw HTTP result: "+e.toString());
+            Log.e(TAG, callback_tag + ": Error in getting raw HTTP result: "+e.toString());
+            retVal.addException(e);
         }
 
         retVal.setRawResponse(data);
@@ -135,7 +192,7 @@ public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
         Object json = new JSONTokener(jsonIn).nextValue();
 
         if (json instanceof JSONArray) {
-            Log.i(TAG, "Found a returned JSONArray");
+            Log.i(TAG, callback_tag + ": Found a returned JSONArray");
             // This use case is to support legacy API results which returned a raw array,
             // and morph them into the new structure which specifically has a "result" field
             // in the returned object holding the array.
@@ -146,12 +203,12 @@ public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
         } else {
             JSONObject resObj = (JSONObject) json;
             if(resObj.has("results")) {
-                Log.i(TAG, "Found a JSONObject to work with, and it already has results!");
+                Log.i(TAG, callback_tag + ": Found a JSONObject to work with, and it already has results!");
                 return (JSONObject) json;
             } else {
                 // Apparently the API handed us an object that didn't have a results value,
                 // so we're going to take their whole result and shove it in a result value
-                Log.i(TAG, "Found an old-style JSONObject, manipulating to have results field.");
+                Log.i(TAG, callback_tag + ": Found an old-style JSONObject, manipulating to have results field.");
                 JSONObject newRes = new JSONObject();
                 newRes.put("results", (JSONObject)json);
                 return newRes;

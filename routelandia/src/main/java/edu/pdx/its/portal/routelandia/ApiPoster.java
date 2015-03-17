@@ -46,13 +46,25 @@ import edu.pdx.its.portal.routelandia.entities.APIResultWrapper;
  *
  * Created by loc on 1/30/15.
  */
-public class ApiPoster extends AsyncTask<APIPostWrapper, Void, APIResultWrapper>{
+public class ApiPoster<T> extends AsyncTask<APIPostWrapper, Void, APIResultWrapper>{
     private final String TAG = "APIPoster";
+
+    private AsyncResult delegate;
+    private String callback_tag;
+    private Class<T> target_class;
+    private APIResultWrapper.ResultType result_type;
+
+    public ApiPoster(AsyncResult d, String callback_tag, Class<T> klass, APIResultWrapper.ResultType rt) {
+        this.delegate = d;
+        this.callback_tag = callback_tag;
+        this.target_class = klass;
+        this.result_type = rt;
+    }
 
     @Override
     protected APIResultWrapper doInBackground(APIPostWrapper... params) {
         // Foolishly assume that only the first param matters...
-        APIResultWrapper retVal = new APIResultWrapper();
+        APIResultWrapper retVal = new APIResultWrapper<T>(result_type, target_class);
         postJsonObjectToUrl(params[0].getFullUrl(), params[0].getPostObj(), retVal);
         return retVal;
     }

@@ -18,20 +18,41 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
+import edu.pdx.its.portal.routelandia.ApiFetcher;
+
 /**
  * This class accepts the raw JSON returned by an API endpoint and gives us a way to handle some of
  * the additional data about the request, and easily access the data we need!
  *
  * Created by joshproehl on 3/3/15.
  */
-public class APIResultWrapper {
+public class APIResultWrapper<T> {
     private static final String TAG = "APIResultWrapper";
 
+    private String callback_tag;
     private String rawResponse;
     private JSONObject parsedResponse;
-
+    private Class<T> target_class;
+    private ArrayList<T> listResponse;
+    private T objectResponse;
     private int httpStatus;
 
+    public static enum ResultType {
+        RESULT_AS_LIST, RESULT_AS_OBJECT
+    }
+
+
+    private ResultType result_type;
+
+    private ArrayList<Exception> exceptions;
+
+    public APIResultWrapper(ResultType rt, Class<T> klass) {
+        this.result_type = rt;
+        this.target_class = klass;
+        exceptions = new ArrayList<>();
+    }
 
     /**
      * Gets the "results" object out of the raw JSON.
@@ -65,4 +86,37 @@ public class APIResultWrapper {
         this.httpStatus = httpStatus;
     }
 
+    public ArrayList<Exception> getExceptions() {
+        return exceptions;
+    }
+    public void addException(Exception e) {
+        this.exceptions.add(e);
+    }
+
+    public String getCallbackTag() {
+        return callback_tag;
+    }
+    public void setCallbackTag(String t) {
+        this.callback_tag = t;
+    }
+
+    public ResultType getResultType() {
+        return result_type;
+    }
+
+    public void setListResponse(ArrayList<T> listResponse) {
+        this.listResponse = listResponse;
+    }
+
+    public ArrayList<T> getListResponse() {
+        return listResponse;
+    }
+
+    public T getObjectResponse() {
+        return objectResponse;
+    }
+
+    public void setObjectResponse(T objectResponse) {
+        this.objectResponse = objectResponse;
+    }
 }
