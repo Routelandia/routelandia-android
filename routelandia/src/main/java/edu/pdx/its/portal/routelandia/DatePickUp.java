@@ -39,10 +39,11 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 
 import edu.pdx.its.portal.routelandia.entities.APIException;
+import edu.pdx.its.portal.routelandia.entities.APIResultWrapper;
 import edu.pdx.its.portal.routelandia.entities.TrafficStat;
 
 
-public class DatePickUp extends ActionBarActivity {
+public class DatePickUp extends ActionBarActivity implements AsyncResult {
     private static final String TAG = "Activity: DatePickup";
     private TimePicker thisTimePicker;
     private Button btnDepartureDate;
@@ -211,7 +212,7 @@ public class DatePickUp extends ActionBarActivity {
             public void onClick(View v) {
                 
                 try {
-                    trafficStatList = (ArrayList) TrafficStat.getStatsResultListFor(startPoint, endPoint, departureTime, weekDay);
+                    trafficStatList = (ArrayList) TrafficStat.getStatsResultListFor(startPoint, endPoint, departureTime, weekDay, DatePickUp.this);
                 }
                 catch (APIException e) {
                     // TODO: RESTART ACTIVITY AFTER TELLING USER THAT THEY NEED TO DO SOMETHING!!
@@ -243,6 +244,11 @@ public class DatePickUp extends ActionBarActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onApiResult(APIResultWrapper result) {
+        // For now, do nothing...
     }
 
     protected class DayPickSelectedListener implements AdapterView.OnItemSelectedListener {
