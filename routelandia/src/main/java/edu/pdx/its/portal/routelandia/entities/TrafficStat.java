@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import edu.pdx.its.portal.routelandia.ApiPoster;
+import edu.pdx.its.portal.routelandia.AsyncResult;
 
 /**
  * Created by locle on 2/27/15.
@@ -202,7 +203,7 @@ public class TrafficStat extends APIEntity implements Parcelable {
      * @param weekday String representing the weekday to query for. (i.e. 'Thursday')
      * @return A list of TrafficStat objects representing the API Results.
      */
-    public static List<TrafficStat> getStatsResultListFor(LatLng sp, LatLng ep, String mid, String weekday) throws APIException {
+    public static List<TrafficStat> getStatsResultListFor(LatLng sp, LatLng ep, String mid, String weekday, AsyncResult ar) throws APIException {
         List<TrafficStat> retVal = new ArrayList<>();
 
         // TODO: This should not be hardcoded here, but inflected... Sadly, static methods and all...
@@ -213,7 +214,7 @@ public class TrafficStat extends APIEntity implements Parcelable {
         Log.i(TAG, "POSTing  to "+postURL+" : "+postObj.toString());
 
         try {
-            APIResultWrapper resWrap = new ApiPoster().execute(postReq).get();
+            APIResultWrapper resWrap = new ApiPoster<TrafficStat>(ar, "RESULT_TRAFFIC_STAT", TrafficStat.class, APIResultWrapper.ResultType.RESULT_AS_LIST).execute(postReq).get();
             if(resWrap.getHttpStatus() != 200) {
                 Log.e(TAG, "API Returned non-200, throwing error!");
                 Log.e(TAG, resWrap.getParsedResponse().toString());
