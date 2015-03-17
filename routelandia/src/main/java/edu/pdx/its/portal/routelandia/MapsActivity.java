@@ -91,6 +91,13 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
             if(savedInstanceState != null){
                 getItemsFromSaveBundle(savedInstanceState);
 
+                // Redraw the map
+                for (HashMap.Entry<Integer, List<Station>> entry : listOfStationsBaseOnHighwayid.entrySet()) {
+                    int highwayid = (int)entry.getKey();
+                    List<Station> tStationList = entry.getValue();
+                    int colorHighlightTheFreeWay = generatePairhighWayColor(highwayid);
+                    drawHighway(tStationList, colorHighlightTheFreeWay);
+                }
             }
             else {
                 fetchHighwayData();
