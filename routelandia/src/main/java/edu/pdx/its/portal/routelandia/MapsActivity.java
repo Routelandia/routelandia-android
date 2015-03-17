@@ -202,7 +202,6 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
     }
 
     private void downloadStationsBasedOnHighway() {
-        // TODO: Should use iterator. Potential crashing bug on NullPointer
         Iterator hItr = this.highwayList.iterator();
         while(hItr.hasNext()) {
             // Get a list of all stations from the API.
