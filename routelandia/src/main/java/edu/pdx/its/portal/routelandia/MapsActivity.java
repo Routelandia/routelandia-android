@@ -93,12 +93,45 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
 
             }
             else {
-                APIEntity.fetchListForEntity(Highway.class, this, RESULT_HIGHWAY_LIST);
+                fetchHighwayData();
             }
         }
         usersDragTheMarkers();
 
         goToDatePickUp();
+    }
+
+    /**
+     * Start the async running to go and get highway data. Will draw fetched data on the map.
+     */
+    private void fetchHighwayData() {
+        APIEntity.fetchListForEntity(Highway.class, this, RESULT_HIGHWAY_LIST);
+    }
+
+    /**
+     * Erase anything drawn on the map, and clear our downloaded information out.
+     * Essentially resets the app to the beginning.
+     */
+    private void clearMap() {
+        mMap.clear();
+        listOfStationsBaseOnHighwayid = new HashMap<>();
+    }
+
+    /**
+     * The user has dropped markers, get rid of them.
+     */
+    private void clearMarkers() {
+        if(firstMarker == null && secondMarker == null){
+            Toast.makeText(MapsActivity.this, "You have no marker to remove", Toast.LENGTH_LONG).show();
+        }
+        if(firstMarker != null){
+            firstMarker.remove();
+            firstMarker = null;
+        }
+        if(secondMarker != null){
+            secondMarker.remove();
+            secondMarker = null;
+        }
     }
 
     @Override
@@ -112,17 +145,14 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.miClearMap:
-                if(firstMarker == null && secondMarker == null){
-                    Toast.makeText(MapsActivity.this, "You have no marker to remove", Toast.LENGTH_LONG).show();
+                return true;
+            case R.id.miRefresh:
+                if(firstMarker != null || secondMarker != null) {
+                    // Don't make the "you don't have markers" text pop up unless it needs to
+                    clearMarkers();
                 }
-                if(firstMarker != null){
-                firstMarker.remove();
-                    firstMarker = null;
-                }
-                if(secondMarker != null){
-                    secondMarker.remove();
-                    secondMarker = null;
-                }
+                clearMap();
+                fetchHighwayData();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
