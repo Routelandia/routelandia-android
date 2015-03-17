@@ -65,54 +65,28 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
     private final String RESULT_HIGHWAY_LIST = "result_highway_list";
     private final String RESULT_STATION_LIST = "result_station_list";
 
+
+    //region Data fetching methods
+
     /**
-     * Perform initialization of all fragments and loaders.
-     *
-     * @param savedInstanceState Bundle from Google SDK
+     * Start the async running to go and get highway data. Will draw fetched data on the map.
      */
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
-        setUpMapIfNeeded();
-
-        // Getting Google Play availability status
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
-
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are not available
-
-            int requestCode = 10;
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, requestCode);
-            dialog.show();
-
-        } else { // Google Play Services are available
-            // Getting reference to SupportMapFragment of the activity_maps
-            SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-
-            // Getting Map for the SupportMapFragment
-            mMap = fm.getMap();
-
-            if(savedInstanceState != null){
-                getItemsFromSaveBundle(savedInstanceState);
-
-                // Redraw the map
-                for (HashMap.Entry<Integer, List<Station>> entry : listOfStationsBaseOnHighwayid.entrySet()) {
-                    int highwayid = (int)entry.getKey();
-                    List<Station> tStationList = entry.getValue();
-                    int colorHighlightTheFreeWay = generatePairhighWayColor(highwayid);
-                    drawHighway(tStationList, colorHighlightTheFreeWay);
-                }
-            }
-            else {
-                activeAsyncs = 0;    // Make sure that we don't get stuck somehow
-                initLoadingDialog();
-                fetchHighwayData();
-            }
-        }
-        usersDragTheMarkers();
-
-        goToDatePickUp();
+    private void fetchHighwayData() {
+        APIEntity.fetchListForEntity(Highway.class, this, RESULT_HIGHWAY_LIST);
     }
+
+    private void downloadStationsBasedOnHighway() {
+        Iterator hItr = this.highwayList.iterator();
+        while(hItr.hasNext()) {
+            // Get a list of all stations from the API.
+            Highway tHighway = (Highway)hItr.next();
+            String nestedStationsUrl = tHighway.getNestedEntityUrl(Station.class);
+            tHighway.fetchListForURLAsEntity(nestedStationsUrl, Station.class, this, RESULT_STATION_LIST);
+        }
+    }
+
+    //endregion
+    //region Internal Utility Methods
 
     /**
      * Start up the dialog to prevent user from clicking while things are loading...
@@ -123,12 +97,6 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
         loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         loadingDialog.setCancelable(false);
         loadingDialog.show();
-    }
-    /**
-     * Start the async running to go and get highway data. Will draw fetched data on the map.
-     */
-    private void fetchHighwayData() {
-        APIEntity.fetchListForEntity(Highway.class, this, RESULT_HIGHWAY_LIST);
     }
 
     /**
@@ -157,107 +125,51 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.maps, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle presses on the action bar items
-        switch (item.getItemId()) {
-            case R.id.miClearMap:
-                clearMarkers();
-                return true;
-            case R.id.miRefresh:
-                if(firstMarker != null || secondMarker != null) {
-                    // Don't make the "you don't have markers" text pop up unless it needs to
-                    clearMarkers();
-                }
-                clearMap();
-                initLoadingDialog();
-                fetchHighwayData();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+    /**
+     * The function check if users tap a point close 200m to the freeway
+     * then drag a markerOptions
+     * @param point which is users tap on the map
+     */
+    private void drawMarker(LatLng point) {
+        List<LatLng> drawnPoints = globalPoly.getPoints();
+        if (PolyUtil.isLocationOnPath(point, drawnPoints, true, 200.0)) {
+            if(firstMarker == null){
+                firstMarker = mMap.addMarker(new MarkerOptions().position(point).
+                        icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).
+                        draggable(true).title("Start"));
+                startPoint = firstMarker.getPosition();
+            }
+            else if(secondMarker == null ){
+                secondMarker = mMap.addMarker(new MarkerOptions().position(point).
+                        icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).
+                        draggable(true).title("End"));
+                endPoint = secondMarker.getPosition();
+            }
         }
     }
 
     /**
-     * overwrite onMapClickListener to let users drag markerOptions in the map*
+     * draw polyline for each station based on its list latlng*
+     * @param stations: in its highway
      */
-    private void usersDragTheMarkers() {
-        mMap.setOnMapClickListener(new OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng point) {
-                drawMarker(point);
-            }
-        });
-    }
-
-    /**
-     * Create a time and data button so users can go to the next page
-     * which allow them to choose the time when they want to commute*
-     */
-    private void goToDatePickUp() {
-        Button timeAndDateButton = (Button) findViewById(R.id.button3);
-        timeAndDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(firstMarker != null && secondMarker != null) {
-                    Intent i = new Intent(getApplicationContext(), DatePickUp.class).
-                            putExtra("lat of first point", startPoint.latitude).
-                            putExtra("lng of first point", startPoint.longitude).
-                            putExtra("lat of second point", endPoint.latitude).
-                            putExtra("lng of second point", endPoint.longitude);
-                    startActivity(i);
-                } else {
-                    new ErrorPopup("Error", "Please select a start and an end point along the same color of highway section.").givePopup(v.getContext()).show();
+    public void drawHighway(List<Station> stations, int color){
+        Iterator<Station> stationIter = stations.iterator();
+        while(stationIter.hasNext()) {
+            Station s = stationIter.next();
+            if(s.getLatLngList().size() !=0) {
+                List<LatLng> points = s.getLatLngList();
+                if (points != null) {
+                    globalPoly.addAll(points);
+                    PolylineOptions polylineOptions = new PolylineOptions();
+                    polylineOptions.addAll(points).width(10).color(color).geodesic(true);
+                    mMap.addPolyline(polylineOptions);
                 }
             }
-        });
-    }
-
-    private void downloadStationsBasedOnHighway() {
-        Iterator hItr = this.highwayList.iterator();
-        while(hItr.hasNext()) {
-            // Get a list of all stations from the API.
-            Highway tHighway = (Highway)hItr.next();
-            String nestedStationsUrl = tHighway.getNestedEntityUrl(Station.class);
-            tHighway.fetchListForURLAsEntity(nestedStationsUrl, Station.class, this, RESULT_STATION_LIST);
         }
     }
 
     /**
-     * get all the data from save bundle* 
-     * @param savedInstanceState: bundle from the activities
-     */
-    private void getItemsFromSaveBundle(Bundle savedInstanceState) {
-        //get the hashmap list of station before users rotate the phone
-        listOfStationsBaseOnHighwayid = (HashMap<Integer, List<Station>>) savedInstanceState.get("a hashmap of list stations");
-
-        //if users drag first marker, get the latlng back and re-create that marker
-        if(savedInstanceState.get("lat of first marker") != null) {
-            LatLng latLngOfFirstMarker = new LatLng((Double) savedInstanceState.get("lat of first marker"), (Double) savedInstanceState.get("lng of first marker"));
-            firstMarker = mMap.addMarker(new MarkerOptions().position(latLngOfFirstMarker).
-                    icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).
-                    draggable(true).title("Start"));
-            startPoint = firstMarker.getPosition();
-        }
-
-        //if users drag second marker, get the latlng back and re-create that marker
-        if(savedInstanceState.get("lat of second marker") != null) {
-            LatLng latLngOfSecondMarker = new LatLng((Double) savedInstanceState.get("lat of second marker"), (Double) savedInstanceState.get("lng of second marker"));
-            secondMarker = mMap.addMarker(new MarkerOptions().position(latLngOfSecondMarker).
-                    icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).
-                    draggable(true).title("End"));
-            endPoint = secondMarker.getPosition();
-        }
-    }
-
-    /**
-     * * 
+     * *
      * @param highwayID: highway number
      * @return the pair color based on pair high
      */
@@ -296,12 +208,71 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
         return colorHighlightTheFreeWay;
     }
 
+    //endregion
+    //region Menu methods
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.maps, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.miClearMap:
+                clearMarkers();
+                return true;
+            case R.id.miRefresh:
+                if(firstMarker != null || secondMarker != null) {
+                    // Don't make the "you don't have markers" text pop up unless it needs to
+                    clearMarkers();
+                }
+                clearMap();
+                initLoadingDialog();
+                fetchHighwayData();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    //endregion
+    //region view/navigation handling methods
+
+    /**
+     * Create a time and data button so users can go to the next page
+     * which allow them to choose the time when they want to commute*
+     */
+    private void goToDatePickUp() {
+        Button timeAndDateButton = (Button) findViewById(R.id.button3);
+        timeAndDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(firstMarker != null && secondMarker != null) {
+                    Intent i = new Intent(getApplicationContext(), DatePickUp.class).
+                            putExtra("lat of first point", startPoint.latitude).
+                            putExtra("lng of first point", startPoint.longitude).
+                            putExtra("lat of second point", endPoint.latitude).
+                            putExtra("lng of second point", endPoint.longitude);
+                    startActivity(i);
+                } else {
+                    new ErrorPopup("Error", "Please select a start and an end point along the same color of highway section.").givePopup(v.getContext()).show();
+                }
+            }
+        });
+    }
+
+    //endregion
+    // region AsyncResult methods
 
     /**
      * The method that will be called when we get back the results of our API Query for highways.
      *
      * @param resWrap the result object.
      */
+    @Override
     public void onApiResult(APIResultWrapper resWrap) {
         Log.i(TAG, "Got API Result for " + resWrap.getCallbackTag() + ", which has " + resWrap.getExceptions().size() + " exceptions!");
 
@@ -361,19 +332,64 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
         activeAsyncs++;
     }
 
+    // endregion
+    //region save/restore state methods
+
     /**
-     * Dispatch onResume() to fragments.  Note that for better inter-operation
-     * with older versions of the platform, at the point of this call the
-     * fragments attached to the activity are <em>not</em> resumed.  This means
-     * that in some cases the previous state may still be saved, not allowing
-     * fragment transactions that modify the state.  To correctly interact
-     * with fragments in their proper state, you should instead override
-     * {@link #onResumeFragments()}.
+     * Perform initialization of all fragments and loaders.
+     *
+     * @param savedInstanceState Bundle from Google SDK
      */
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+
+        // Getting Google Play availability status
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
+
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are not available
+
+            int requestCode = 10;
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, requestCode);
+            dialog.show();
+
+        } else { // Google Play Services are available
+            // Getting reference to SupportMapFragment of the activity_maps
+            SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
+            // Getting Map for the SupportMapFragment
+            mMap = fm.getMap();
+
+            if(savedInstanceState != null){
+                getItemsFromSaveBundle(savedInstanceState);
+
+                // Redraw the map
+                for (HashMap.Entry<Integer, List<Station>> entry : listOfStationsBaseOnHighwayid.entrySet()) {
+                    int highwayid = (int)entry.getKey();
+                    List<Station> tStationList = entry.getValue();
+                    int colorHighlightTheFreeWay = generatePairhighWayColor(highwayid);
+                    drawHighway(tStationList, colorHighlightTheFreeWay);
+                }
+            }
+            else {
+                activeAsyncs = 0;    // Make sure that we don't get stuck somehow
+                initLoadingDialog();
+                fetchHighwayData();
+            }
+        }
+
+
+        // overwrite onMapClickListener to let users drag markerOptions in the map
+        mMap.setOnMapClickListener(new OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+                drawMarker(point);
+            }
+        });
+
+        goToDatePickUp();
     }
 
     /**
@@ -406,6 +422,48 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
     }
 
     /**
+     * Dispatch onResume() to fragments.  Note that for better inter-operation
+     * with older versions of the platform, at the point of this call the
+     * fragments attached to the activity are <em>not</em> resumed.  This means
+     * that in some cases the previous state may still be saved, not allowing
+     * fragment transactions that modify the state.  To correctly interact
+     * with fragments in their proper state, you should instead override
+     * {@link #onResumeFragments()}.
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setUpMapIfNeeded();
+    }
+
+    /**
+     * get all the data from save bundle*
+     * @param savedInstanceState: bundle from the activities
+     */
+    private void getItemsFromSaveBundle(Bundle savedInstanceState) {
+        //get the hashmap list of station before users rotate the phone
+        listOfStationsBaseOnHighwayid = (HashMap<Integer, List<Station>>) savedInstanceState.get("a hashmap of list stations");
+
+        //if users drag first marker, get the latlng back and re-create that marker
+        if(savedInstanceState.get("lat of first marker") != null) {
+            LatLng latLngOfFirstMarker = new LatLng((Double) savedInstanceState.get("lat of first marker"), (Double) savedInstanceState.get("lng of first marker"));
+            firstMarker = mMap.addMarker(new MarkerOptions().position(latLngOfFirstMarker).
+                    icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).
+                    draggable(true).title("Start"));
+            startPoint = firstMarker.getPosition();
+        }
+
+        //if users drag second marker, get the latlng back and re-create that marker
+        if(savedInstanceState.get("lat of second marker") != null) {
+            LatLng latLngOfSecondMarker = new LatLng((Double) savedInstanceState.get("lat of second marker"), (Double) savedInstanceState.get("lng of second marker"));
+            secondMarker = mMap.addMarker(new MarkerOptions().position(latLngOfSecondMarker).
+                    icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).
+                    draggable(true).title("End"));
+            endPoint = secondMarker.getPosition();
+        }
+    }
+
+    /**
      * Save all appropriate fragment state.
      *
      * @param outState to write into the byte code
@@ -430,46 +488,6 @@ public class MapsActivity extends ActionBarActivity implements AsyncResult {
         }
     }
 
-    /**
-     * The function check if users tap a point close 200m to the freeway
-     * then drag a markerOptions
-     * @param point which is users tap on the map
-     */
-    private void drawMarker(LatLng point) {
-        List<LatLng> drawnPoints = globalPoly.getPoints();
-        if (PolyUtil.isLocationOnPath(point, drawnPoints, true, 200.0)) {
-            if(firstMarker == null){
-                firstMarker = mMap.addMarker(new MarkerOptions().position(point).
-                        icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).
-                        draggable(true).title("Start"));
-                startPoint = firstMarker.getPosition();
-            }
-            else if(secondMarker == null ){
-                secondMarker = mMap.addMarker(new MarkerOptions().position(point).
-                        icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).
-                        draggable(true).title("End"));
-                endPoint = secondMarker.getPosition();
-            }
-        }
-    }
+    //endregion
 
-    /**
-     * draw polyline for each station based on its list latlng*
-     * @param stations: in its highway
-     */
-    public void drawHighway(List<Station> stations, int color){
-        Iterator<Station> stationIter = stations.iterator();
-        while(stationIter.hasNext()) {
-            Station s = stationIter.next();
-            if(s.getLatLngList().size() !=0) {
-                List<LatLng> points = s.getLatLngList();
-                if (points != null) {
-                    globalPoly.addAll(points);
-                    PolylineOptions polylineOptions = new PolylineOptions();
-                    polylineOptions.addAll(points).width(10).color(color).geodesic(true);
-                    mMap.addPolyline(polylineOptions);
-                }
-            }
-        }
-    }  
 }
