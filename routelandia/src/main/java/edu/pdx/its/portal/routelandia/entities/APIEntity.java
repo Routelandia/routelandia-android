@@ -26,7 +26,7 @@ public abstract class APIEntity {
     private static final String TAG = "APIEntity<>";
 
     // Define the root URL we'll concatenate individual resources URL's to
-    public static final String API_ROOT = "http://capstoneaa.cs.pdx.edu/api/";
+    public static final String API_ROOT = "http://routelandia.its.pdx.edu/";
     // Note: Must contain trailing slash!
 
     public abstract int getEntityId();
