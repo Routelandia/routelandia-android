@@ -38,10 +38,11 @@ import edu.pdx.its.portal.routelandia.ApiFetcher;
 public class Station extends APIEntity implements Serializable {
     private static final String TAG = "Station Entity";
     protected int stationid;
+    protected int highwayid;
     protected int linkedListPosition;
     List<LatLng> latLngList = new ArrayList<>();
 
-    // This really should be more dynamic.. But we're going to go with it for now.
+    // TODO: This really should be more dynamic.. But we're going to go with it for now.
     public static String getListUrlNestedInHighway(int highwayid) {
         return "highways/"+highwayid+"/stations/";
     }
@@ -66,6 +67,7 @@ public class Station extends APIEntity implements Serializable {
 
     public Station(JSONObject json) throws JSONException {
         this.stationid = json.getInt("stationid");
+        this.highwayid = json.getInt("highwayid");
 
         if (!json.isNull("geojson_raw")) {
             JSONObject geojsonRaw = json.getJSONObject("geojson_raw");
@@ -146,4 +148,5 @@ public class Station extends APIEntity implements Serializable {
         latLngList.add(new LatLng(in.readDouble(), in.readDouble()));
     }
 
+    public int getHighwayId() { return this.highwayid; }
 }

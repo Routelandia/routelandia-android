@@ -27,40 +27,120 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 /**
  * This class is designed to be the one-stop-shop for getting JSON results back from the API.
  *
  * Created by joshproehl on 3/2/15.
  */
-public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
+public class ApiFetcher<T> extends AsyncTask<String, Integer, APIResultWrapper> {
     private final String TAG = "ApiFetcher";
+
+    private AsyncResult delegate;
+    private String callback_tag;
+    private Class<T> target_class;
+
+
+    public APIResultWrapper.ResultType fetch_type;
+
+
+
+    public ApiFetcher(AsyncResult d, String callback_tag, Class<T> klass, APIResultWrapper.ResultType rt) {
+        this.delegate = d;
+        this.callback_tag = callback_tag;
+        this.target_class = klass;
+        this.fetch_type = rt;
+    }
+
 
     @Override
     protected APIResultWrapper doInBackground(String... params) {
-        APIResultWrapper retVal = new APIResultWrapper();
+        APIResultWrapper retVal = new APIResultWrapper<T>(fetch_type, target_class);
+        retVal.setCallbackTag(callback_tag);
 
         try {
             // Fetch the HTTP Result and parse it into the JSON to be returned.
             String rawResult = fetchRawResult(params[0], retVal);
             retVal.setParsedResponse(parseRawResult(rawResult));
+
+            if(fetch_type == APIResultWrapper.ResultType.RESULT_AS_LIST) {
+                // This is a list response type, so we're going to convert the parsedResponse into
+                // an array of objects...
+                ArrayList<T> objArr = new ArrayList<>();
+
+                try {
+                    // If we don't have a 200 code, we've already added an error to bubble up.
+                    if (retVal.getHttpStatus() == 200) {
+                        JSONObject res = retVal.getParsedResponse();
+                        // TODO: Crashing
+                        JSONArray resArray = (JSONArray) res.get("results");
+                        for (int i = 0; i < resArray.length(); i++) {
+                            //Create a entity object from the JSONObject for each array index and add it to the list
+                            JSONObject tObj = (JSONObject) resArray.get(i);
+                            objArr.add(target_class.getConstructor(JSONObject.class).newInstance(tObj));
+                        }
+                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, e.getMessage());
+                    // TODO: This should get back to the UI probably!
+                //} catch (InterruptedException | ExecutionException e) {
+                //    Log.e(TAG, e.getMessage());
+                //    // TODO: Probably should do *something* eh?
+                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    Log.e(TAG, "Generics problem! " + e.toString());
+                    e.printStackTrace();
+                    // TODO: The app needs to shut down now...
+                }
+
+                retVal.setListResponse(objArr);
+            } else if(fetch_type == APIResultWrapper.ResultType.RESULT_AS_OBJECT ) {
+                // Things should happen here... if we were to ever fetch single objects rather than lists...
+
+                /* Copied from APIEntity when moved to async as prototype..
+                   TODO: Mimic above list process, but only add this ONE to the list?
+                try{
+                    APIResultWrapper resWrap = new ApiFetcher(ar).execute(url).get();
+                    JSONObject res = resWrap.getParsedResponse();
+                    if(resWrap.getHttpStatus() != 200) {
+                        // Apparently our HTTP response contained an error, so we'll be bailing now...
+                        throw new APIException("Problem communicating with the server...", resWrap);
+                    }
+                    JSONObject resObj = (JSONObject)res.get("results");
+                    return klass.getConstructor(JSONObject.class).newInstance(resObj);
+                } catch (JSONException e) {
+                    Log.e(TAG, e.getMessage());
+                    // TODO: This should get back to the UI probably!
+                } catch (InterruptedException|ExecutionException e) {
+                    Log.e(TAG, e.getMessage());
+                    // TODO: Probably should do *something* eh?
+                } catch (NoSuchMethodException|InstantiationException|IllegalAccessException|InvocationTargetException e) {
+                    Log.e(TAG, "Generics problem! "+e.toString());
+                    e.printStackTrace();
+                    // TODO: The app needs to shut down now...
+                }
+                return null; // Should never arrive...
+                */
+            }
+
         } catch (IOException e) {
-            Log.e(TAG, "Error doing background API Fetch: " + e.toString());
+            Log.e(TAG, callback_tag + ": Error doing background API Fetch: " + e.toString());
+            retVal.addException(e);
         } catch (JSONException e) {
-            Log.e(TAG, "Could not parse raw result into JSON..." + e.toString());
+            Log.e(TAG, callback_tag + ": Could not parse raw result into JSON..." + e.toString());
+            retVal.addException(e);
         }
         return retVal;
     }
 
-    /*
-    // TODO: Is this needed/correct?
     @Override
-    protected void onPostExecute(String result) {
-        super.onPostExecute(result);
+    protected void onPostExecute(APIResultWrapper result) {
+        delegate.onApiResult(result);
     }
-    */
 
 
     /**
@@ -91,7 +171,12 @@ public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
             retVal.setHttpStatus(status);
 
             // Reading data from url
-            iStream = urlConnection.getInputStream();
+            try {
+                iStream = urlConnection.getInputStream();
+            } catch(IOException e) {
+                // Our API returns 404's, but they're still JSON...
+                iStream = urlConnection.getErrorStream();
+            }
 
             // Create bufferedReader from input
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(iStream));
@@ -111,11 +196,29 @@ public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
             //close the buffered reader
             bufferedReader.close();
 
-        } catch (Exception e) {
-            Log.e(TAG, "Error in getting raw HTTP result: "+e.toString());
+        } catch (IOException e) {
+            Log.e(TAG, callback_tag + ": Error in getting raw HTTP result: " + e.toString());
+            retVal.addException(e);
         }
 
-        retVal.setRawResponse(data);
+        if(retVal.getHttpStatus() == 200) {
+            retVal.setRawResponse(data);
+        } else {
+            try{
+                // Since errors are still JSON we're going to parse it and get the message
+                Object json = new JSONTokener(data).nextValue();
+
+                if (json instanceof JSONObject && ((JSONObject)json).has("error")) {
+                    retVal.addException(new APIException(((JSONObject) json).getJSONObject("error").getString("message"), retVal));
+                } else {
+                    retVal.addException(new APIException("Server returned a 404 error for "+stringURL, retVal));
+                }
+
+                // Since we've got an exception object now, we need to parse it as an object...j
+            } catch(JSONException e) {
+                retVal.addException(new APIException("Server returned a 404 error for "+stringURL, retVal));
+            }
+        }
         return data;
     }
 
@@ -134,7 +237,7 @@ public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
         Object json = new JSONTokener(jsonIn).nextValue();
 
         if (json instanceof JSONArray) {
-            Log.i(TAG, "Found a returned JSONArray");
+            Log.i(TAG, callback_tag + ": Found a returned JSONArray");
             // This use case is to support legacy API results which returned a raw array,
             // and morph them into the new structure which specifically has a "result" field
             // in the returned object holding the array.
@@ -145,12 +248,12 @@ public class ApiFetcher extends AsyncTask<String, Integer, APIResultWrapper> {
         } else {
             JSONObject resObj = (JSONObject) json;
             if(resObj.has("results")) {
-                Log.i(TAG, "Found a JSONObject to work with, and it already has results!");
+                Log.i(TAG, callback_tag + ": Found a JSONObject to work with, and it already has results!");
                 return (JSONObject) json;
             } else {
                 // Apparently the API handed us an object that didn't have a results value,
                 // so we're going to take their whole result and shove it in a result value
-                Log.i(TAG, "Found an old-style JSONObject, manipulating to have results field.");
+                Log.i(TAG, callback_tag + ": Found an old-style JSONObject, manipulating to have results field.");
                 JSONObject newRes = new JSONObject();
                 newRes.put("results", (JSONObject)json);
                 return newRes;

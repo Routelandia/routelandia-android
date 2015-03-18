@@ -12,6 +12,7 @@
     <string name="start_button">START</string>
     <string name="day_pick">Choose a week day</string>
     <string name="clear_markers">Clear Markers</string>
+    <string name="refresh">Refresh</string>
     <string name="choose_datetime">Choose Time and Date</string>
 
     <string-array name="week_day">

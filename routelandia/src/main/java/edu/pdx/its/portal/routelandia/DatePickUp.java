@@ -17,10 +17,13 @@ package edu.pdx.its.portal.routelandia;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
@@ -39,10 +42,11 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 
 import edu.pdx.its.portal.routelandia.entities.APIException;
+import edu.pdx.its.portal.routelandia.entities.APIResultWrapper;
 import edu.pdx.its.portal.routelandia.entities.TrafficStat;
 
 
-public class DatePickUp extends ActionBarActivity {
+public class DatePickUp extends ActionBarActivity implements AsyncResult {
     private static final String TAG = "Activity: DatePickup";
     private TimePicker thisTimePicker;
     private Button btnDepartureDate;
@@ -57,6 +61,8 @@ public class DatePickUp extends ActionBarActivity {
     protected String departureTime;
     protected ArrayList<TrafficStat> trafficStatList;
     private int TIME_PICKER_INTERVAL = 15;
+    private ProgressDialog loadingDialog;
+    private int activeAsyncs = 0;
 
     /**
      * Perform initialization of all fragments and loaders.
@@ -209,9 +215,14 @@ public class DatePickUp extends ActionBarActivity {
 
             @Override
             public void onClick(View v) {
-                
-                try {
-                    trafficStatList = (ArrayList) TrafficStat.getStatsResultListFor(startPoint, endPoint, departureTime, weekDay);
+                loadingDialog = new ProgressDialog(DatePickUp.this);
+                loadingDialog.setMessage("Fetching statistics from server...");
+                loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                loadingDialog.setCancelable(false);
+                loadingDialog.show();
+
+                TrafficStat.getStatsResultListFor(startPoint, endPoint, departureTime, weekDay, DatePickUp.this);
+                /*
                 }
                 catch (APIException e) {
                     // TODO: RESTART ACTIVITY AFTER TELLING USER THAT THEY NEED TO DO SOMETHING!!
@@ -232,18 +243,50 @@ public class DatePickUp extends ActionBarActivity {
                         new ErrorPopup("Error", "Could not complete request: \n\n" + e.getMessage()).givePopup(DatePickUp.this).show();
                     }
                 }
-
-                if(trafficStatList == null){
-                    Log.e(TAG, "No results returned from statistics query.");
-                }
-                else{
-                    Intent intent = new Intent(getApplicationContext(),ListStat.class);
-                    intent.putParcelableArrayListExtra("travel info", trafficStatList);
-                    startActivity(intent);
-                }
+                */
             }
         });
     }
+
+    //region AsyncTask results
+
+    @Override
+    public void onApiResult(APIResultWrapper resWrap) {
+        trafficStatList = resWrap.getListResponse();
+
+        loadingDialog.dismiss();
+        activeAsyncs--;
+
+        if(resWrap.getExceptions().size() > 0) {
+            String errStr = "";
+            Iterator eItr = resWrap.getExceptions().iterator();
+            while (eItr.hasNext()) {
+                // TODO: Handle specific exception differently?
+                Exception tEx = (Exception) eItr.next();
+                errStr += tEx.getMessage() + "\n\n";
+            }
+
+            new ErrorPopup("Error fetching statistics...", errStr).givePopup(this).show();
+        } else {
+            if (trafficStatList == null) {
+                // This actually shouldn't happen because if no results returned an error SHOULD be,
+                // and so the above block should have caught it... But we like to cover everything.
+                Log.e(TAG, "No results returned from statistics query.");
+                new ErrorPopup("Error", "Server returned no results").givePopup(this).show();
+            } else {
+                Intent intent = new Intent(getApplicationContext(), ListStat.class);
+                intent.putParcelableArrayListExtra("travel info", trafficStatList);
+                startActivity(intent);
+            }
+        }
+    }
+
+    @Override
+    public void addActiveAsync(AsyncTask t){
+        activeAsyncs++;
+    }
+
+    //endregion
 
     protected class DayPickSelectedListener implements AdapterView.OnItemSelectedListener {
         /**
