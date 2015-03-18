@@ -76,25 +76,44 @@ public class ApiPoster<T> extends AsyncTask<APIPostWrapper, Void, APIResultWrapp
             if(retVal.getHttpStatus() != 200) {
                 Log.e(TAG, "API Returned non-200, throwing error!");
                 Log.e(TAG, retVal.getParsedResponse().toString());
-                retVal.addException(new APIException("Error on POST", retVal));
-            }
-            JSONObject parsedRawRes = retVal.getParsedResponse();
-            JSONArray jResult = parsedRawRes.getJSONArray("results");
-            Log.i(TAG, "Got results array: "+jResult);
-            // Now loop through all the results and make the list
-            if (jResult == null) {
-                // No items were found? Sounds suspicious, but I guess we're done.
-                Log.i("RESULT", "Apparently nothing was in the results array...");
-            } else {
-                try {
-                    for (int i = 0; i < jResult.length(); i++) {
-                        //Create a JSONObject and use it to construct a TravelingInfo to add to the list
-                        JSONObject jsonObject = (JSONObject) jResult.get(i);
-                        objArr.add(new TrafficStat(jsonObject));
+                // Bit of a hack to work around the not-super-great error message the server hands back. :-)
+                if(retVal.getHttpStatus() == 400) {
+                    retVal.addException(new APIException("Please pick two points along the same colored section of highway.", retVal));
+                }
+                try{
+                    // Since errors are still JSON we're going to parse it and get the message
+                    Object json = new JSONTokener(retVal.getParsedResponse().toString()).nextValue();
+
+                    if (json instanceof JSONObject && ((JSONObject)json).has("error")) {
+                        retVal.addException(new APIException(((JSONObject) json).getJSONObject("error").getString("message"), retVal));
+
+                    } else {
+                        retVal.addException(new APIException("Server returned a 404 error when asked for statistics.", retVal));
                     }
-                } catch (JSONException e) {
-                    // TODO: Should we bubble this up or fail out if this happens?
-                    Log.e(TAG, "Ignored a specific result due to JSON Exception!");
+
+                    // Since we've got an exception object now, we need to parse it as an object...j
+                } catch(JSONException e) {
+                    retVal.addException(new APIException("Server returned a 404 error when asked for statistics.", retVal));
+                }
+            } else { // HTTP status was indeed 200!
+                JSONObject parsedRawRes = retVal.getParsedResponse();
+                JSONArray jResult = parsedRawRes.getJSONArray("results");
+                Log.i(TAG, "Got results array: " + jResult);
+                // Now loop through all the results and make the list
+                if (jResult == null) {
+                    // No items were found? Sounds suspicious, but I guess we're done.
+                    Log.i("RESULT", "Apparently nothing was in the results array...");
+                } else {
+                    try {
+                        for (int i = 0; i < jResult.length(); i++) {
+                            //Create a JSONObject and use it to construct a TravelingInfo to add to the list
+                            JSONObject jsonObject = (JSONObject) jResult.get(i);
+                            objArr.add(new TrafficStat(jsonObject));
+                        }
+                    } catch (JSONException e) {
+                        // TODO: Should we bubble this up or fail out if this happens?
+                        Log.e(TAG, "Ignored a specific result due to JSON Exception!");
+                    }
                 }
             }
         } catch(JSONException je) {

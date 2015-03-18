@@ -74,17 +74,16 @@ public class ApiFetcher<T> extends AsyncTask<String, Integer, APIResultWrapper> 
                 ArrayList<T> objArr = new ArrayList<>();
 
                 try {
-                    if (retVal.getHttpStatus() != 200) {
-                        // Apparently our HTTP response contained an error, so we'll be bailing now...
-
-                        retVal.addException(new APIException("Problem communicating with the server...", retVal));
-                    }
-                    JSONObject res = retVal.getParsedResponse();
-                    JSONArray resArray = (JSONArray) res.get("results");
-                    for (int i = 0; i < resArray.length(); i++) {
-                        //Create a entity object from the JSONObject for each array index and add it to the list
-                        JSONObject tObj = (JSONObject) resArray.get(i);
-                        objArr.add(target_class.getConstructor(JSONObject.class).newInstance(tObj));
+                    // If we don't have a 200 code, we've already added an error to bubble up.
+                    if (retVal.getHttpStatus() == 200) {
+                        JSONObject res = retVal.getParsedResponse();
+                        // TODO: Crashing
+                        JSONArray resArray = (JSONArray) res.get("results");
+                        for (int i = 0; i < resArray.length(); i++) {
+                            //Create a entity object from the JSONObject for each array index and add it to the list
+                            JSONObject tObj = (JSONObject) resArray.get(i);
+                            objArr.add(target_class.getConstructor(JSONObject.class).newInstance(tObj));
+                        }
                     }
                 } catch (JSONException e) {
                     Log.e(TAG, e.getMessage());
@@ -172,7 +171,12 @@ public class ApiFetcher<T> extends AsyncTask<String, Integer, APIResultWrapper> 
             retVal.setHttpStatus(status);
 
             // Reading data from url
-            iStream = urlConnection.getInputStream();
+            try {
+                iStream = urlConnection.getInputStream();
+            } catch(IOException e) {
+                // Our API returns 404's, but they're still JSON...
+                iStream = urlConnection.getErrorStream();
+            }
 
             // Create bufferedReader from input
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(iStream));
@@ -192,12 +196,29 @@ public class ApiFetcher<T> extends AsyncTask<String, Integer, APIResultWrapper> 
             //close the buffered reader
             bufferedReader.close();
 
-        } catch (Exception e) {
-            Log.e(TAG, callback_tag + ": Error in getting raw HTTP result: "+e.toString());
+        } catch (IOException e) {
+            Log.e(TAG, callback_tag + ": Error in getting raw HTTP result: " + e.toString());
             retVal.addException(e);
         }
 
-        retVal.setRawResponse(data);
+        if(retVal.getHttpStatus() == 200) {
+            retVal.setRawResponse(data);
+        } else {
+            try{
+                // Since errors are still JSON we're going to parse it and get the message
+                Object json = new JSONTokener(data).nextValue();
+
+                if (json instanceof JSONObject && ((JSONObject)json).has("error")) {
+                    retVal.addException(new APIException(((JSONObject) json).getJSONObject("error").getString("message"), retVal));
+                } else {
+                    retVal.addException(new APIException("Server returned a 404 error for "+stringURL, retVal));
+                }
+
+                // Since we've got an exception object now, we need to parse it as an object...j
+            } catch(JSONException e) {
+                retVal.addException(new APIException("Server returned a 404 error for "+stringURL, retVal));
+            }
+        }
         return data;
     }
 
