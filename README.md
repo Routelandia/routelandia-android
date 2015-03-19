@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/Routelandia/routelandia-android.svg?branch=master)](https://travis-ci.org/Routelandia/routelandia-android)
 
-Routelandia Android application use Google Play services to load Google Map
+Routelandia Android application use Google Play services to load Google Map.
+
+Download it from the [Play Store](https://play.google.com/store/apps/details?id=edu.pdx.its.portal.routelandia).
 
 ## Requirements
 
