@@ -232,7 +232,7 @@ public class ListStat extends ActionBarActivity {
                     tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
                             TableRow.LayoutParams.MATCH_PARENT));
                     tv.setBackgroundResource(R.drawable.cell_shape);
-                    tv.setPadding(40, 40, 40, 40);
+                    tv.setPadding(60, 10, 60, 10);
                     tv.setTextColor(Color.BLACK);
                     if (j == 0) {
                         tv.setText("Time");
@@ -254,7 +254,7 @@ public class ListStat extends ActionBarActivity {
                     tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
                             TableRow.LayoutParams.MATCH_PARENT));
                     tv.setBackgroundResource(R.drawable.cell_shape);
-                    tv.setPadding(40, 40, 40, 40);
+                    tv.setPadding(60, 10, 60, 10);
                     tv.setTextColor(Color.BLACK);
                     if (j == 0) {
                         if (trafficStats.get(i).getMinutes() == 0) {
